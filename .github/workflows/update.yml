@@ -70,8 +70,10 @@ jobs:
         timeout-minutes: 20
         run: python src/collector.py
 
+      # 수집이 실패·시간 초과해도 직전 데이터로 화면은 반드시 만든다.
+      # (이 단계가 건너뛰어지면 index.html 없이 배포되어 사이트가 404 가 된다)
       - name: Build Site
-        if: steps.decide.outputs.mode != 'skip'
+        if: steps.decide.outputs.mode != 'skip' && !cancelled()
         run: python src/build_site.py
 
       - name: Commit data
@@ -93,8 +95,12 @@ jobs:
           git status --short | head -20
           echo "::warning::데이터 커밋 push 실패 — 사이트 배포는 계속 진행합니다."
 
-      - name: Upload Pages artifact
+      - name: Check page
         if: steps.decide.outputs.mode != 'skip' && !cancelled()
+        run: test -s docs/index.html || { echo "::error::docs/index.html 이 없어 배포를 중단합니다."; exit 1; }
+
+      - name: Upload Pages artifact
+        if: steps.decide.outputs.mode != 'skip' && !cancelled() && hashFiles('docs/index.html') != ''
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/
