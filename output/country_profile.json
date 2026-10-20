@@ -1,0 +1,3650 @@
+{
+  "generated_at": "2026-10-20T16:48:44+09:00",
+  "countries": [
+    {
+      "region": "한국",
+      "country_ko": "한국",
+      "country_en": "South Korea",
+      "iso3": "KOR",
+      "iso2": "KR",
+      "capital": "서울",
+      "population": "51.6백만 명",
+      "gdp": "2,245.8십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Global Headquarters (Seongnam)",
+        "Daejeon Plant (Daejeon)",
+        "Geumsan Plant (Geumsan)",
+        "Hankook Technodome (Daejeon)",
+        "Hankook Engineering Lab (Daejeon)",
+        "Hankook Technoring (Taean)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "KOR",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "51.615",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "KOR",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2245.847",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "KOR",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중국",
+      "country_ko": "중국",
+      "country_en": "China",
+      "iso3": "CHN",
+      "iso2": "CN",
+      "capital": "베이징",
+      "population": "1,401.7백만 명",
+      "gdp": "21,546.4십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire China Headquarters (Shanghai)",
+        "Jiangsu Plant (Huai'an)",
+        "Jiaxing Plant (Jiaxing)",
+        "Chongqing Plant (Chongqing)",
+        "China Technical Center (Jiaxing)",
+        "11개 영업지사 (전국)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "CHN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "1401.733",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "CHN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "21546.403",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "CHN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "미주",
+      "country_ko": "미국",
+      "country_en": "United States",
+      "iso3": "USA",
+      "iso2": "US",
+      "capital": "워싱턴 D.C.",
+      "population": "342.8백만 명",
+      "gdp": "32,642.4십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "USD 1,257 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire America Corp. (Nashville)",
+        "Tennessee Plant (Clarksville)",
+        "American Technical Center (Uniontown)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "USA",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "342.838",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "USA",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "32642.373",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "USA",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "1257.0",
+          "unit": "월급",
+          "currency": "USD",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "미주",
+      "country_ko": "캐나다",
+      "country_en": "Canada",
+      "iso3": "CAN",
+      "iso2": "CA",
+      "capital": "오타와",
+      "population": "41.4백만 명",
+      "gdp": "2,490.3십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Canada Corp. (Brampton)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "CAN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "41.432",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "CAN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2490.256",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "CAN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "독일",
+      "country_en": "Germany",
+      "iso3": "DEU",
+      "iso2": "DE",
+      "capital": "베를린",
+      "population": "83.3백만 명",
+      "gdp": "5,471.3십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "EUR 2,343 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Europe Headquarters (Neu-Isenburg)",
+        "Europe Technical Center (Hannover)",
+        "Hankook Reifen Deutschland GmbH (Neu-Isenburg)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "DEU",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "83.278",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "DEU",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "5471.299",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "DEU",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "2343.0",
+          "unit": "월급",
+          "currency": "EUR",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "헝가리",
+      "country_en": "Hungary",
+      "iso3": "HUN",
+      "iso2": "HU",
+      "capital": "부다페스트",
+      "population": "9.5백만 명",
+      "gdp": "265.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "HUF 322,800 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hungary Plant (Rácalmás)",
+        "Hankook Tire Budapest Kereskedelmi Kft. (Budapest)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "HUN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "9.536",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "HUN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "265.911",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "HUN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "322800.0",
+          "unit": "월급",
+          "currency": "HUF",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "영국",
+      "country_en": "United Kingdom",
+      "iso3": "GBR",
+      "iso2": "GB",
+      "capital": "런던",
+      "population": "69.8백만 명",
+      "gdp": "4,268.4십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tyre U.K. Ltd. (Daventry)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "GBR",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "69.85",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "GBR",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "4268.446",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "GBR",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 값 없음; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "프랑스",
+      "country_en": "France",
+      "iso3": "FRA",
+      "iso2": "FR",
+      "capital": "파리",
+      "population": "69.1백만 명",
+      "gdp": "3,554.2십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "EUR 1,867 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook France S.A.R.L. (Villeurbanne)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "FRA",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "69.082",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "FRA",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "3554.155",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "FRA",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "1867.0",
+          "unit": "월급",
+          "currency": "EUR",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "이탈리아",
+      "country_en": "Italy",
+      "iso3": "ITA",
+      "iso2": "IT",
+      "capital": "로마",
+      "population": "58.9백만 명",
+      "gdp": "2,701.7십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "법정 최저임금 없음 (단체협약으로 결정)",
+      "sites": [
+        "Hankook Tire Italia S.R.L. (Sesto San Giovanni)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "ITA",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "58.879",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "ITA",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2701.737",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "ITA",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "각국 노동법 기준",
+          "source_url": "",
+          "status": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": "법정 최저임금 없음 — 단체협약으로 결정"
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "스페인",
+      "country_en": "Spain",
+      "iso3": "ESP",
+      "iso2": "ES",
+      "capital": "마드리드",
+      "population": "49.9백만 명",
+      "gdp": "2,085.3십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "EUR 1,425 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook España, S.A. (Madrid)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "ESP",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "49.94",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "ESP",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2085.276",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "ESP",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "1425.0",
+          "unit": "월급",
+          "currency": "EUR",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "네덜란드",
+      "country_en": "Netherlands",
+      "iso3": "NLD",
+      "iso2": "NL",
+      "capital": "암스테르담",
+      "population": "18.1백만 명",
+      "gdp": "1,423.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "EUR 2,338 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Netherlands B.V. (Hoofddorp)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "NLD",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "18.13",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "NLD",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "1423.856",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "NLD",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "2338.0",
+          "unit": "월급",
+          "currency": "EUR",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "폴란드",
+      "country_en": "Poland",
+      "iso3": "POL",
+      "iso2": "PL",
+      "capital": "바르샤바",
+      "population": "36.3백만 명",
+      "gdp": "1,133.1십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "PLN 4,806 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Polska Sp. z o.o. (Warsaw)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "POL",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "36.333",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "POL",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "1133.088",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "POL",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "4806.0",
+          "unit": "월급",
+          "currency": "PLN",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "스웨덴",
+      "country_en": "Sweden",
+      "iso3": "SWE",
+      "iso2": "SE",
+      "capital": "스톡홀름",
+      "population": "10.8백만 명",
+      "gdp": "745.1십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "법정 최저임금 없음 (단체협약으로 결정)",
+      "sites": [
+        "Hankook Tire Sweden AB (Upplands Väsby)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "SWE",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "10.76",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "SWE",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "745.081",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "SWE",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "각국 노동법 기준",
+          "source_url": "",
+          "status": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": "법정 최저임금 없음 — 단체협약으로 결정"
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "러시아",
+      "country_en": "Russia",
+      "iso3": "RUS",
+      "iso2": "RU",
+      "capital": "모스크바",
+      "population": "143.4백만 명",
+      "gdp": "2,861.2십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Rus LLC (Moscow)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "RUS",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "143.394",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "RUS",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2861.156",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "RUS",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "튀르키예",
+      "country_en": "Türkiye",
+      "iso3": "TUR",
+      "iso2": "TR",
+      "capital": "앙카라",
+      "population": "86.2백만 명",
+      "gdp": "1,818.0십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "TRY 33,030 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Lastikleri A.S. (Istanbul)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "TUR",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "86.245",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "TUR",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "1817.987",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "TUR",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "33030.0",
+          "unit": "월급",
+          "currency": "TRY",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "체코",
+      "country_en": "Czechia",
+      "iso3": "CZE",
+      "iso2": "CZ",
+      "capital": "프라하",
+      "population": "10.8백만 명",
+      "gdp": "428.0십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "CZK 22,400 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Ceska Republika s.r.o. (Prague)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "CZE",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "10.803",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "CZE",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "427.953",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "CZE",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "22400.0",
+          "unit": "월급",
+          "currency": "CZK",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "우크라이나",
+      "country_en": "Ukraine",
+      "iso3": "UKR",
+      "iso2": "UA",
+      "capital": "키이우",
+      "population": "32.4백만 명",
+      "gdp": "229.4십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "UAH 8,647 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Ukraine LLC (Kyiv)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "UKR",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "32.423",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "UKR",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "229.406",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "UKR",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "8647.0",
+          "unit": "월급",
+          "currency": "UAH",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "오스트리아",
+      "country_en": "Austria",
+      "iso3": "AUT",
+      "iso2": "AT",
+      "capital": "빈",
+      "population": "9.2백만 명",
+      "gdp": "616.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "법정 최저임금 없음 (단체협약으로 결정)",
+      "sites": [
+        "Hankook Tire Austria GmbH (Schwechat)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "AUT",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "9.205",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "AUT",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "616.896",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "AUT",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "각국 노동법 기준",
+          "source_url": "",
+          "status": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": "법정 최저임금 없음 — 단체협약으로 결정"
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "세르비아",
+      "country_en": "Serbia",
+      "iso3": "SRB",
+      "iso2": "RS",
+      "capital": "베오그라드",
+      "population": "6.5백만 명",
+      "gdp": "111.2십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "RSD 87,207 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire d.o.o. Beograd (Belgrade)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "SRB",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "6.493",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "SRB",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "111.204",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "SRB",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "87207.0",
+          "unit": "월급",
+          "currency": "RSD",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "루마니아",
+      "country_en": "Romania",
+      "iso3": "ROU",
+      "iso2": "RO",
+      "capital": "부쿠레슈티",
+      "population": "19.0백만 명",
+      "gdp": "470.1십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "RON 4,325 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Romania S.R.L. (Bucharest)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "ROU",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "19.0",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "ROU",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "470.091",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "ROU",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "4325.0",
+          "unit": "월급",
+          "currency": "RON",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "모로코",
+      "country_en": "Morocco",
+      "iso3": "MAR",
+      "iso2": "MA",
+      "capital": "라바트",
+      "population": "38.0백만 명",
+      "gdp": "195.6십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Morocco SAS (Casablanca)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "MAR",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "38.05",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "MAR",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "195.632",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "MAR",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "유럽",
+      "country_ko": "크로아티아",
+      "country_en": "Croatia",
+      "iso3": "HRV",
+      "iso2": "HR",
+      "capital": "자그레브",
+      "population": "3.9백만 명",
+      "gdp": "115.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "EUR 1,050 / 월급 (2026-07-01 시행)",
+      "sites": [
+        "Hankook Tire Zagreb d.o.o. (Zagreb)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "HRV",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "3.882",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "HRV",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "115.915",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "HRV",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "1050.0",
+          "unit": "월급",
+          "currency": "EUR",
+          "effective_date": "2026-07-01",
+          "source": "Eurostat (earn_mw_cur)",
+          "source_url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중남미",
+      "country_ko": "멕시코",
+      "country_en": "Mexico",
+      "iso3": "MEX",
+      "iso2": "MX",
+      "capital": "멕시코시티",
+      "population": "134.4백만 명",
+      "gdp": "2,176.2십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire de México S.A. de C.V. (Mexico City)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "MEX",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "134.407",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "MEX",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2176.236",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "MEX",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중남미",
+      "country_ko": "콜롬비아",
+      "country_en": "Colombia",
+      "iso3": "COL",
+      "iso2": "CO",
+      "capital": "보고타",
+      "population": "53.4백만 명",
+      "gdp": "572.7십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Colombia Ltda. (Bogotá)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "COL",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "53.399",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "COL",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "572.735",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "COL",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중남미",
+      "country_ko": "칠레",
+      "country_en": "Chile",
+      "iso3": "CHL",
+      "iso2": "CL",
+      "capital": "산티아고",
+      "population": "20.2백만 명",
+      "gdp": "402.2십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Chile SpA (Santiago)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "CHL",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "20.151",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "CHL",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "402.243",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "CHL",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중남미",
+      "country_ko": "브라질",
+      "country_en": "Brazil",
+      "iso3": "BRA",
+      "iso2": "BR",
+      "capital": "브라질리아",
+      "population": "214.1백만 명",
+      "gdp": "2,654.8십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire do Brasil (São Paulo)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "BRA",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "214.142",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "BRA",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2654.761",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "BRA",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중남미",
+      "country_ko": "파나마",
+      "country_en": "Panama",
+      "iso3": "PAN",
+      "iso2": "PA",
+      "capital": "파나마시티",
+      "population": "4.6백만 명",
+      "gdp": "96.5십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Latin America Distribution Center S.A. (Panama City)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "PAN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "4.621",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "PAN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "96.471",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "PAN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "인도네시아",
+      "country_en": "Indonesia",
+      "iso3": "IDN",
+      "iso2": "ID",
+      "capital": "자카르타",
+      "population": "287.2백만 명",
+      "gdp": "1,480.0십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Indonesia Plant (Cikarang)",
+        "PT. Hankook Tire Sales Indonesia (Jakarta)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "IDN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "287.198",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "IDN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "1479.954",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "IDN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "일본",
+      "country_en": "Japan",
+      "iso3": "JPN",
+      "iso2": "JP",
+      "capital": "도쿄",
+      "population": "122.7백만 명",
+      "gdp": "4,342.0십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Japan Corp. (Osaka)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "JPN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "122.656",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "JPN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "4341.986",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "JPN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "호주",
+      "country_en": "Australia",
+      "iso3": "AUS",
+      "iso2": "AU",
+      "capital": "캔버라",
+      "population": "28.1백만 명",
+      "gdp": "2,110.7십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tyre Australia Pty. Ltd. (Sydney)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "AUS",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "28.078",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "AUS",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "2110.657",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "AUS",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "말레이시아",
+      "country_en": "Malaysia",
+      "iso3": "MYS",
+      "iso2": "MY",
+      "capital": "쿠알라룸푸르",
+      "population": "34.2백만 명",
+      "gdp": "547.1십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Malaysia Sdn. Bhd. (Kuala Lumpur)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "MYS",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "34.234",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "MYS",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "547.1",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "MYS",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "태국",
+      "country_en": "Thailand",
+      "iso3": "THA",
+      "iso2": "TH",
+      "capital": "방콕",
+      "population": "71.6백만 명",
+      "gdp": "599.1십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Thailand Co., Ltd. (Bangkok)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "THA",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "71.56",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "THA",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "599.115",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "THA",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "베트남",
+      "country_en": "Vietnam",
+      "iso3": "VNM",
+      "iso2": "VN",
+      "capital": "하노이",
+      "population": "103.1백만 명",
+      "gdp": "542.1십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Vietnam Co., Ltd. (Ho Chi Minh City)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "VNM",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "103.077",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "VNM",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "542.13",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "VNM",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "대만",
+      "country_en": "Taiwan",
+      "iso3": "TWN",
+      "iso2": "TW",
+      "capital": "타이베이",
+      "population": "23.2백만 명",
+      "gdp": "1,019.6십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Taiwan Co., Ltd. (Taipei)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "TWN",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "23.198",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "TWN",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "1019.596",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "TWN",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "아태",
+      "country_ko": "싱가포르",
+      "country_en": "Singapore",
+      "iso3": "SGP",
+      "iso2": "SG",
+      "capital": "싱가포르",
+      "population": "6.1백만 명",
+      "gdp": "667.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "법정 최저임금 없음 (업종별 점진임금모델(PWM) 적용)",
+      "sites": [
+        "Hankook Tire Singapore Pte. Ltd. (Singapore)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "SGP",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "6.121",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "SGP",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "667.889",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "SGP",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "각국 노동법 기준",
+          "source_url": "",
+          "status": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": "법정 최저임금 없음 — 업종별 점진임금모델(PWM) 적용"
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중아",
+      "country_ko": "아랍에미리트",
+      "country_en": "United Arab Emirates",
+      "iso3": "ARE",
+      "iso2": "AE",
+      "capital": "아부다비",
+      "population": "11.6백만 명",
+      "gdp": "661.0십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "법정 최저임금 없음 (자국민 대상 기준만 있음)",
+      "sites": [
+        "Hankook Tire Middle East & Africa FZE (Dubai)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "ARE",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "11.575",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "ARE",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "661.018",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "ARE",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "각국 노동법 기준",
+          "source_url": "",
+          "status": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": "법정 최저임금 없음 — 자국민 대상 기준만 있음"
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중아",
+      "country_ko": "이집트",
+      "country_en": "Egypt",
+      "iso3": "EGY",
+      "iso2": "EG",
+      "capital": "카이로",
+      "population": "110.1백만 명",
+      "gdp": "442.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire and Technology Egypt LLC (Cairo)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "EGY",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "110.058",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "EGY",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "442.886",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "EGY",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중아",
+      "country_ko": "사우디아라비아",
+      "country_en": "Saudi Arabia",
+      "iso3": "SAU",
+      "iso2": "SA",
+      "capital": "리야드",
+      "population": "36.7백만 명",
+      "gdp": "1,343.3십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "법정 최저임금 없음 (자국민 대상 기준만 있음)",
+      "sites": [
+        "Hankook Tire Co., Ltd. Jeddah Office (Jeddah)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "SAU",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "36.726",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "SAU",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "1343.346",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "SAU",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "각국 노동법 기준",
+          "source_url": "",
+          "status": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": "법정 최저임금 없음 — 자국민 대상 기준만 있음"
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    },
+    {
+      "region": "중아",
+      "country_ko": "카자흐스탄",
+      "country_en": "Kazakhstan",
+      "iso3": "KAZ",
+      "iso2": "KZ",
+      "capital": "아스타나",
+      "population": "20.6백만 명",
+      "gdp": "397.9십억 USD",
+      "inflation": "-",
+      "unemployment": "-",
+      "min_wage": "-",
+      "sites": [
+        "Hankook Tire Co., Ltd. Almaty Office (Almaty)"
+      ],
+      "details": {
+        "population": {
+          "iso3": "KAZ",
+          "indicator": "population",
+          "base_year": "2026",
+          "value": "20.606",
+          "unit": "백만 명",
+          "currency": "",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "gdp": {
+          "iso3": "KAZ",
+          "indicator": "gdp",
+          "base_year": "2026",
+          "value": "397.921",
+          "unit": "십억",
+          "currency": "USD",
+          "effective_date": "2026",
+          "source": "IMF WEO",
+          "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO",
+          "status": "정상",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "min_wage": {
+          "iso3": "KAZ",
+          "indicator": "min_wage",
+          "base_year": "2026",
+          "value": "",
+          "unit": "",
+          "currency": "",
+          "effective_date": "",
+          "source": "",
+          "source_url": "",
+          "status": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+          "collected_at": "2026-10-20 16:48:22",
+          "region": "",
+          "note": ""
+        },
+        "inflation": {
+          "status": "데이터 없음"
+        },
+        "unemployment": {
+          "status": "데이터 없음"
+        }
+      }
+    }
+  ],
+  "review": [
+    {
+      "iso3": "KOR",
+      "국가": "한국",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "KOR",
+      "국가": "한국",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "KOR",
+      "국가": "한국",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CHN",
+      "국가": "중국",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CHN",
+      "국가": "중국",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CHN",
+      "국가": "중국",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "USA",
+      "국가": "미국",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "USA",
+      "국가": "미국",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CAN",
+      "국가": "캐나다",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CAN",
+      "국가": "캐나다",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CAN",
+      "국가": "캐나다",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "DEU",
+      "국가": "독일",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "DEU",
+      "국가": "독일",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "HUN",
+      "국가": "헝가리",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "HUN",
+      "국가": "헝가리",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "GBR",
+      "국가": "영국",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 값 없음; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "GBR",
+      "국가": "영국",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "GBR",
+      "국가": "영국",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "FRA",
+      "국가": "프랑스",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "FRA",
+      "국가": "프랑스",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ITA",
+      "국가": "이탈리아",
+      "항목": "최저임금",
+      "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+      "값": "법정 최저임금 없음 (단체협약으로 결정)",
+      "출처": "각국 노동법 기준",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ITA",
+      "국가": "이탈리아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ITA",
+      "국가": "이탈리아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ESP",
+      "국가": "스페인",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ESP",
+      "국가": "스페인",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "NLD",
+      "국가": "네덜란드",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "NLD",
+      "국가": "네덜란드",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "POL",
+      "국가": "폴란드",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "POL",
+      "국가": "폴란드",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SWE",
+      "국가": "스웨덴",
+      "항목": "최저임금",
+      "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+      "값": "법정 최저임금 없음 (단체협약으로 결정)",
+      "출처": "각국 노동법 기준",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SWE",
+      "국가": "스웨덴",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SWE",
+      "국가": "스웨덴",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "RUS",
+      "국가": "러시아",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "RUS",
+      "국가": "러시아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "RUS",
+      "국가": "러시아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "TUR",
+      "국가": "튀르키예",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "TUR",
+      "국가": "튀르키예",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CZE",
+      "국가": "체코",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CZE",
+      "국가": "체코",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "UKR",
+      "국가": "우크라이나",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "UKR",
+      "국가": "우크라이나",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "AUT",
+      "국가": "오스트리아",
+      "항목": "최저임금",
+      "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+      "값": "법정 최저임금 없음 (단체협약으로 결정)",
+      "출처": "각국 노동법 기준",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "AUT",
+      "국가": "오스트리아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "AUT",
+      "국가": "오스트리아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SRB",
+      "국가": "세르비아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SRB",
+      "국가": "세르비아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ROU",
+      "국가": "루마니아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ROU",
+      "국가": "루마니아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MAR",
+      "국가": "모로코",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MAR",
+      "국가": "모로코",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MAR",
+      "국가": "모로코",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "HRV",
+      "국가": "크로아티아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "HRV",
+      "국가": "크로아티아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MEX",
+      "국가": "멕시코",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MEX",
+      "국가": "멕시코",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MEX",
+      "국가": "멕시코",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "COL",
+      "국가": "콜롬비아",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "COL",
+      "국가": "콜롬비아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "COL",
+      "국가": "콜롬비아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CHL",
+      "국가": "칠레",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CHL",
+      "국가": "칠레",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "CHL",
+      "국가": "칠레",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "BRA",
+      "국가": "브라질",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "BRA",
+      "국가": "브라질",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "BRA",
+      "국가": "브라질",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "PAN",
+      "국가": "파나마",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "PAN",
+      "국가": "파나마",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "PAN",
+      "국가": "파나마",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "IDN",
+      "국가": "인도네시아",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "IDN",
+      "국가": "인도네시아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "IDN",
+      "국가": "인도네시아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "JPN",
+      "국가": "일본",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "JPN",
+      "국가": "일본",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "JPN",
+      "국가": "일본",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "AUS",
+      "국가": "호주",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "AUS",
+      "국가": "호주",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "AUS",
+      "국가": "호주",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MYS",
+      "국가": "말레이시아",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MYS",
+      "국가": "말레이시아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "MYS",
+      "국가": "말레이시아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "THA",
+      "국가": "태국",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "THA",
+      "국가": "태국",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "THA",
+      "국가": "태국",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "VNM",
+      "국가": "베트남",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "VNM",
+      "국가": "베트남",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "VNM",
+      "국가": "베트남",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "TWN",
+      "국가": "대만",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "TWN",
+      "국가": "대만",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "TWN",
+      "국가": "대만",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SGP",
+      "국가": "싱가포르",
+      "항목": "최저임금",
+      "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+      "값": "법정 최저임금 없음 (업종별 점진임금모델(PWM) 적용)",
+      "출처": "각국 노동법 기준",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SGP",
+      "국가": "싱가포르",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SGP",
+      "국가": "싱가포르",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ARE",
+      "국가": "아랍에미리트",
+      "항목": "최저임금",
+      "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+      "값": "법정 최저임금 없음 (자국민 대상 기준만 있음)",
+      "출처": "각국 노동법 기준",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ARE",
+      "국가": "아랍에미리트",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "ARE",
+      "국가": "아랍에미리트",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "EGY",
+      "국가": "이집트",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "EGY",
+      "국가": "이집트",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "EGY",
+      "국가": "이집트",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SAU",
+      "국가": "사우디아라비아",
+      "항목": "최저임금",
+      "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
+      "값": "법정 최저임금 없음 (자국민 대상 기준만 있음)",
+      "출처": "각국 노동법 기준",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SAU",
+      "국가": "사우디아라비아",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "SAU",
+      "국가": "사우디아라비아",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "KAZ",
+      "국가": "카자흐스탄",
+      "항목": "최저임금",
+      "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "KAZ",
+      "국가": "카자흐스탄",
+      "항목": "인플레이션",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    },
+    {
+      "iso3": "KAZ",
+      "국가": "카자흐스탄",
+      "항목": "실업률",
+      "상태": "데이터 없음",
+      "값": "-",
+      "출처": "",
+      "출처 URL": ""
+    }
+  ]
+}
