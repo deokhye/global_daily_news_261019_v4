@@ -87,7 +87,8 @@
   .row-2 { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
   .row-2 > .main-col { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
   .row-2 > .side-col { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
-  .half { flex: 1 1 520px; }
+  .half { flex: 1 1 400px; }
+  .col-half { flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
 
   .orgs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 10px; }
   .org { text-align: left; cursor: pointer; border-radius: 14px; padding: 12px 14px; min-height: 64px; color: var(--text);
@@ -403,27 +404,36 @@
         '<span class="l"><span>' + o.count + '개국</span>' + (o.alerts ? '<span class="badge b-red" title="현지 안전 동향 국가 수">⚠ ' + o.alerts + '</span>' : '') + '</span></button>';
     }).join('') + '</section>';
 
-    h += '<div class="row-2">';
-    h += '<section class="card half" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
+    // '전체': 왼쪽 = 안전 / 오른쪽 = HR + 그 아래 글로벌 동향
+    // 조직 선택: 안전·HR 2열 + 글로벌 동향 하단(전체 폭)
+    var wide = state.org === 'ALL';
+    var cardCls = wide ? 'card' : 'card half';
+    var sec = '';
+    sec += '<section class="' + cardCls + '" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5H2.5z"></path><path d="M12 10v4M12 17.5v.01"></path></svg>' +
       '현지 안전 동향 <span class="count" style="color:#fff;background:#B91C1C">' + safety.length + '</span></h2>' +
       '<span class="note">국가별 주요 안전 보도</span></div>';
-    h += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
+    sec += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
       : '<p class="empty">선택한 조직에는 오늘 주요 안전 보도가 없습니다.</p>';
-    h += '</section>';
-    h += '<section class="card half" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
+    sec += '</section>';
+    var safetyHtml = sec; sec = '';
+    sec += '<section class="' + cardCls + '" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
       'HR·노동 주요 소식 <span class="count b-law">' + hr.length + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
-    h += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
+    sec += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
       : '<p class="empty">선택한 조직에는 새 HR·노동 소식이 없습니다.</p>';
-    h += '</section></div>';
+    sec += '</section>';
+    var hrHtml = sec; sec = '';
 
     var gi = realItems(DASHBOARD.global_industry);
-    h += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
-    h += gi.length ? '<div class="grid-2">' + gi.map(function (i) {
+    sec += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
+    sec += gi.length ? '<div class="' + (wide ? 'gi-list' : 'grid-2') + '">' + gi.map(function (i) {
       return articleLink(i, metaLine(i, '<span class="badge b-ind">' + esc(i.tag || '완성차') + '</span>') + '<span class="ttl sm">' + esc(i.title) + '</span>');
     }).join('') + '</div>' : '<p class="empty">수집된 글로벌 동향이 없습니다.</p>';
-    h += '</section>';
+    sec += '</section>';
+    h += wide
+      ? '<div class="row-2"><div class="col-half">' + safetyHtml + '</div><div class="col-half">' + hrHtml + sec + '</div></div>'
+      : '<div class="row-2">' + safetyHtml + hrHtml + '</div>' + sec;
     document.getElementById('main').innerHTML = h;
   }
 
