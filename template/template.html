@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global HR Insight</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --bg: #F4F5F7; --card: #FFFFFF; --line: #E2E8F0; --line-soft: #F1F5F9;
+    --text: #1E293B; --sub: #475569; --muted: #64748B;
+    --accent: #C2410C; --accent-dark: #9A3412; --accent-bg: #FFF7ED; --accent-line: #FED7AA;
+    --red: #B91C1C; --red-bg: #FEE2E2; --amber: #92400E; --amber-bg: #FEF3C7;
+    --indigo: #3730A3; --indigo-bg: #E0E7FF; --up: #B91C1C; --down: #1D4ED8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-dark); text-decoration: underline; }
+  button { font-family: inherit; }
+  .hidden { display: none !important; }
+  .wrap { max-width: 1360px; margin: 0 auto; padding: 0 24px; }
+
+  header.top { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+  .top-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 14px 24px; }
+  .brand { display: flex; align-items: center; gap: 12px; flex: 1 1 320px; }
+  .brand-mark { width: 40px; height: 40px; border-radius: 12px; background: #FFF0E6; display: flex; align-items: center; justify-content: center; }
+  .brand h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
+  .brand p { margin: 0; font-size: 12px; color: var(--muted); }
+  .date-box { display: flex; align-items: center; gap: 8px; }
+  .date-box label { font-size: 12px; color: var(--sub); font-weight: 700; }
+  .date-box input { height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px; font-size: 14px; font-family: inherit; }
+  .date-box.loading { opacity: .5; pointer-events: none; }
+  nav.tabs { display: flex; gap: 4px; }
+  nav.tabs a { padding: 12px 18px; font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 3px solid transparent; }
+  nav.tabs a:hover { text-decoration: none; color: var(--text); }
+  nav.tabs a.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
+
+  .picker { border-top: 1px solid var(--line-soft); background: #FBFBFC; }
+  .picker-inner { padding-top: 10px; padding-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .picker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .pill { min-height: 36px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer;
+          border: 1px solid var(--line); background: #fff; color: var(--sub); }
+  .pill[aria-pressed="true"] { border-color: var(--accent-dark); background: var(--accent-dark); color: #fff; }
+  .picker-current { font-size: 14px; color: var(--sub); margin-left: 8px; }
+  .picker-toggle { margin-left: auto; min-height: 36px; padding: 0 14px; border: 1px solid #CBD5E1; background: #fff; border-radius: 9px;
+                   font-size: 13px; font-weight: 700; color: #334155; cursor: pointer; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 999px; font-size: 13px;
+          cursor: pointer; border: 1px solid var(--line); background: #fff; color: #334155; }
+  .chip img { width: 18px; height: 13px; object-fit: cover; border-radius: 2px; }
+  .chip .tier { font-size: 10px; font-weight: 900; border-radius: 4px; padding: 0 4px; background: #FFEDD5; color: var(--accent-dark); }
+  .chip[aria-pressed="true"] { border-color: var(--text); background: var(--text); color: #fff; font-weight: 700; }
+  .chip[aria-pressed="true"] .tier { background: rgba(255,255,255,.2); color: #FFEDD5; }
+
+  /* .wrap(class)의 padding 단축 속성보다 우선하도록 id 선택자로 지정 */
+  #main { padding-top: 24px; padding-bottom: 18px; }
+  main { display: flex; flex-direction: column; gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; min-width: 0; }
+  .card h2 { margin: 0; font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+  .card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .note { font-size: 12px; color: var(--muted); }
+  .count { font-size: 13px; font-weight: 700; border-radius: 999px; padding: 1px 9px; }
+  .empty { margin: 12px 0 0; font-size: 14px; color: var(--muted); }
+  .page-title { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .page-title h2 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
+
+  .item { display: block; padding: 13px 0; border-bottom: 1px solid var(--line-soft); color: var(--text); }
+  .item:last-child { border-bottom: 0; }
+  .item.old { opacity: .6; }
+  .item.old:hover { opacity: 1; }
+  a.item:hover { text-decoration: none; background: var(--accent-bg); border-radius: 10px; margin: 0 -10px; padding-left: 10px; padding-right: 10px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }
+  .meta .src { font-weight: 700; color: var(--sub); }
+  .ttl { display: block; font-size: 15px; font-weight: 700; line-height: 1.5; margin-top: 4px; color: var(--text); }
+  .ttl.sm { font-size: 14px; }
+  a.ttl:hover { color: var(--accent); }
+  .badge { font-size: 12px; font-weight: 700; border-radius: 6px; padding: 1px 8px; }
+  .b-law { color: var(--indigo); background: var(--indigo-bg); }
+  .b-red { color: var(--red); background: var(--red-bg); }
+  .b-amber { color: var(--amber); background: var(--amber-bg); }
+  .b-ind { color: var(--accent-dark); background: #FFEDD5; }
+  .b-tr { border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; font-size: 11px; color: var(--muted); }
+  .ctry-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; font-size: 14px; color: var(--text); cursor: pointer; }
+  .ctry-link:hover { color: var(--accent); text-decoration: underline; }
+  .row-2 { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  .row-2 > .main-col { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+  .row-2 > .side-col { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+  .half { flex: 1 1 520px; }
+
+  .orgs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 10px; }
+  .org { text-align: left; cursor: pointer; border-radius: 14px; padding: 12px 14px; min-height: 64px; color: var(--text);
+         border: 1px solid var(--line); background: #fff; }
+  .org[aria-pressed="true"] { border: 2px solid var(--accent-dark); background: var(--accent-bg); }
+  .org b { display: block; font-size: 14px; }
+  .org span.l { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-top: 4px; font-size: 13px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+
+  .overview { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .overview .flag { width: 48px; height: 34px; object-fit: cover; border-radius: 5px; border: 1px solid var(--line); }
+  .overview .eyebrow { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .overview h2 { font-size: 26px; letter-spacing: -0.02em; }
+  .overview dl { flex: 1 1 420px; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 14px; }
+  .overview dl div { display: flex; gap: 6px; }
+  .overview dt { color: var(--muted); }
+  .overview dd { margin: 0; font-weight: 700; }
+  .sites { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  .sites .lbl { font-size: 13px; font-weight: 900; color: var(--accent-dark); margin-right: 4px; }
+  .site { display: inline-flex; align-items: baseline; gap: 6px; background: var(--accent-bg); border: 1px solid var(--accent-line);
+          border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+  .site b { font-weight: 700; }
+  .site span { color: var(--muted); }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .kpi { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 20px; min-width: 0; }
+  .kpi .k { font-size: 13px; color: var(--muted); font-weight: 700; }
+  .kpi .v { font-size: 28px; font-weight: 900; margin-top: 4px; line-height: 1.2; word-break: keep-all; }
+  .kpi .v small { font-size: 15px; font-weight: 700; }
+  .kpi .v.long { font-size: 20px; }
+  .kpi .d { font-size: 13px; font-weight: 700; color: var(--sub); margin-top: 2px; }
+  .kpi .s { font-size: 12px; color: var(--sub); margin-top: 8px; }
+  .kpi svg { display: block; margin-top: 6px; }
+  .kpi table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+  .kpi td { padding: 3px 0; } .kpi td:last-child { text-align: right; font-weight: 700; }
+  .calc { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .calc label { font-size: 14px; font-weight: 700; color: var(--sub); }
+  .calc input { width: 160px; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px; font-size: 15px; font-weight: 700; font-family: inherit; }
+  .calc .res { font-size: 20px; font-weight: 900; color: var(--accent-dark); }
+  .calc .basis { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--line-soft); padding: 4px; border-radius: 12px; }
+  .seg button { min-height: 38px; padding: 0 14px; border: 0; border-radius: 9px; font-size: 14px; cursor: pointer; background: transparent; color: var(--sub); }
+  .seg button[aria-selected="true"] { background: #fff; color: var(--accent-dark); font-weight: 700; box-shadow: 0 1px 3px rgba(15,23,42,.12); }
+  .seg .n { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .off-list { margin: 0; padding: 0; list-style: none; }
+  .off-list li { border-bottom: 1px solid var(--line-soft); }
+  .off-list li:last-child { border-bottom: 0; }
+  .off-list a { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text); }
+  .off-list a b { font-weight: 700; }
+  .off-list a span { color: var(--muted); text-align: right; }
+
+  #toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 50; background: var(--text); color: #fff;
+           padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.25); max-width: 90vw; }
+  #fatal { background: var(--red); color: #fff; text-align: center; padding: 8px 16px; font-size: 14px; font-weight: 600; }
+  footer { border-top: 1px solid var(--line); background: #fff; padding: 24px 0 28px; line-height: 1.6; text-align: center; font-size: 12px; color: var(--muted); }
+
+  @media (max-width: 1100px) {
+    .orgs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .wrap, .top-row { padding-left: 16px; padding-right: 16px; }
+    .orgs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kpis, .grid-2 { grid-template-columns: minmax(0, 1fr); }
+    .card { padding: 18px; }
+    .calc .basis { margin-left: 0; }
+    header.top { position: static; }
+  }
+</style>
+</head>
+<body>
+<div id="fatal" class="hidden">대시보드 데이터를 불러오지 못했습니다. data/countries_data.json 이 올바르게 생성되었는지 확인해주세요.</div>
+<div id="toast" class="hidden" role="status" aria-live="polite"></div>
+
+<header class="top">
+  <div class="top-row" style="max-width:1360px;margin:0 auto">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+      </div>
+      <div>
+        <h1>Global HR Insight</h1>
+        <p>한국타이어 39개국 HR·현지 정세 데일리 브리핑</p>
+      </div>
+    </div>
+    <div class="date-box" id="date-box">
+      <label for="briefDatePicker">일자</label>
+      <input type="date" id="briefDatePicker" value="{{ generated_at_date }}" min="{{ archive_min_date }}" max="{{ archive_max_date }}">
+    </div>
+  </div>
+  <div class="wrap">
+    <nav class="tabs" aria-label="주요 화면">
+      <a href="#/briefing" id="tab-briefing">오늘의 브리핑</a>
+      <a href="#/country" id="tab-country">국가 상세</a>
+    </nav>
+  </div>
+</header>
+<div class="picker hidden" id="picker">
+    <div class="wrap picker-inner">
+      <div class="picker-row">
+        <div class="picker-row" role="group" aria-label="권역" id="region-tabs"></div>
+        <span class="picker-current hidden" id="picker-current"></span>
+        <button type="button" class="picker-toggle" id="picker-toggle" aria-expanded="true">국가 목록 접기 ▴</button>
+      </div>
+      <div class="chips" role="group" aria-label="국가" id="country-chips"></div>
+    </div>
+  </div>
+
+<main class="wrap" id="main"></main>
+
+<footer>
+  <div>© Hankook Tire &amp; Technology - Global HR Team · 매일 오전 6시(KST) 수집</div>
+  <div id="sync-display-text" style="margin-top: 6px;">{{ as_of_display }}</div>
+</footer>
+
+<script id="dashboard-data" type="application/json">{{ dashboard_json|safe }}</script>
+<script>
+(function () {
+  'use strict';
+  var INITIAL_DATE = "{{ generated_at_date }}";
+  var ARCHIVE_MIN_DATE = "{{ archive_min_date }}";
+  var HIERARCHY = ['KR', 'US', 'DE', 'CN', 'HU', 'ID'];
+  var TIER = { KR: 'HQ', US: '본부', DE: '본부', CN: '본부', HU: '공장', ID: '공장' };
+  var NEWS_TABS = [{ id: 'pol', label: '정치·경제' }, { id: 'soc', label: '사회·문화' }, { id: 'safe', label: '안전·재난' }];
+  // 현지 안전 동향 분류 (서로 겹치지 않는 5개). 앞의 3개는 빨강, 뒤의 2개는 주황 배지
+  var SAFETY_RED = { '무력충돌·테러': 1, '자연재해': 1, '대형사고': 1 };
+  // 과거 데이터의 옛 태그를 새 분류로 변환
+  var SAFETY_TAG_MAP = { '지진': '자연재해', '무력충돌': '무력충돌·테러', '테러·치안': '무력충돌·테러', '시위·소요': '사회불안', '환경·보건': '보건·환경' };
+  function normTag(t) { return SAFETY_TAG_MAP[t] || t || ''; }
+  // 브리핑에서 국가별 1건만 고를 때의 중요도 순서 (앞일수록 중요)
+  var SAFETY_PRIORITY = ['무력충돌·테러', '자연재해', '대형사고', '사회불안', '보건·환경'];
+  var KR_PANEL = [['US', '1 USD'], ['DE', '1 EUR'], ['CN', '1 CNY']];
+  var FALLBACK_TITLE = '현지 산업 및 정책 모니터링 중';
+
+  // ------------------------------------------------------------- data
+  var DASHBOARD, REGIONS, COUNTRIES;
+  try {
+    DASHBOARD = JSON.parse(document.getElementById('dashboard-data').textContent);
+    REGIONS = (DASHBOARD.regions || []).filter(function (r) { return r && r.key; });
+    COUNTRIES = DASHBOARD.countries || [];
+    if (!COUNTRIES.length) throw new Error('countries 비어 있음');
+  } catch (err) {
+    console.error(err);
+    document.getElementById('fatal').classList.remove('hidden');
+    return;
+  }
+  var INITIAL_DASHBOARD = DASHBOARD;
+  var currentDate = INITIAL_DATE;
+
+  // ------------------------------------------------------------- utils
+  function esc(v) {
+    return String(v === null || v === undefined ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function safeUrl(u) {
+    try { var x = new URL(String(u || ''), location.href); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : '#'; }
+    catch (e) { return '#'; }
+  }
+  function safeFlag(f) { return /^[a-z]{2}$/.test(String(f || '')) ? f : 'un'; }
+  function fmtDate(d) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || '')); return m ? m[2] + '.' + m[3] : ''; }
+  // 기사 날짜를 보고 있는 날짜(currentDate) 기준 '오늘 / 어제 / N일 전'으로 표시 (7일 이상이면 월.일)
+  function daysAgo(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || '')); if (!m) return null;
+    var a = Date.UTC(+m[1], +m[2] - 1, +m[3]);
+    var b = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(currentDate || '')); if (!b) return null;
+    return Math.round((Date.UTC(+b[1], +b[2] - 1, +b[3]) - a) / 86400000);
+  }
+  function relDate(d) {
+    var n = daysAgo(d);
+    if (n === null) return '';
+    if (n <= 0) return '오늘';
+    if (n === 1) return '어제';
+    if (n < 7) return n + '일 전';
+    return fmtDate(d);
+  }
+  function byNewest(a, b) { return String(b.published || '').localeCompare(String(a.published || '')); }
+  function isOld(i) { var n = daysAgo(i.published); return n !== null && n >= 7; }
+  function autoDec(n) { var a = Math.abs(n); return a >= 100 ? 1 : (a >= 10 ? 2 : 3); }
+  function fmtNum(v, d) {
+    var n = Number(v); if (v === null || v === undefined || !isFinite(n)) return '-';
+    var k = (typeof d === 'number') ? d : autoDec(n);
+    return n.toLocaleString('ko-KR', { minimumFractionDigits: k, maximumFractionDigits: k });
+  }
+  function storeGet(k, dflt) { try { var v = localStorage.getItem(k); return v === null ? dflt : v; } catch (e) { return dflt; } }
+  function storeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 저장 불가 환경은 무시 */ } }
+  function toast(msg) {
+    var t = document.getElementById('toast'); t.textContent = msg; t.classList.remove('hidden');
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.add('hidden'); }, 3600);
+  }
+  function rank(code) { var i = HIERARCHY.indexOf(code); return i === -1 ? HIERARCHY.length : i; }
+  function sorted(list) {
+    return list.slice().sort(function (a, b) {
+      var d = rank(a.code) - rank(b.code); return d || String(a.name_kr || '').localeCompare(String(b.name_kr || ''), 'ko-KR');
+    });
+  }
+  function regionLabel(key) { var r = REGIONS.find(function (x) { return x.key === key; }); return r ? r.label : key; }
+  function byCode(code) { return COUNTRIES.find(function (c) { return c.code === code; }); }
+  // 연예·가십 기사 숨김 (수집 단계에서도 거르지만, 이미 수집된 과거 데이터에도 적용)
+  var GOSSIP = /연예|아이돌|걸그룹|보이그룹|가수|드라마|예능|열애|결혼식|이혼|컴백|앨범|뮤직비디오|데뷔|소속사|방송인|유튜버|인플루언서|셀럽|스캔들|팬미팅|콘서트|오디션|(^|[^가-힣])배우(?![다고며는기])|celebrit|\bsinger\b|\bactor\b|\bactress\b|k-?pop|\bidol\b|girl group|boy band|\balbum\b|\bconcert\b|reality (show|tv)|\bdating\b|divorce|\bwedding\b|box office|\brapper\b|influencer|red carpet|gossip|love is blind|kardashian/i;
+  function realItems(list) {
+    return (Array.isArray(list) ? list : []).filter(function (i) {
+      return i && i.title && !i.is_fallback && i.title !== FALLBACK_TITLE &&
+        !GOSSIP.test(i.title) && !GOSSIP.test(i.original_title || '');
+    });
+  }
+  function trend(c, cat) {
+    var t = (c.hr_trends || []).find(function (x) { return x && x.category === cat; });
+    return realItems(t ? t.items : []);
+  }
+  function news(c) {
+    var n = c.news;
+    if (!n) n = { pol: c.headlines, soc: [], safe: [] };   // 구버전 아카이브 호환
+    return { pol: realItems(n.pol), soc: realItems(n.soc), safe: realItems(n.safe) };
+  }
+  function trBadge(i) { return i.translated ? '<span class="b-tr" title="원문: ' + esc(i.original_title || '') + '">자동번역</span>' : ''; }
+  function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
+  function articleLink(i, inner) {
+    return '<a class="item' + (isOld(i) ? ' old' : '') + '" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>';
+  }
+  function metaLine(i, extra) {
+    return '<div class="meta"><span class="src">' + esc(i.source || '') + '</span><span>' + relDate(i.published) + '</span>' + (extra || '') + trBadge(i) + '</div>';
+  }
+
+  // ------------------------------------------------------------- state & routing
+  var state = {
+    view: 'briefing',
+    org: 'ALL',
+    code: (byCode('KR') || COUNTRIES[0]).code,
+    pickRegion: null,
+    tab: 'pol',
+    amount: '1',
+    pickerOpen: storeGet('ghr.pickerOpen', '1') === '1'
+  };
+  function readHash() {
+    var m = /^#\/country(?:\/([A-Z]{2}))?(?:\/(pol|soc|safe))?/.exec(location.hash || '');
+    if (m) {
+      state.view = 'country';
+      if (m[1] && byCode(m[1])) {
+        var nc = byCode(m[1]);
+        if (state.pickRegion !== 'ALL' && state.pickRegion !== nc.region) state.pickRegion = null;
+        state.code = m[1];
+      }
+      state.tab = m[2] || 'pol';
+    } else {
+      state.view = 'briefing';
+    }
+  }
+  function go(code, tab) { location.hash = '#/country/' + code + (tab ? '/' + tab : ''); }
+  window.addEventListener('hashchange', function () { readHash(); render(); window.scrollTo(0, 0); });
+
+  function render() {
+    document.getElementById('tab-briefing').classList.toggle('active', state.view === 'briefing');
+    document.getElementById('tab-country').classList.toggle('active', state.view === 'country');
+    document.getElementById('tab-country').setAttribute('href', '#/country/' + state.code);
+    document.getElementById('picker').classList.toggle('hidden', state.view !== 'country');
+    if (state.view === 'country') { renderPicker(); renderCountry(); } else { renderBriefing(); }
+  }
+
+  // ------------------------------------------------------------- 오늘의 브리핑
+  function scopeCountries() {
+    return state.org === 'ALL' ? COUNTRIES : COUNTRIES.filter(function (c) { return c.region === state.org; });
+  }
+  function groupByLink(rows) {
+    var map = {}, out = [];
+    rows.forEach(function (r) {
+      var key = String(r.item.link || r.item.title || '').toLowerCase();
+      if (!map[key]) { map[key] = { item: r.item, countries: [] }; out.push(map[key]); }
+      if (map[key].countries.indexOf(r.country) === -1) map[key].countries.push(r.country);
+    });
+    return out;
+  }
+  function countryButtons(list, tab) {
+    var shown = list.slice(0, 3).map(function (c) {
+      return '<button type="button" class="ctry-link" data-go="' + esc(c.code) + '" data-gotab="' + (tab || '') + '">' + esc(c.name_kr) + '</button>';
+    }).join('<span aria-hidden="true">·</span>');
+    return shown + (list.length > 3 ? ' <span class="note">외 ' + (list.length - 3) + '개국</span>' : '');
+  }
+  function feedRow(g, badges, tab) {
+    var i = g.item;
+    return '<div class="item"><div class="meta">' + countryButtons(g.countries, tab) + badges + '</div>' +
+      '<a class="ttl sm" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer">' + esc(i.title) + '</a>' +
+      '<div class="meta"><span class="src">' + esc(i.source || '') + '</span><span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
+  }
+  function renderBriefing() {
+    var scope = scopeCountries();
+    // 국가별로 그날 가장 중요한 1건만: 안전은 심각도 → 최신순, HR은 법·제도 → 최신순
+    var newer = function (a, b) { return String(b.published || '').localeCompare(String(a.published || '')); };
+    var sevRank = function (i) { var k = SAFETY_PRIORITY.indexOf(normTag(i.safety_tag)); return k === -1 ? SAFETY_PRIORITY.length : k; };
+    var safetyRows = [], hrRows = [];
+    scope.forEach(function (c) {
+      var s = news(c).safe.slice().sort(function (a, b) { return sevRank(a) - sevRank(b) || newer(a, b); })[0];
+      if (s) safetyRows.push({ item: s, country: c });
+      var r = trend(c, 'HR & LABOR').slice().sort(function (a, b) { return (b.law ? 1 : 0) - (a.law ? 1 : 0) || newer(a, b); })[0];
+      if (r) hrRows.push({ item: r, country: c });
+    });
+    var byDate = function (a, b) { return newer(a.item, b.item); };
+    var safety = groupByLink(safetyRows).sort(function (a, b) { return sevRank(a.item) - sevRank(b.item) || byDate(a, b); });
+    var hr = groupByLink(hrRows).sort(function (a, b) { return (b.item.law ? 1 : 0) - (a.item.law ? 1 : 0) || byDate(a, b); }).slice(0, 12);
+
+    var alertCount = {};
+    COUNTRIES.forEach(function (c) { if (news(c).safe.length) alertCount[c.region] = (alertCount[c.region] || 0) + 1; });
+    var total = Object.keys(alertCount).reduce(function (s, k) { return s + alertCount[k]; }, 0);
+    var orgs = [{ key: 'ALL', label: '전체', count: COUNTRIES.length, alerts: total }].concat(
+      REGIONS.filter(function (r) { return r.key !== 'ALL'; }).map(function (r) {
+        return { key: r.key, label: r.label, count: COUNTRIES.filter(function (c) { return c.region === r.key; }).length, alerts: alertCount[r.key] || 0 };
+      }));
+    var scopeLabel = state.org === 'ALL' ? '전체 ' + COUNTRIES.length + '개국' : regionLabel(state.org) + ' ' + scope.length + '개국';
+    var d = new Date(currentDate + 'T00:00:00');
+    var dateLabel = isNaN(d) ? currentDate : d.getFullYear() + '년 ' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + '일월화수목금토'.charAt(d.getDay()) + ')';
+
+    var h = '<div class="page-title"><h2>' + esc(dateLabel) + ' 브리핑</h2><span class="note">' + esc(DASHBOARD.as_of_display || '') + ' · ' + esc(scopeLabel) + '</span></div>';
+    h += '<section class="orgs" aria-label="조직 선택">' + orgs.map(function (o) {
+      return '<button type="button" class="org" data-org="' + esc(o.key) + '" aria-pressed="' + (o.key === state.org) + '"><b>' + esc(o.label) + '</b>' +
+        '<span class="l"><span>' + o.count + '개국</span>' + (o.alerts ? '<span class="badge b-red" title="현지 안전 동향 국가 수">⚠ ' + o.alerts + '</span>' : '') + '</span></button>';
+    }).join('') + '</section>';
+
+    h += '<div class="row-2">';
+    h += '<section class="card half" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5H2.5z"></path><path d="M12 10v4M12 17.5v.01"></path></svg>' +
+      '현지 안전 동향 <span class="count" style="color:#fff;background:#B91C1C">' + safety.length + '</span></h2>' +
+      '<span class="note">국가별 주요 안전 보도</span></div>';
+    h += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
+      : '<p class="empty">선택한 조직에는 오늘 주요 안전 보도가 없습니다.</p>';
+    h += '</section>';
+    h += '<section class="card half" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
+      'HR·노동 주요 소식 <span class="count b-law">' + hr.length + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
+    h += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
+      : '<p class="empty">선택한 조직에는 새 HR·노동 소식이 없습니다.</p>';
+    h += '</section></div>';
+
+    var gi = realItems(DASHBOARD.global_industry);
+    h += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
+    h += gi.length ? '<div class="grid-2">' + gi.map(function (i) {
+      return articleLink(i, metaLine(i, '<span class="badge b-ind">' + esc(i.tag || '완성차') + '</span>') + '<span class="ttl sm">' + esc(i.title) + '</span>');
+    }).join('') + '</div>' : '<p class="empty">수집된 글로벌 동향이 없습니다.</p>';
+    h += '</section>';
+    document.getElementById('main').innerHTML = h;
+  }
+
+  // ------------------------------------------------------------- 국가 선택(권역 탭 + 국가 칩)
+  function renderPicker() {
+    var cur = byCode(state.code);
+    var region = state.pickRegion || (cur ? cur.region : 'ALL');
+    document.getElementById('region-tabs').innerHTML = REGIONS.map(function (r) {
+      return '<button type="button" class="pill" data-region="' + esc(r.key) + '" aria-pressed="' + (r.key === region) + '">' + esc(r.label) + '</button>';
+    }).join('');
+    var list = sorted(region === 'ALL' ? COUNTRIES : COUNTRIES.filter(function (c) { return c.region === region; }));
+    document.getElementById('country-chips').innerHTML = list.map(function (c) {
+      var tier = TIER[c.code];
+      return '<button type="button" class="chip" data-code="' + esc(c.code) + '" aria-pressed="' + (c.code === state.code) + '">' +
+        '<img src="https://flagcdn.com/w40/' + safeFlag(c.flag) + '.png" alt="" loading="lazy">' + esc(c.name_kr) +
+        (tier ? '<span class="tier">' + tier + '</span>' : '') +
+        '</button>';
+    }).join('');
+    var open = state.pickerOpen;
+    document.getElementById('country-chips').classList.toggle('hidden', !open);
+    var curEl = document.getElementById('picker-current');
+    curEl.classList.toggle('hidden', open);
+    curEl.innerHTML = cur ? '선택: <strong style="color:#1E293B">' + esc(regionLabel(cur.region)) + ' › ' + esc(cur.name_kr) + '</strong>' : '';
+    var t = document.getElementById('picker-toggle');
+    t.textContent = open ? '국가 목록 접기 ▴' : '국가 목록 펼치기 ▾';
+    t.setAttribute('aria-expanded', String(open));
+  }
+
+  // ------------------------------------------------------------- 국가 상세
+  function splitRef(s) {
+    var m = /^(.*?)\s*\(([^()]*)\)\s*$/.exec(String(s || ''));
+    return m ? { v: m[1], ref: m[2] } : { v: String(s || '-'), ref: '' };
+  }
+  function minWageText(mw) {
+    if (mw && typeof mw === 'object') {
+      var d = String(mw.display || '').trim();
+      return { v: d || '-', note: String(mw.note || '').trim() };
+    }
+    var r = splitRef(String(mw || '').trim() || '-');
+    return { v: r.v, note: r.ref };
+  }
+  function sparkline(values) {
+    var v = (values || []).filter(function (x) { return typeof x === 'number' && isFinite(x); }).slice(-6);
+    if (v.length < 2) return '';
+    var min = Math.min.apply(null, v), max = Math.max.apply(null, v), rng = (max - min) || 1;
+    var pts = v.map(function (x, i) { return (i * 200 / (v.length - 1)).toFixed(1) + ',' + (44 - (x - min) / rng * 40).toFixed(1); }).join(' ');
+    return '<svg width="100%" height="40" viewBox="0 0 200 48" preserveAspectRatio="none" role="img" aria-label="최근 ' + v.length + '개월 환율 추이: ' +
+      esc(fmtNum(v[0])) + '원에서 ' + esc(fmtNum(v[v.length - 1])) + '원"><polyline points="' + pts +
+      '" fill="none" stroke="#C2410C" stroke-width="2.5" vector-effect="non-scaling-stroke"></polyline></svg>';
+  }
+  // "10.19 종가 기준 · 출처: Yahoo Finance" — 출처 글자 자체가 원문 링크
+  function fxSourceLine(asof, source, url) {
+    var src = esc(source);
+    if (url && safeUrl(url) !== '#') src = '<a href="' + esc(safeUrl(url)) + '" target="_blank" rel="noopener noreferrer">' + src + '</a>';
+    return (asof ? fmtDate(asof) + ' 종가 기준 · ' : '') + '출처: ' + src;
+  }
+  function fxCard(c) {
+    var fx = c.exchange_rate || {};
+    if (fx.is_base) {
+      var rows = KR_PANEL.map(function (p) {
+        var o = byCode(p[0]); var f = (o && o.exchange_rate) || {};
+        return '<tr><td>' + p[1] + '</td><td>' + (f.current_rate ? esc(fmtNum(f.current_rate, f.decimals)) + '원' : '-') + '</td></tr>';
+      }).join('');
+      var us = (byCode('US') || {}).exchange_rate || {};
+      return '<div class="kpi"><div class="k">주요 통화 환율</div><table>' + rows + '</table><div class="s">' + fxSourceLine(us.asof, 'Yahoo Finance', us.url) + '</div></div>';
+    }
+    var unit = fx.unit_base || 1;
+    var has = fx.current_rate !== null && fx.current_rate !== undefined && isFinite(Number(fx.current_rate)) && Number(fx.current_rate) > 0;
+    var pct = Number(fx.change_pct);
+    var chg = (!has || fx.change_pct === null || fx.change_pct === undefined || !isFinite(pct)) ? '<div class="d">등락 정보 없음</div>'
+      : pct === 0 ? '<div class="d">– 전일 대비 변동 없음</div>'
+      : '<div class="d" style="color:' + (pct > 0 ? 'var(--up)' : 'var(--down)') + '">' + (pct > 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(2) + '% 전일 대비</div>';
+    return '<div class="kpi"><div class="k">환율 (' + unit + ' ' + esc(c.currency) + ')</div>' +
+      '<div class="v">' + (has ? esc(fmtNum(fx.current_rate, fx.decimals)) + '<small>원</small>' : '수집 실패') + '</div>' + chg + sparkline(fx.history_values) +
+      '<div class="s">' + fxSourceLine(fx.asof, fx.source || 'Yahoo Finance', fx.url) + '</div></div>';
+  }
+  function refLabel(ref) {
+    var m = /^(\d{4})\.(\d{2})$/.exec(ref);
+    if (m) return m[1] + '년 ' + Number(m[2]) + '월 기준';
+    return ref ? ref + ' 기준' : '';
+  }
+  function statCard(label, raw, source) {
+    var r = splitRef(raw);
+    var ref = refLabel(r.ref);
+    return '<div class="kpi"><div class="k">' + label + '</div><div class="v">' + esc(r.v || '-') + '</div>' +
+      (ref ? '<div class="d" style="font-weight:500">' + esc(ref) + '</div>' : '') +
+      '<div class="s">출처: ' + esc(source || 'Global HR 자체 조사') + '</div></div>';
+  }
+  // 최저임금 출처: 법정 최저임금이 없으면 '각국 노동법 기준', 내부 보정자료 표기는 '정부 공식 발표'로 통일
+  function minWageSource(value, source) {
+    if (/법정 최저임금 없음/.test(String(value || ''))) return '각국 노동법 기준';
+    var s = String(source || '');
+    if (!s || /보정|HR 확인|자체 조사/.test(s)) return '정부 공식 발표';
+    return s.replace(/\s*\(HR 확인\)/, '');
+  }
+  function calcResult(c) {
+    var fx = c.exchange_rate || {};
+    var amt = parseFloat(state.amount);
+    if (isNaN(amt) || !fx.current_rate) return '-';
+    return Math.round(amt * (fx.current_rate / (fx.unit_base || 1))).toLocaleString('ko-KR');
+  }
+  function renderCountry() {
+    var c = byCode(state.code);
+    if (!c) { document.getElementById('main').innerHTML = '<p class="empty">국가 데이터가 없습니다.</p>'; return; }
+    var p = c.profile || {}, src = p.sources || {}, fx = c.exchange_rate || {};
+    var mw = minWageText(p.min_wage);
+    var sites = (c.hubs && c.hubs.length) ? c.hubs : (c.offices || []);   // offices: 구버전 아카이브 호환
+    var nw = news(c);
+    if (!nw[state.tab]) state.tab = 'pol';
+    var hr = trend(c, 'HR & LABOR').slice().sort(byNewest), auto = trend(c, 'AUTO MARKET').slice().sort(byNewest);
+    var official = Array.isArray(c.official_sources) ? c.official_sources : [];
+
+    var h = '<section class="card" aria-label="국가 개요" style="padding:18px 24px"><div class="overview">' +
+      '<img class="flag" src="https://flagcdn.com/w80/' + safeFlag(c.flag) + '.png" alt="' + esc(c.name_kr) + ' 국기">' +
+      '<div><div class="eyebrow">' + esc(String(c.name_en || '').toUpperCase()) + ' · ' + esc(c.currency || '') + '</div><h2>' + esc(c.name_kr) + '</h2></div>' +
+      '<dl><div><dt>수도</dt><dd>' + esc(p.capital || '-') + '</dd></div><div><dt>총인구</dt><dd>' + esc(p.population || '-') + '</dd></div>' +
+      '<div><dt>GDP</dt><dd>' + esc(p.gdp || '-') + '</dd></div></dl></div>';
+    if (sites.length) {
+      h += '<div class="sites"><span class="lbl">한국타이어 거점</span>' + sites.map(function (s) {
+        var m = /^(.*)\s\(([^()]*)\)$/.exec(String(s));
+        return '<span class="site"><b>' + esc(m ? m[1] : s) + '</b>' + (m ? '<span>' + esc(m[2]) + '</span>' : '') + '</span>';
+      }).join('') + '</div>';
+    }
+    h += '</section>';
+
+    h += '<section class="kpis" aria-label="핵심 지표">' + fxCard(c) +
+      statCard('물가상승률 (CPI YoY)', p.inflation, src.inflation) +
+      statCard('실업률', p.unemployment, src.unemployment) +
+      '<div class="kpi"><div class="k">최저임금</div><div class="v' + (mw.v.length > 14 ? ' long' : '') + '">' + esc(mw.v) + '</div>' +
+      (mw.note ? '<div class="d" style="font-weight:500">' + esc(mw.note) + '</div>' : '') +
+      '<div class="s">출처: ' + esc(minWageSource(mw.v, src.min_wage)) + '</div></div></section>';
+
+    if (!fx.is_base) {
+      h += '<section class="calc" aria-label="환율 계산기"><label for="calcInput">환율 계산기</label>' +
+        '<input id="calcInput" type="number" min="0" step="any" inputmode="decimal" value="' + esc(state.amount) + '">' +
+        '<span style="font-size:14px;font-weight:700;color:var(--sub)">' + esc(c.currency) + '</span><span aria-hidden="true" style="color:#94A3B8;font-weight:700">=</span>' +
+        '<span class="res" id="calcResult" aria-live="polite">' + calcResult(c) + ' 원</span>' +
+        (fx.current_rate ? '<span class="basis">기준 ' + (fx.unit_base || 1) + ' ' + esc(c.currency) + ' = ' + esc(fmtNum(fx.current_rate, fx.decimals)) + '원' +
+          (fx.asof ? ' (' + fmtDate(fx.asof) + ' 종가)' : '') + '</span>' : '') + '</section>';
+    }
+
+    h += '<div class="row-2"><div class="main-col">';
+    h += '<section class="card" aria-labelledby="hr-h"><div class="card-head"><h2 id="hr-h">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
+      'HR·노동</h2><span class="note">노동법 · 임금 · 고용 · 노조/파업</span></div>';
+    h += hr.length ? hr.map(function (i) {
+      return articleLink(i, metaLine(i, i.law ? '<span class="badge b-law">법·제도</span>' : '') + '<span class="ttl">' + esc(i.title) + '</span>');
+    }).join('') : '<p class="empty">최근 2주 동안 수집된 HR·노동 보도가 없습니다.</p>';
+    h += '</section>';
+
+    h += '<section class="card" aria-labelledby="news-h"><div class="card-head"><h2 id="news-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 8h3v9a2 2 0 0 1-2 2"></path><path d="M7 9h7M7 13h7M7 17h4"></path></svg>현지 주요 뉴스</h2><div class="seg" role="tablist" aria-label="뉴스 분류">' +
+      NEWS_TABS.map(function (t) {
+        return '<button type="button" role="tab" data-newstab="' + t.id + '" aria-selected="' + (t.id === state.tab) + '">' + t.label + '<span class="n">' + nw[t.id].length + '</span></button>';
+      }).join('') + '</div></div>';
+    var list = nw[state.tab];
+    h += list.length ? list.map(function (i) {
+      return articleLink(i, metaLine(i, state.tab === 'safe' ? safetyBadge(i.safety_tag) : '') + '<span class="ttl">' + esc(i.title) + '</span>');
+    }).join('') : '<p class="empty">' + (state.tab === 'safe' ? '최근 3일 동안 안전·재난 관련 보도가 없습니다.' : '최근 수집된 보도가 없습니다.') + '</p>';
+    h += '</section></div>';
+
+    h += '<aside class="side-col"><section class="card" aria-labelledby="ind-h"><h2 id="ind-h" style="margin-bottom:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>완성차·타이어</h2>';
+    h += auto.length ? auto.map(function (i) {
+      return articleLink(i, metaLine(i) + '<span class="ttl sm">' + esc(i.title) + '</span>');
+    }).join('') : '<p class="empty">최근 2주 동안 수집된 산업 보도가 없습니다.</p>';
+    h += '</section><section class="card" aria-labelledby="off-h"><h2 id="off-h" style="margin-bottom:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"></path><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"></path></svg>공식 기관 · 보고서</h2>';
+    h += official.length ? '<ul class="off-list">' + official.map(function (o) {
+      return '<li><a href="' + esc(safeUrl(o.url)) + '" target="_blank" rel="noopener noreferrer"><b>' + esc(o.name) + ' ↗</b><span>' + esc(o.desc || '') + '</span></a></li>';
+    }).join('') + '</ul>' : '<p class="empty" style="font-size:13px">등록된 기관이 없습니다.</p>';
+    h += '</section></aside></div>';
+    document.getElementById('main').innerHTML = h;
+  }
+
+  // ------------------------------------------------------------- 이벤트
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-org],[data-go],[data-region],[data-code],[data-newstab]');
+    if (!el) return;
+    if (el.hasAttribute('data-org')) { state.org = el.getAttribute('data-org'); renderBriefing(); return; }
+    if (el.hasAttribute('data-go')) { go(el.getAttribute('data-go'), el.getAttribute('data-gotab') || ''); return; }
+    if (el.hasAttribute('data-region')) {
+      // 권역을 누르면 그 권역의 첫 번째 국가(위계순)를 바로 보여준다. 예: 미주 → 미국, 전체 → 한국
+      var rg = el.getAttribute('data-region');
+      var first = sorted(rg === 'ALL' ? COUNTRIES : COUNTRIES.filter(function (c) { return c.region === rg; }))[0];
+      state.pickRegion = rg;
+      if (!state.pickerOpen) { state.pickerOpen = true; storeSet('ghr.pickerOpen', '1'); }
+      if (first && first.code !== state.code) { go(first.code); } else { renderPicker(); }
+      return;
+    }
+    if (el.hasAttribute('data-code')) { state.pickRegion = null; go(el.getAttribute('data-code')); return; }
+    if (el.hasAttribute('data-newstab')) { state.tab = el.getAttribute('data-newstab'); renderCountry(); }
+  });
+  document.getElementById('picker-toggle').addEventListener('click', function () {
+    state.pickerOpen = !state.pickerOpen; storeSet('ghr.pickerOpen', state.pickerOpen ? '1' : '0'); renderPicker();
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'calcInput') {
+      state.amount = e.target.value;
+      var c = byCode(state.code), out = document.getElementById('calcResult');
+      if (c && out) out.textContent = calcResult(c) + ' 원';
+    }
+  });
+
+  // ------------------------------------------------------------- 날짜(아카이브) 조회
+  function applyDataset(d, dateStr) {
+    DASHBOARD = d;
+    REGIONS = (d.regions || REGIONS).filter(function (r) { return r && r.key; });
+    COUNTRIES = d.countries || [];
+    currentDate = dateStr;
+    document.getElementById('sync-display-text').textContent = d.as_of_display || (dateStr + ' 아카이브');
+    if (!byCode(state.code)) state.code = (COUNTRIES[0] || {}).code;
+    render();
+  }
+  document.getElementById('briefDatePicker').addEventListener('change', function (e) {
+    var input = e.target, dateStr = input.value;
+    if (dateStr === INITIAL_DATE) { applyDataset(INITIAL_DASHBOARD, INITIAL_DATE); return; }
+    var box = document.getElementById('date-box'); box.classList.add('loading');
+    fetch('./archive/' + dateStr + '.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (j) { if (!j.countries || !j.countries.length) throw new Error('empty'); applyDataset(j, dateStr); })
+      .catch(function () {
+        toast('선택하신 일자(' + dateStr + ')의 아카이브 데이터가 없습니다.' + (ARCHIVE_MIN_DATE ? ' (조회 가능: ' + ARCHIVE_MIN_DATE + ' 이후)' : ''));
+        input.value = currentDate;
+      })
+      .then(function () { box.classList.remove('loading'); });
+  });
+
+  readHash();
+  render();
+})();
+</script>
+</body>
+</html>

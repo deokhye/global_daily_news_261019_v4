@@ -1,0 +1,395 @@
+{
+  "_설명": "자동 수집(output/country_profile.json) 값이 없을 때 쓰는 보조 지표. 키는 ISO3. 값은 화면에 그대로 표시됩니다.",
+  "countries": {
+    "KOR": {
+      "population": "약 5,170만 명",
+      "gdp": "약 1.87조 달러",
+      "inflation": "2.0%",
+      "unemployment": "3.0%",
+      "min_wage": {
+        "display": "10,320원 / 시간",
+        "note": "2026년 기준"
+      }
+    },
+    "USA": {
+      "population": "약 3억 4,200만 명",
+      "gdp": "약 27.4조 달러",
+      "inflation": "3.0%",
+      "unemployment": "4.1%",
+      "min_wage": {
+        "display": "$7.25 / 시간",
+        "note": "연방 기준, 2009-07-24 이후 동결·테네시주 별도 기준 없음"
+      }
+    },
+    "DEU": {
+      "population": "약 8,450만 명",
+      "gdp": "약 4.71조 달러",
+      "inflation": "2.3%",
+      "unemployment": "6.0%",
+      "min_wage": {
+        "display": "€13.90 / 시간",
+        "note": "2026년 기준"
+      }
+    },
+    "CHN": {
+      "population": "약 14억 900만 명",
+      "gdp": "약 18.5조 달러",
+      "inflation": "0.3%",
+      "unemployment": "5.1%",
+      "min_wage": {
+        "display": "약 25위안 / 시간",
+        "note": "지역별 상이(참고치), 상하이 등 대도시 기준"
+      }
+    },
+    "HUN": {
+      "population": "약 970만 명",
+      "gdp": "약 2,230억 달러",
+      "inflation": "4.4%",
+      "unemployment": "4.2%",
+      "min_wage": {
+        "display": "약 290,800포린트 / 월",
+        "note": "비숙련 기준, 2025년 기준"
+      }
+    },
+    "IDN": {
+      "population": "약 2억 8,000만 명",
+      "gdp": "약 1.40조 달러",
+      "inflation": "1.8%",
+      "unemployment": "4.9%",
+      "min_wage": {
+        "display": "약 5,396,761루피아 / 월",
+        "note": "자카르타(DKI) 기준, 지역별 상이"
+      }
+    },
+    "NLD": {
+      "population": "약 1,800만 명",
+      "gdp": "약 1.14조 달러",
+      "inflation": "3.2%",
+      "unemployment": "3.7%",
+      "min_wage": {
+        "display": "€14.71 / 시간",
+        "note": "2026년 기준"
+      }
+    },
+    "TWN": {
+      "population": "약 2,340만 명",
+      "gdp": "약 8,000억 달러",
+      "inflation": "2.0%",
+      "unemployment": "3.4%",
+      "min_wage": {
+        "display": "NT$190 / 시간",
+        "note": "월 NT$29,500, 2026년 기준"
+      }
+    },
+    "RUS": {
+      "population": "약 1억 4,400만 명",
+      "gdp": "약 2.24조 달러",
+      "inflation": "8.9%",
+      "unemployment": "2.4%",
+      "min_wage": {
+        "display": "약 22,440루블 / 월",
+        "note": "MROT 기준, 2025년"
+      }
+    },
+    "ROU": {
+      "population": "약 1,900만 명",
+      "gdp": "약 3,600억 달러",
+      "inflation": "5.7%",
+      "unemployment": "5.4%",
+      "min_wage": {
+        "display": "약 €814 / 월",
+        "note": "2025.1 Eurostat 기준"
+      }
+    },
+    "MYS": {
+      "population": "약 3,450만 명",
+      "gdp": "약 4,450억 달러",
+      "inflation": "1.9%",
+      "unemployment": "3.2%",
+      "min_wage": {
+        "display": "RM8.72 / 시간",
+        "note": "월 RM1,700 기준, 2025.2 시행"
+      }
+    },
+    "MEX": {
+      "population": "약 1억 2,900만 명",
+      "gdp": "약 1.85조 달러",
+      "inflation": "4.6%",
+      "unemployment": "2.7%",
+      "min_wage": {
+        "display": "약 9,583.52페소 / 월",
+        "note": "일반지역 기준, 2026년, 국경지대는 더 높음"
+      }
+    },
+    "MAR": {
+      "population": "약 3,780만 명",
+      "gdp": "약 1,510억 달러",
+      "inflation": "1.5%",
+      "unemployment": "13.3%",
+      "min_wage": {
+        "display": "약 17.07디르함 / 시간",
+        "note": "참고치"
+      }
+    },
+    "VNM": {
+      "population": "약 1억 10만 명",
+      "gdp": "약 5,000억 달러",
+      "inflation": "3.6%",
+      "unemployment": "2.0%",
+      "min_wage": {
+        "display": "약 5,310,000동 / 월",
+        "note": "1지역(하노이·호치민 등) 기준, 2026.1, 지역별 상이"
+      }
+    },
+    "BRA": {
+      "population": "약 2억 1,700만 명",
+      "gdp": "약 2.33조 달러",
+      "inflation": "4.5%",
+      "unemployment": "6.4%",
+      "min_wage": {
+        "display": "약 1,631헤알 / 월",
+        "note": "2026년 기준(참고치), 13번째 급여 별도 지급 관행"
+      }
+    },
+    "SAU": {
+      "population": "약 3,700만 명",
+      "gdp": "약 1.11조 달러",
+      "inflation": "2.0%",
+      "unemployment": "3.7%",
+      "min_wage": {
+        "display": "SAR23.08 / 시간",
+        "note": "공공부문 기준, 외국인 근로자 미적용"
+      }
+    },
+    "SRB": {
+      "population": "약 660만 명",
+      "gdp": "약 900억 달러",
+      "inflation": "4.2%",
+      "unemployment": "8.6%",
+      "min_wage": {
+        "display": "약 308디나르 / 시간",
+        "note": "참고치"
+      }
+    },
+    "SWE": {
+      "population": "약 1,060만 명",
+      "gdp": "약 5,930억 달러",
+      "inflation": "1.9%",
+      "unemployment": "8.2%",
+      "min_wage": {
+        "display": "법정 최저임금 없음",
+        "note": "업종별 단체협약(CBA)으로 결정"
+      }
+    },
+    "ESP": {
+      "population": "약 4,850만 명",
+      "gdp": "약 1.72조 달러",
+      "inflation": "2.8%",
+      "unemployment": "11.2%",
+      "min_wage": {
+        "display": "약 €1,381 / 월",
+        "note": "연 14회 분할 지급 관행, 2025.1 Eurostat 기준"
+      }
+    },
+    "SGP": {
+      "population": "약 600만 명",
+      "gdp": "약 5,300억 달러",
+      "inflation": "2.5%",
+      "unemployment": "2.0%",
+      "min_wage": {
+        "display": "법정 최저임금 없음",
+        "note": "Progressive Wage Model로 업종별 하한선 운영"
+      }
+    },
+    "ARE": {
+      "population": "약 1,010만 명",
+      "gdp": "약 5,350억 달러",
+      "inflation": "2.3%",
+      "unemployment": "2.6%",
+      "min_wage": {
+        "display": "법정 최저임금 없음",
+        "note": "-"
+      }
+    },
+    "GBR": {
+      "population": "약 6,850만 명",
+      "gdp": "약 3.59조 달러",
+      "inflation": "2.6%",
+      "unemployment": "4.4%",
+      "min_wage": {
+        "display": "£12.71 / 시간",
+        "note": "National Living Wage(21세 이상), 2025~26년 기준"
+      }
+    },
+    "AUT": {
+      "population": "약 910만 명",
+      "gdp": "약 5,400억 달러",
+      "inflation": "2.9%",
+      "unemployment": "5.3%",
+      "min_wage": {
+        "display": "법정 최저임금 없음",
+        "note": "업종별 단체협약(CBA)으로 결정"
+      }
+    },
+    "UKR": {
+      "population": "약 3,650만 명",
+      "gdp": "약 1,900억 달러",
+      "inflation": "11.5%",
+      "unemployment": "13.5%",
+      "min_wage": {
+        "display": "약 8,000흐리브냐 / 월",
+        "note": "2025년 기준"
+      }
+    },
+    "EGY": {
+      "population": "약 1억 1,700만 명",
+      "gdp": "약 3,900억 달러",
+      "inflation": "12.0%",
+      "unemployment": "6.9%",
+      "min_wage": {
+        "display": "약 7,000파운드 / 월",
+        "note": "공공부문 기준(참고치)"
+      }
+    },
+    "ITA": {
+      "population": "약 5,870만 명",
+      "gdp": "약 2.30조 달러",
+      "inflation": "1.7%",
+      "unemployment": "6.1%",
+      "min_wage": {
+        "display": "법정 최저임금 없음",
+        "note": "업종별 단체협약(CBA)으로 결정"
+      }
+    },
+    "JPN": {
+      "population": "약 1억 2,400만 명",
+      "gdp": "약 4.10조 달러",
+      "inflation": "2.8%",
+      "unemployment": "2.4%",
+      "min_wage": {
+        "display": "¥1,121 / 시간",
+        "note": "2026년 전국 가중평균, 지역별 상이(도쿄 ¥1,226)"
+      }
+    },
+    "CZE": {
+      "population": "약 1,070만 명",
+      "gdp": "약 3,400억 달러",
+      "inflation": "2.6%",
+      "unemployment": "2.7%",
+      "min_wage": {
+        "display": "약 20,800코루나 / 월",
+        "note": "2025년 기준"
+      }
+    },
+    "CHL": {
+      "population": "약 1,980만 명",
+      "gdp": "약 3,300억 달러",
+      "inflation": "4.1%",
+      "unemployment": "8.5%",
+      "min_wage": {
+        "display": "약 539,000페소 / 월",
+        "note": "2025년 기준(참고치)"
+      }
+    },
+    "KAZ": {
+      "population": "약 2,020만 명",
+      "gdp": "약 2,700억 달러",
+      "inflation": "8.4%",
+      "unemployment": "4.7%",
+      "min_wage": {
+        "display": "약 85,000텐게 / 월",
+        "note": "2025년 기준"
+      }
+    },
+    "CAN": {
+      "population": "약 4,100만 명",
+      "gdp": "약 2.24조 달러",
+      "inflation": "2.4%",
+      "unemployment": "6.9%",
+      "min_wage": {
+        "display": "약 CAD 17.75 / 시간",
+        "note": "연방부문 기준, 주(州)별로 상이"
+      }
+    },
+    "COL": {
+      "population": "약 5,240만 명",
+      "gdp": "약 3,630억 달러",
+      "inflation": "5.2%",
+      "unemployment": "9.3%",
+      "min_wage": {
+        "display": "1,423,500페소 / 월",
+        "note": "2025년 기준"
+      }
+    },
+    "HRV": {
+      "population": "약 380만 명",
+      "gdp": "약 900억 달러",
+      "inflation": "3.8%",
+      "unemployment": "6.0%",
+      "min_wage": {
+        "display": "약 €970 / 월",
+        "note": "2025.1 Eurostat 기준, 2023년부터 유로 사용"
+      }
+    },
+    "THA": {
+      "population": "약 7,160만 명",
+      "gdp": "약 5,400억 달러",
+      "inflation": "0.8%",
+      "unemployment": "1.0%",
+      "min_wage": {
+        "display": "1일 400바트",
+        "note": "2025년 기준, 지역별 상이"
+      }
+    },
+    "TUR": {
+      "population": "약 8,570만 명",
+      "gdp": "약 1.34조 달러",
+      "inflation": "38.0%",
+      "unemployment": "8.6%",
+      "min_wage": {
+        "display": "₺164.94 / 시간",
+        "note": "2026년 기준"
+      }
+    },
+    "PAN": {
+      "population": "약 450만 명",
+      "gdp": "약 860억 달러",
+      "inflation": "1.0%",
+      "unemployment": "7.4%",
+      "min_wage": {
+        "display": "업종별 상이",
+        "note": "참고치, 업종·지역별 세분화된 고시"
+      }
+    },
+    "POL": {
+      "population": "약 3,760만 명",
+      "gdp": "약 8,400억 달러",
+      "inflation": "3.9%",
+      "unemployment": "2.9%",
+      "min_wage": {
+        "display": "zł31.4 / 시간",
+        "note": "2026년 기준"
+      }
+    },
+    "FRA": {
+      "population": "약 6,830만 명",
+      "gdp": "약 3.13조 달러",
+      "inflation": "1.4%",
+      "unemployment": "7.4%",
+      "min_wage": {
+        "display": "€12.02 / 시간",
+        "note": "SMIC 기준"
+      }
+    },
+    "AUS": {
+      "population": "약 2,700만 명",
+      "gdp": "약 1.79조 달러",
+      "inflation": "2.8%",
+      "unemployment": "4.2%",
+      "min_wage": {
+        "display": "A$26.44 / 시간",
+        "note": "2025~26년 기준"
+      }
+    }
+  }
+}

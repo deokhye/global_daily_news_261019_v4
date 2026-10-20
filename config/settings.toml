@@ -1,0 +1,24 @@
+# 국가 기본 프로필 수집 설정 — 숫자 기준값은 모두 여기서 관리합니다.
+
+[annual]
+# 총인구·GDP·최저임금의 기준연도. 0 이면 실행 연도를 사용합니다.
+base_year = 0
+# IMF WEO 발표판(출처 표기용). 예: "2026년 10월". 비워두면 "IMF WEO"로만 표기합니다.
+imf_weo_vintage = ""
+# 최저임금 보정 파일의 확인일이 이 일수보다 오래되면 '검토 필요'
+override_stale_days = 365
+
+[monthly]
+# 인플레이션·실업률이 직전 값보다 이 값(%p)을 넘게 바뀌면 경고
+change_alert_pp = 5.0
+
+[http]
+# 웹 수집 시 사용할 User-Agent (연락처를 실제 담당자 메일로 바꿔 주세요)
+user_agent = "HankookTire-GlobalHR-CountryProfile/1.0 (+mailto:hr-data@example.com)"
+# Trading Economics 페이지 요청 간 대기(초) — 최소·최대 사이에서 무작위
+scrape_min_delay = 3.0
+scrape_max_delay = 5.0
+# 공개 API(IMF/World Bank/Eurostat/ILOSTAT) 요청 간 대기(초)
+api_delay = 0.5
+max_retries = 3
+timeout = 30

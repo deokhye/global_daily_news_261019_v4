@@ -1,0 +1,20 @@
+# 버전 범위 고정 — 큰 변경(메이저 버전)이 들어오지 않도록 상한을 둔다.
+# 실제 설치된 정확한 버전은 Actions 로그의 "Install" 단계에 출력된다.
+# yfinance 는 야후 쪽 변경에 맞춰 자주 수정되므로 0.2.x 최신을 쓰도록 하한만 높게 둔다.
+
+# 대시보드 (src/)
+requests>=2.32,<3
+yfinance>=0.2.54,<0.3
+Jinja2>=3.1.4,<4
+MarkupSafe>=2.1,<4
+feedparser>=6.0.11,<7
+pandas>=2.1,<3
+pytz>=2024.1
+
+# 국가 기본 프로필 (country_profile/)
+beautifulsoup4>=4.12,<5
+openpyxl>=3.1,<4
+tzdata>=2024.1
+
+# 테스트
+pytest>=8,<9

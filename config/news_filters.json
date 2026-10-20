@@ -1,0 +1,451 @@
+{
+  "_설명": {
+    "aliases": "제목에 하나라도 들어가야 해당 국가 기사로 인정 (대소문자 구분). 영문 국가명은 자동 포함",
+    "exclude": "검색어에 붙일 제외어 (Google 뉴스 문법, 예: -Florida)",
+    "reject": "제목이 이 정규식에 걸리면 버림 (동명 지명·동음이의어)",
+    "query_name": "뉴스 검색에 쓸 영문 국가명 (없으면 countries.csv 의 영문명). 예: Türkiye → Turkey"
+  },
+  "USA": {
+    "aliases": [
+      "United States",
+      "U.S.",
+      "US",
+      "USA",
+      "America",
+      "American",
+      "Americans",
+      "Washington",
+      "Fed",
+      "White House"
+    ],
+    "exclude": [],
+    "reject": "\\bLatin America\\b|\\bSouth America\\b|\\bCentral America\\b"
+  },
+  "DEU": {
+    "aliases": [
+      "Germany",
+      "German",
+      "Germans",
+      "Berlin",
+      "Bundestag",
+      "Bundesbank"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "CHN": {
+    "aliases": [
+      "China",
+      "Chinese",
+      "Beijing",
+      "Shanghai",
+      "Xi Jinping"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "HUN": {
+    "aliases": [
+      "Hungary",
+      "Hungarian",
+      "Budapest",
+      "Orban",
+      "Orbán"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "IDN": {
+    "aliases": [
+      "Indonesia",
+      "Indonesian",
+      "Jakarta",
+      "Prabowo"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "NLD": {
+    "aliases": [
+      "Netherlands",
+      "Dutch",
+      "Amsterdam",
+      "The Hague",
+      "Rotterdam"
+    ],
+    "exclude": [
+      "-\"Love is Blind\""
+    ],
+    "reject": "Love is Blind|Pennsylvania Dutch"
+  },
+  "TWN": {
+    "aliases": [
+      "Taiwan",
+      "Taiwanese",
+      "Taipei"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "RUS": {
+    "aliases": [
+      "Russia",
+      "Russian",
+      "Russians",
+      "Moscow",
+      "Kremlin",
+      "Putin"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "ROU": {
+    "aliases": [
+      "Romania",
+      "Romanian",
+      "Bucharest"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "MYS": {
+    "aliases": [
+      "Malaysia",
+      "Malaysian",
+      "Kuala Lumpur",
+      "Anwar"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "MEX": {
+    "aliases": [
+      "Mexico",
+      "Mexican",
+      "Mexicans",
+      "Sheinbaum"
+    ],
+    "exclude": [
+      "-\"New Mexico\""
+    ],
+    "reject": "\\bNew Mexico\\b|\\bGulf of Mexico\\b"
+  },
+  "MAR": {
+    "aliases": [
+      "Morocco",
+      "Moroccan",
+      "Rabat",
+      "Casablanca",
+      "Tangier"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "VNM": {
+    "aliases": [
+      "Vietnam",
+      "Vietnamese",
+      "Viet Nam",
+      "Hanoi",
+      "Ho Chi Minh"
+    ],
+    "exclude": [],
+    "reject": "\\bVietnam War\\b|\\bVietnam veteran"
+  },
+  "BRA": {
+    "aliases": [
+      "Brazil",
+      "Brazilian",
+      "Brasilia",
+      "Brasília",
+      "Sao Paulo",
+      "São Paulo",
+      "Lula"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "SAU": {
+    "aliases": [
+      "Saudi",
+      "Saudi Arabia",
+      "Riyadh",
+      "Jeddah",
+      "Aramco"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "SRB": {
+    "aliases": [
+      "Serbia",
+      "Serbian",
+      "Belgrade",
+      "Vucic",
+      "Vučić"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "SWE": {
+    "aliases": [
+      "Sweden",
+      "Swedish",
+      "Stockholm"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "ESP": {
+    "aliases": [
+      "Spain",
+      "Spanish",
+      "Madrid",
+      "Barcelona",
+      "Sánchez",
+      "Sanchez"
+    ],
+    "exclude": [],
+    "reject": "\\bSpanish[- ](language|speaking|speakers)\\b"
+  },
+  "SGP": {
+    "aliases": [
+      "Singapore",
+      "Singaporean",
+      "Singaporeans",
+      "MAS"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "ARE": {
+    "aliases": [
+      "UAE",
+      "United Arab Emirates",
+      "Emirati",
+      "Emirates",
+      "Dubai",
+      "Abu Dhabi"
+    ],
+    "exclude": [],
+    "reject": "\\bEmirates (Stadium|Cup)\\b"
+  },
+  "GBR": {
+    "aliases": [
+      "UK",
+      "U.K.",
+      "Britain",
+      "British",
+      "England",
+      "English",
+      "London",
+      "Scotland",
+      "Wales",
+      "Starmer",
+      "Bank of England"
+    ],
+    "exclude": [],
+    "reject": "\\bNew England\\b|\\bEnglish Premier League\\b|\\bLondon, Ontario\\b"
+  },
+  "AUT": {
+    "aliases": [
+      "Austria",
+      "Austrian",
+      "Vienna"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "UKR": {
+    "aliases": [
+      "Ukraine",
+      "Ukrainian",
+      "Ukrainians",
+      "Kyiv",
+      "Zelensky",
+      "Zelenskyy"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "EGY": {
+    "aliases": [
+      "Egypt",
+      "Egyptian",
+      "Cairo",
+      "Suez"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "ITA": {
+    "aliases": [
+      "Italy",
+      "Italian",
+      "Italians",
+      "Rome",
+      "Milan",
+      "Meloni"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "JPN": {
+    "aliases": [
+      "Japan",
+      "Japanese",
+      "Tokyo",
+      "BOJ",
+      "Bank of Japan"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "CZE": {
+    "aliases": [
+      "Czech",
+      "Czechia",
+      "Czech Republic",
+      "Prague"
+    ],
+    "exclude": [],
+    "reject": "",
+    "query_name": "Czech"
+  },
+  "CHL": {
+    "aliases": [
+      "Chile",
+      "Chilean",
+      "Chileans",
+      "Santiago"
+    ],
+    "exclude": [
+      "-pepper",
+      "-peppers",
+      "-recipe",
+      "-chili"
+    ],
+    "reject": "(?i)\\bchile[s]? (pepper|relleno|verde|colorado)|\\bgreen chile\\b|\\bred chile\\b|\\bHatch\\b|\\bSantiago Bernabéu\\b"
+  },
+  "KAZ": {
+    "aliases": [
+      "Kazakhstan",
+      "Kazakh",
+      "Astana",
+      "Almaty",
+      "Tokayev"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "CAN": {
+    "aliases": [
+      "Canada",
+      "Canadian",
+      "Canadians",
+      "Ottawa",
+      "Ontario",
+      "Quebec",
+      "Carney"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "COL": {
+    "aliases": [
+      "Colombia",
+      "Colombian",
+      "Colombians",
+      "Bogota",
+      "Bogotá",
+      "Medellin",
+      "Medellín",
+      "Petro"
+    ],
+    "exclude": [],
+    "reject": "\\bColumbia\\b"
+  },
+  "HRV": {
+    "aliases": [
+      "Croatia",
+      "Croatian",
+      "Zagreb"
+    ],
+    "exclude": [],
+    "reject": ""
+  },
+  "THA": {
+    "aliases": [
+      "Thailand",
+      "Thai",
+      "Bangkok"
+    ],
+    "exclude": [],
+    "reject": "(?i)\\bthai (food|restaurant|curry|massage)\\b"
+  },
+  "TUR": {
+    "aliases": [
+      "Turkey",
+      "Türkiye",
+      "Turkiye",
+      "Turkish",
+      "Ankara",
+      "Istanbul",
+      "Erdogan",
+      "Erdoğan"
+    ],
+    "exclude": [
+      "-Thanksgiving"
+    ],
+    "reject": "(?i)\\bthanksgiving\\b|\\bturkey (recipe|dinner|sandwich)\\b",
+    "query_name": "Turkey"
+  },
+  "PAN": {
+    "aliases": [
+      "Panama",
+      "Panamanian",
+      "Panama Canal"
+    ],
+    "exclude": [
+      "-\"Panama City Beach\"",
+      "-Florida",
+      "-Fla"
+    ],
+    "reject": "Panama City(,)? (FL|Fla|Florida)|Panama City Beach|Bay County|Panama Jack"
+  },
+  "POL": {
+    "aliases": [
+      "Poland",
+      "Polish",
+      "Warsaw",
+      "Tusk"
+    ],
+    "exclude": [],
+    "reject": "(?i)\\bnail polish\\b"
+  },
+  "FRA": {
+    "aliases": [
+      "France",
+      "French",
+      "Paris",
+      "Macron",
+      "Élysée"
+    ],
+    "exclude": [],
+    "reject": "(?i)\\bfrench (fries|toast|bulldog|press)\\b|\\bParis Hilton\\b|\\bParis, (Texas|Tennessee|TN|TX)\\b"
+  },
+  "AUS": {
+    "aliases": [
+      "Australia",
+      "Australian",
+      "Australians",
+      "Canberra",
+      "Sydney",
+      "Melbourne",
+      "Albanese",
+      "RBA"
+    ],
+    "exclude": [],
+    "reject": ""
+  }
+}
