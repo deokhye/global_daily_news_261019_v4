@@ -1,0 +1,112 @@
+name: Daily Global Brief Update
+
+# 실행 모드
+#   collect : 뉴스·환율 수집 → 화면 생성 → 데이터 커밋 → 배포   (매일 예약 실행, 수동 실행 기본값)
+#   build   : 화면만 다시 생성 → 배포 (수집 없음)              (main 에 코드·설정 push, 국가 프로필 갱신 후)
+#   skip    : 아무것도 안 함                                    (백업 예약인데 오늘 데이터가 이미 있을 때)
+on:
+  schedule:
+    # 목표: KST 06:30 전 갱신 완료. 정각을 피해 지연을 줄인다.
+    - cron: "20 20 * * *"   # 주 실행: KST 05:20
+    - cron: "50 20 * * *"   # 백업 실행: KST 05:50 (오늘 아카이브가 없을 때만 수집)
+  push:
+    branches: [main]
+    paths: ["src/**", "template/**", "config/**"]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "collect = 뉴스·환율 수집 후 배포 / build = 화면만 다시 생성"
+        type: choice
+        options: [collect, build]
+        default: collect
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update-and-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      mode: ${{ steps.decide.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide mode
+        id: decide
+        run: |
+          TODAY=$(TZ=Asia/Seoul date +%F)
+          MODE=collect
+          if [ "${{ github.event_name }}" = "push" ]; then MODE=build; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then MODE="${{ inputs.mode }}"; fi
+          if [ "${{ github.event.schedule }}" = "50 20 * * *" ] && [ -f "docs/archive/$TODAY.json" ]; then
+            echo "백업 실행: 오늘($TODAY) 데이터가 이미 있어 건너뜁니다."; MODE=skip
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "today=$TODAY" >> "$GITHUB_OUTPUT"
+          echo "실행 모드: $MODE"
+
+      - uses: actions/setup-python@v5
+        if: steps.decide.outputs.mode != 'skip'
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        if: steps.decide.outputs.mode != 'skip'
+        run: |
+          pip install -r requirements.txt
+          echo "설치된 버전 (문제 생기면 requirements.txt 고정값과 비교):"
+          pip freeze | grep -iE "yfinance|pandas|requests|feedparser|jinja2|beautifulsoup4|openpyxl"
+
+      - name: Run Collector
+        if: steps.decide.outputs.mode == 'collect'
+        timeout-minutes: 20
+        run: python src/collector.py
+
+      - name: Build Site
+        if: steps.decide.outputs.mode != 'skip'
+        run: python src/build_site.py
+
+      - name: Commit data
+        if: steps.decide.outputs.mode == 'collect'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ docs/archive/
+          if git diff --staged --quiet; then echo "변경 없음"; exit 0; fi
+          git commit -q -m "chore: daily brief data [${{ steps.decide.outputs.today }}]"
+          for i in 1 2 3; do
+            echo "── push 시도 $i/3"
+            if git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" 2>&1 && git push origin "HEAD:${GITHUB_REF_NAME}" 2>&1; then
+              echo "push 완료"; exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          git status --short | head -20
+          echo "::warning::데이터 커밋 push 실패 — 사이트 배포는 계속 진행합니다."
+
+      - name: Upload Pages artifact
+        if: steps.decide.outputs.mode != 'skip' && !cancelled()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+  deploy:
+    needs: update-and-build
+    if: needs.update-and-build.outputs.mode != 'skip' && !cancelled()
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
