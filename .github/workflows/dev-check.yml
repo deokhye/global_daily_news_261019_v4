@@ -1,0 +1,72 @@
+name: Dev Check
+
+# main 이외 브랜치 push / main 대상 PR 에서 자동 실행. 커밋·배포는 하지 않는다.
+#   기본      : 테스트 + 저장소에 있는 데이터로 화면만 생성 (1~2분, 외부 요청 없음)
+#   수동 실행 : "실제 수집까지 점검"을 켜면 뉴스·환율을 실제로 수집해 본다 (10~15분)
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      live:
+        description: "실제 수집까지 점검 (뉴스·환율·번역)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dev-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: Run Collector (실제 수집)
+        if: inputs.live
+        timeout-minutes: 20
+        run: python src/collector.py 2>&1 | tee collector.log
+
+      - name: Build Site
+        run: python src/build_site.py
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Dev Check"
+            if [ -f collector.log ]; then
+              echo '```'
+              grep -E "\[품질\]|번역 완료|번역 중단|시간 예산|Google News 오류|개국 수집 완료" collector.log || true
+              echo '```'
+            else
+              echo "실제 수집 없이 저장된 데이터로 화면만 만들었습니다. (수동 실행에서 '실제 수집까지 점검'을 켜면 수집도 점검합니다)"
+            fi
+            echo "미리보기: Artifacts 의 **site-preview** 를 내려받아 압축을 풀고, 그 폴더에서 \`python -m http.server\` 실행 후 http://localhost:8000 접속 (날짜 이동까지 확인 가능)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload site preview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-preview
+          path: docs/
+          retention-days: 7
