@@ -1,35 +1,45 @@
 """
-collector.py
-------------
-Global HR Insight — 한국타이어 39개국 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
+collector.py  (v4)
+------------------
+Global Daily News — 한국타이어 39개 진출국 데이터 수집기.
 
-입력 (모두 config/, src/profile_overlay.py 가 읽음)
-  countries.csv · country_codes.csv · sites.csv · official_sources.csv · manual_profile.json
-  news_filters.json            국가별 뉴스 별칭·제외어·거부 정규식
-  output/country_profile.json  국가 기본 프로필 자동 수집 결과(있을 때만)
-
+입력
+  data/countries_metadata.json : 국가 기본 메타데이터(국가명/통화/수도/인구/GDP/물가/실업률/
+                                 최저임금/거점). 리스트 형식 또는
+                                 {"as_of": "2026-10-01", "countries": [...]} 형식 모두 지원.
 출력
-  data/countries_data.json      오늘자 전체 데이터 (build_site.py 입력, 압축 JSON)
-  data/translation_cache.json   영→한 번역 캐시 (45일 보존)
-  docs/archive/YYYY-MM-DD.json  날짜별 아카이브 (180일 보존) + index.json
+  data/countries_data.json      : 오늘자 전체 데이터 (build_site.py 입력)
+  data/translation_cache.json   : 영→한 번역 캐시 (재실행 시 번역 호출 최소화)
+  docs/archive/YYYY-MM-DD.json  : 날짜별 아카이브 (180일 보존) + index.json
 
-수집 항목
-  환율        yfinance 일괄 다운로드 → 직접/USD 교차 환산 중 신뢰도 높은 쪽, 1년 월말 추이
-  현지 뉴스    Google News RSS — 안전·재난 / 정치·경제 / 사회·문화 (국가 관련성·가십 필터)
-  HR·노동      한국어 우선 → 영문 보충, 법·제도 기사 표시
-  완성차·타이어 국가별 + 글로벌(경쟁사·시장) 동향
-  번역        수집 후 일괄 번역(Google → MyMemory), 시간 예산·연속 실패 시 중단
+매 실행마다 새로 수집하는 것은 환율(yfinance)과 뉴스(Google News RSS) 두 가지다.
 
-실행 시간 보호
-  FX_BUDGET_SEC / NEWS_BUDGET_SEC / TRANSLATION_BUDGET_SEC 를 넘기면 남은 작업은 직전 값으로 대체.
+v4 변경 사항
+  1) 번역: 국가별 병렬 스레드 안에서 개별 호출하던 방식을 폐기. 수집이 끝난 뒤 한 번에
+     묶음(batch) 번역 + 재시도/백오프 + MyMemory 보조 번역기 + 영구 캐시를 적용했다.
+     이전 실행에서 번역에 실패해 영문으로 남은 캐시 항목도 다음 실행 때 다시 번역한다.
+  2) 환율: 전체 티커를 한 번에 일괄 다운로드(yf.download)해 호출 수를 줄이고,
+     - USD/PAB는 USDKRW=X를 직접 사용 (기존: USDUSD=X 교차 시도로 1개월치만 남던 버그)
+     - 교차 환산은 날짜 정규화 + inner join으로 날짜 어긋남에 의한 이상 등락률 제거
+     - 직접 페어가 낡았거나 교차값과 5% 이상 어긋나면 교차 환산을 채택
+     - 소액 통화 100단위 표기 확대(JPY/VND/IDR/HUF/KZT/CLP/COP) + 크기별 소수 자릿수
+       (decimals 필드)로 저가 통화도 변동이 보이도록 함
+     - 수집·캐시 모두 실패하면 가짜(합성) 곡선 대신 "수집 실패"로 정직하게 표시
+  3) 뉴스 정확도: 국가별 별칭(국명/형용사/수도)이 제목에 실제로 들어간 기사만 채택하고,
+     동명이인 지명(Panama City FL, chile pepper 등)은 제외어로 걸러낸다.
+     비즈니스 동향은 따옴표로 묶은 국가명 + OR 키워드 쿼리로 다시 설계했다.
+  4) 요약 정리: HTML 엔티티(&nbsp; 등) 디코딩, 제목과 같은 무의미한 요약 제거,
+     링크+정규화 제목 기준 중복 제거, 발행일(published) 필드 추가.
+  5) RSS 요청에 타임아웃/재시도/User-Agent 적용 (feedparser 단독 호출은 타임아웃이 없음).
+  6) as_of_display에 실제 수집 시각을 기록 ("YYYY-MM-DD HH:MM KST 수집").
+  7) 기존 아카이브의 &nbsp; 등 깨진 텍스트를 자동 정리.
 
-환경변수 (테스트용)
-  DISABLE_TRANSLATION=1  번역 호출 생략
-  OFFLINE=1              네트워크 호출 없이 캐시·대체 경로만 실행
+환경변수
+  DISABLE_TRANSLATION=1 : 번역 호출 생략(오프라인 테스트용)
+  OFFLINE=1             : 네트워크 호출 전부 생략 → 캐시/폴백 경로만 실행(테스트용)
 """
 
 import os
-import sys
 import re
 import copy
 import html
@@ -46,18 +56,17 @@ import feedparser
 import pandas as pd
 import pytz
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # python src/xxx.py 외 실행 방식 대비
-from profile_overlay import REGIONS, ProfileContext, is_bad_value
-
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("collector")
 
 KST = pytz.timezone("Asia/Seoul")
 BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 DATA_DIR = os.path.join(BASE_DIR, "data")
+METADATA_PATH = os.path.join(DATA_DIR, "countries_metadata.json")
 CACHE_PATH = os.path.join(DATA_DIR, "countries_data.json")
 TRANSLATION_CACHE_PATH = os.path.join(DATA_DIR, "translation_cache.json")
 ARCHIVE_DIR = os.path.join(BASE_DIR, "docs", "archive")
+ARCHIVE_INDEX_PATH = os.path.join(ARCHIVE_DIR, "index.json")
 ARCHIVE_RETENTION_DAYS = 180
 TRANSLATION_CACHE_TTL_DAYS = 45
 
@@ -87,26 +96,79 @@ MIN_RELIABLE_TRADING_DAYS = 30
 FALLBACK_TEXT = "현지 산업 및 정책 모니터링 중"
 HANGUL_RE = re.compile(r"[가-힣]")
 
+REGIONS = [
+    {"key": "ALL", "label": "전체"},
+    {"key": "KR", "label": "한국"},
+    {"key": "CN", "label": "중국"},
+    {"key": "AMER", "label": "미주"},
+    {"key": "EU", "label": "유럽"},
+    {"key": "LATAM", "label": "중남미"},
+    {"key": "APAC", "label": "아태"},
+    {"key": "MEA", "label": "중아"},
+]
+
 # ---------------------------------------------------------------------------
 # 국가별 뉴스 필터 사전
 #   aliases  : 제목에 하나라도 (대소문자 구분, 단어 경계) 들어가야 해당 국가 기사로 인정
 #   exclude  : 검색 쿼리에 붙일 제외어 (Google News 문법)
 #   reject   : 제목이 이 정규식에 걸리면 버림 (동명 지명/동음이의어)
 # ---------------------------------------------------------------------------
-NEWS_FILTERS_PATH = os.path.join(BASE_DIR, "config", "news_filters.json")
-
-
-def _load_news_filters() -> dict:
-    """config/news_filters.json (키: ISO3) → {ISO2: {aliases, exclude, reject}}"""
-    try:
-        with open(NEWS_FILTERS_PATH, "r", encoding="utf-8") as f:
-            raw = json.load(f)
-    except FileNotFoundError:
-        log.warning("config/news_filters.json 이 없어 영문 국가명만으로 기사를 거릅니다")
-        return {}
-    iso3_to_iso2 = {c["iso3"]: c["code"] for c in COUNTRIES}
-    return {iso3_to_iso2[k]: v for k, v in raw.items() if k in iso3_to_iso2 and isinstance(v, dict)}
-
+COUNTRY_NEWS_FILTERS = {
+    "US": {"aliases": ["United States", "U.S.", "US", "USA", "America", "American", "Americans", "Washington", "Fed", "White House"],
+           "reject": r"\bLatin America\b|\bSouth America\b|\bCentral America\b"},
+    "DE": {"aliases": ["Germany", "German", "Germans", "Berlin", "Bundestag", "Bundesbank"]},
+    "CN": {"aliases": ["China", "Chinese", "Beijing", "Shanghai", "Xi Jinping"]},
+    "HU": {"aliases": ["Hungary", "Hungarian", "Budapest", "Orban", "Orbán"]},
+    "ID": {"aliases": ["Indonesia", "Indonesian", "Jakarta", "Prabowo"]},
+    "NL": {"aliases": ["Netherlands", "Dutch", "Amsterdam", "The Hague", "Rotterdam"],
+           "exclude": ['-"Love is Blind"'], "reject": r"Love is Blind|Pennsylvania Dutch"},
+    "TW": {"aliases": ["Taiwan", "Taiwanese", "Taipei"]},
+    "RU": {"aliases": ["Russia", "Russian", "Russians", "Moscow", "Kremlin", "Putin"]},
+    "RO": {"aliases": ["Romania", "Romanian", "Bucharest"]},
+    "MY": {"aliases": ["Malaysia", "Malaysian", "Kuala Lumpur", "Anwar"]},
+    "MX": {"aliases": ["Mexico", "Mexican", "Mexicans", "Sheinbaum"],
+           "exclude": ['-"New Mexico"'], "reject": r"\bNew Mexico\b|\bGulf of Mexico\b"},
+    "MA": {"aliases": ["Morocco", "Moroccan", "Rabat", "Casablanca", "Tangier"]},
+    "VN": {"aliases": ["Vietnam", "Vietnamese", "Viet Nam", "Hanoi", "Ho Chi Minh"],
+           "reject": r"\bVietnam War\b|\bVietnam veteran"},
+    "BR": {"aliases": ["Brazil", "Brazilian", "Brasilia", "Brasília", "Sao Paulo", "São Paulo", "Lula"]},
+    "SA": {"aliases": ["Saudi", "Saudi Arabia", "Riyadh", "Jeddah", "Aramco"]},
+    "RS": {"aliases": ["Serbia", "Serbian", "Belgrade", "Vucic", "Vučić"]},
+    "SE": {"aliases": ["Sweden", "Swedish", "Stockholm"]},
+    "ES": {"aliases": ["Spain", "Spanish", "Madrid", "Barcelona", "Sánchez", "Sanchez"],
+           "reject": r"\bSpanish[- ](language|speaking|speakers)\b"},
+    "SG": {"aliases": ["Singapore", "Singaporean", "Singaporeans", "MAS"]},
+    "AE": {"aliases": ["UAE", "United Arab Emirates", "Emirati", "Emirates", "Dubai", "Abu Dhabi"],
+           "reject": r"\bEmirates (Stadium|Cup)\b"},
+    "GB": {"aliases": ["UK", "U.K.", "Britain", "British", "England", "English", "London", "Scotland", "Wales", "Starmer", "Bank of England"],
+           "reject": r"\bNew England\b|\bEnglish Premier League\b|\bLondon, Ontario\b"},
+    "AT": {"aliases": ["Austria", "Austrian", "Vienna"]},
+    "UA": {"aliases": ["Ukraine", "Ukrainian", "Ukrainians", "Kyiv", "Zelensky", "Zelenskyy"]},
+    "EG": {"aliases": ["Egypt", "Egyptian", "Cairo", "Suez"]},
+    "IT": {"aliases": ["Italy", "Italian", "Italians", "Rome", "Milan", "Meloni"]},
+    "JP": {"aliases": ["Japan", "Japanese", "Tokyo", "BOJ", "Bank of Japan"]},
+    "CZ": {"aliases": ["Czech", "Czechia", "Czech Republic", "Prague"]},
+    "CL": {"aliases": ["Chile", "Chilean", "Chileans", "Santiago"],
+           "exclude": ["-pepper", "-peppers", "-recipe", "-chili"],
+           "reject": r"(?i)\bchile[s]? (pepper|relleno|verde|colorado)|\bgreen chile\b|\bred chile\b|\bHatch\b|\bSantiago Bernabéu\b"},
+    "KZ": {"aliases": ["Kazakhstan", "Kazakh", "Astana", "Almaty", "Tokayev"]},
+    "CA": {"aliases": ["Canada", "Canadian", "Canadians", "Ottawa", "Ontario", "Quebec", "Carney"]},
+    "CO": {"aliases": ["Colombia", "Colombian", "Colombians", "Bogota", "Bogotá", "Medellin", "Medellín", "Petro"],
+           "reject": r"\bColumbia\b"},
+    "HR": {"aliases": ["Croatia", "Croatian", "Zagreb"]},
+    "TH": {"aliases": ["Thailand", "Thai", "Bangkok"],
+           "reject": r"(?i)\bthai (food|restaurant|curry|massage)\b"},
+    "TR": {"aliases": ["Turkey", "Türkiye", "Turkiye", "Turkish", "Ankara", "Istanbul", "Erdogan", "Erdoğan"],
+           "exclude": ["-Thanksgiving"], "reject": r"(?i)\bthanksgiving\b|\bturkey (recipe|dinner|sandwich)\b"},
+    "PA": {"aliases": ["Panama", "Panamanian", "Panama Canal"],
+           "exclude": ['-"Panama City Beach"', "-Florida", "-Fla"],
+           "reject": r"Panama City(,)? (FL|Fla|Florida)|Panama City Beach|Bay County|Panama Jack"},
+    "PL": {"aliases": ["Poland", "Polish", "Warsaw", "Tusk"],
+           "reject": r"(?i)\bnail polish\b"},
+    "FR": {"aliases": ["France", "French", "Paris", "Macron", "Élysée"],
+           "reject": r"(?i)\bfrench (fries|toast|bulldog|press)\b|\bParis Hilton\b|\bParis, (Texas|Tennessee|TN|TX)\b"},
+    "AU": {"aliases": ["Australia", "Australian", "Australians", "Canberra", "Sydney", "Melbourne", "Albanese", "RBA"]},
+}
 
 # 비즈니스 동향 2대 카테고리
 #   kr_* : 한국어 검색(1순위)   en_* : 영문 검색(2순위, 번역 대상)
@@ -134,12 +196,77 @@ INDUSTRY_TOPICS = [
 
 
 # ---------------------------------------------------------------------------
-# 0. 국가 목록·프로필 설정 (config/ 단일 출처, src/profile_overlay.py)
+# 0. 메타데이터 로드
 # ---------------------------------------------------------------------------
-_is_bad_value = is_bad_value
-PROFILE = ProfileContext()
-COUNTRIES = PROFILE.countries
-COUNTRY_NEWS_FILTERS = _load_news_filters()
+def _is_bad_value(value) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, str) and value.strip().lower() in {"error", "err", "undefined", "null", "none", "nan", "n/a", ""}:
+        return True
+    return False
+
+
+def _read_metadata_payload():
+    if not os.path.exists(METADATA_PATH):
+        raise FileNotFoundError(f"{METADATA_PATH} 파일이 없습니다. 39개국 메타데이터 파일을 먼저 준비하세요.")
+    with open(METADATA_PATH, "r", encoding="utf-8") as f:
+        raw = f.read()
+    if not raw.strip():
+        raise ValueError(f"{METADATA_PATH} 파일이 비어 있습니다.")
+    return json.loads(raw)
+
+
+def load_countries_metadata(payload) -> list:
+    rows = payload.get("countries") if isinstance(payload, dict) else payload
+    if not isinstance(rows, list) or not rows:
+        raise ValueError(f"{METADATA_PATH} 안에 유효한 countries 리스트가 없습니다.")
+
+    countries = []
+    for row in rows:
+        if not isinstance(row, dict) or _is_bad_value(row.get("code")):
+            log.warning(f"[metadata] 잘못된 국가 항목을 건너뜁니다: {row}")
+            continue
+        code = str(row["code"]).strip().upper()
+        offices = row.get("offices") if isinstance(row.get("offices"), list) else []
+        countries.append({
+            "code": code,
+            "region": row.get("region", "ALL"),
+            "name_kr": row.get("name_ko", code),
+            "name_en": row.get("name_en", code),
+            "currency": row.get("currency", "USD"),
+            "flag": code.lower(),
+            "offices": offices,
+            "hubs": offices,
+            "meta_profile": {
+                "capital": row.get("capital", "-"),
+                "population": row.get("population", "-"),
+                "gdp": row.get("gdp", "-"),
+                "inflation": row.get("inflation", "-"),
+                "unemployment": row.get("unemployment", "-"),
+                "min_wage": row.get("min_wage", "-"),
+                "curr_unit": row.get("curr_unit", ""),
+                "as_of": row.get("as_of", ""),
+            },
+        })
+    if not countries:
+        raise ValueError(f"{METADATA_PATH} 에서 유효한 국가를 하나도 읽지 못했습니다.")
+    return countries
+
+
+def _metadata_asof(payload) -> str:
+    """메타데이터 기준일. dict 형식일 때 as_of / generated_at 키를 읽고, 없으면 빈 문자열
+    (프론트엔드는 빈 값이면 '(… 기준)' 문구 자체를 숨긴다)."""
+    if isinstance(payload, dict):
+        for k in ("as_of", "generated_at", "updated_at"):
+            v = payload.get(k)
+            if not _is_bad_value(v):
+                return str(v)
+    return ""
+
+
+_METADATA_PAYLOAD = _read_metadata_payload()
+COUNTRIES = load_countries_metadata(_METADATA_PAYLOAD)
+METADATA_ASOF = _metadata_asof(_METADATA_PAYLOAD)
 
 
 # ---------------------------------------------------------------------------
@@ -174,6 +301,166 @@ def _yahoo_finance_url(currency: str) -> str:
     if currency in USD_PEGGED_1to1:
         return "https://finance.yahoo.com/quote/USDKRW=X"
     return f"https://finance.yahoo.com/quote/{currency}KRW=X"
+
+
+# ---------------------------------------------------------------------------
+# 1. 국가 프로필
+# ---------------------------------------------------------------------------
+PROFILE_JSON_PATH = os.path.join(BASE_DIR, "output", "country_profile.json")
+PROFILE_FIELDS = ("population", "gdp", "inflation", "unemployment", "min_wage")
+
+
+def load_auto_profiles() -> tuple[dict, str]:
+    """country_profile 파이프라인(python -m country_profile)이 만든 output/country_profile.json 을
+    읽어 {ISO2: 항목} 으로 돌려준다. 파일이 없으면 빈 dict — 기존 메타데이터만 사용한다."""
+    try:
+        with open(PROFILE_JSON_PATH, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        by_code = {str(c.get("iso2", "")).upper(): c for c in payload.get("countries", []) if c.get("iso2")}
+        return by_code, str(payload.get("generated_at", ""))[:10]
+    except FileNotFoundError:
+        return {}, ""
+    except Exception as e:  # noqa: BLE001
+        log.warning(f"자동 수집 프로필 로드 실패(메타데이터만 사용): {e}")
+        return {}, ""
+
+
+AUTO_PROFILES, AUTO_PROFILES_ASOF = load_auto_profiles()
+
+CONFIG_DIR = os.path.join(BASE_DIR, "config")
+
+
+def _read_pipe_csv(path: str) -> list:
+    import csv
+    with open(path, "r", encoding="utf-8-sig", newline="") as f:
+        return [{(k or "").strip(): (v or "").strip() for k, v in row.items()}
+                for row in csv.DictReader(f, delimiter="|")]
+
+
+def load_fixed_config() -> dict:
+    """config/countries.csv(수도)·sites.csv(거점)·country_codes.csv(ISO3→ISO2) 를 읽어
+    {ISO2: {"capital": str, "sites": [..]}} 로 돌려준다. 수도·거점은 수집 대상이 아닌 고정값이라
+    국가 프로필 파이프라인 실행 여부와 관계없이 이 파일 값을 바로 화면에 쓴다."""
+    try:
+        iso2_of = {r["iso3"].upper(): r["iso2"].upper()
+                   for r in _read_pipe_csv(os.path.join(CONFIG_DIR, "country_codes.csv")) if r.get("iso2")}
+        out = {}
+        for r in _read_pipe_csv(os.path.join(CONFIG_DIR, "countries.csv")):
+            iso2 = iso2_of.get(r.get("iso3", "").upper())
+            if iso2:
+                out[iso2] = {"capital": r.get("capital", ""), "sites": []}
+        for r in _read_pipe_csv(os.path.join(CONFIG_DIR, "sites.csv")):
+            iso2 = iso2_of.get(r.get("iso3", "").upper())
+            if iso2 in out and r.get("site_name"):
+                out[iso2]["sites"].append(f"{r['site_name']} ({r['city']})" if r.get("city") else r["site_name"])
+        _attach_official_sources(out, iso2_of)
+        return out
+    except FileNotFoundError:
+        return {}
+    except Exception as e:  # noqa: BLE001
+        log.warning(f"config/ 고정 데이터(수도·거점) 로드 실패 — 메타데이터 값 사용: {e}")
+        return {}
+
+
+EU_MEMBERS_ISO3 = {"DEU", "HUN", "FRA", "ITA", "ESP", "NLD", "POL", "SWE", "CZE", "AUT", "ROU", "HRV"}
+
+
+def _attach_official_sources(out: dict, iso2_of: dict) -> None:
+    """config/official_sources.csv (iso3|name|url|desc). iso3 칸에 ALL 이면 전체 국가, EU 면 EU 회원국에 붙는다.
+    국가별 행이 먼저, 공통 행(EU → ALL)이 뒤에 오도록 정렬한다. http(s) 주소만 허용."""
+    path = os.path.join(CONFIG_DIR, "official_sources.csv")
+    if not os.path.exists(path):
+        return
+    own, common = {}, {}
+    for r in _read_pipe_csv(path):
+        key, url = r.get("iso3", "").upper(), r.get("url", "")
+        if not key or not r.get("name") or not re.match(r"^https?://", url):
+            continue
+        entry = {"name": r["name"], "url": url, "desc": r.get("desc", "")}
+        if key in ("ALL", "EU"):
+            common.setdefault(key, []).append(entry)
+        else:
+            own.setdefault(key, []).append(entry)
+    for iso3, iso2 in iso2_of.items():
+        if iso2 not in out:
+            continue
+        lst = list(own.get(iso3, []))
+        if iso3 in EU_MEMBERS_ISO3:
+            lst += common.get("EU", [])
+        lst += common.get("ALL", [])
+        out[iso2]["official"] = lst
+
+
+FIXED_CONFIG = load_fixed_config()
+
+
+def _official_min_wage_source(mw, official: list) -> str:
+    """메타데이터 최저임금은 각국 정부 공식 발표를 옮겨 적은 값이므로 '자체 조사'가 아니라 공식 출처로 표기한다.
+    비고에 Eurostat 이 적혀 있으면 Eurostat, 아니면 config/official_sources.csv 에서 최저임금 담당 기관
+    (desc 에 '최저임금' 포함)을 찾아 쓰고, 없으면 '정부 공식 발표'."""
+    note = mw.get("note", "") if isinstance(mw, dict) else str(mw or "")
+    if "Eurostat" in note:
+        return "Eurostat"
+    for o in official:
+        if "최저임금" in (o.get("desc") or "") or "minimum" in (o.get("name") or "").lower():
+            return f"{o['name']} (정부 공식 발표)"
+    return "정부 공식 발표"
+
+
+def build_profile(country: dict, cached: dict) -> dict:
+    """프로필 카드 값. 총인구·GDP·인플레이션·실업률·최저임금은 자동 수집 결과
+    (output/country_profile.json)를 우선 쓰고, 값이 없으면('-') 기존 메타데이터로 채운다.
+    수도·거점은 config/countries.csv·sites.csv 값을 우선 쓴다(없으면 메타데이터)."""
+    meta = country.get("meta_profile", {})
+    cached_profile = (cached or {}).get("profile", {})
+    auto = AUTO_PROFILES.get(country.get("code", "").upper(), {})
+    fixed = FIXED_CONFIG.get(country.get("code", "").upper(), {})
+
+    def pick(key):
+        if key == "capital" and fixed.get("capital"):
+            return fixed["capital"]
+        v = auto.get(key) if key in PROFILE_FIELDS else None
+        if not _is_bad_value(v) and v != "-":
+            return v
+        v = meta.get(key)
+        if not _is_bad_value(v):
+            return v
+        return cached_profile.get(key, "-")
+
+    used_auto = any(not _is_bad_value(auto.get(k)) and auto.get(k) != "-" for k in PROFILE_FIELDS)
+    default_src = {"population": "IMF", "gdp": "IMF", "inflation": "Trading Economics",
+                   "unemployment": "Trading Economics", "min_wage": "정부 공식 발표"}
+    sources = {}
+    for k in PROFILE_FIELDS:
+        v = auto.get(k)
+        if not _is_bad_value(v) and v != "-":
+            src = str(((auto.get("details") or {}).get(k) or {}).get("source") or default_src[k])
+            sources[k] = src.split(" (")[0].replace("IMF WEO", "IMF")
+        else:
+            sources[k] = "Global HR 자체 조사"
+    if sources["min_wage"] == "Global HR 자체 조사":
+        sources["min_wage"] = _official_min_wage_source(meta.get("min_wage"), fixed.get("official") or [])
+    # 법정 최저임금이 없는 나라는 '각국 노동법 기준', 보정 파일 값은 '정부 공식 발표'로 표기 (내부 용어 노출 금지)
+    _mw = pick("min_wage")
+    _mw_text = _mw.get("display", "") if isinstance(_mw, dict) else str(_mw or "")
+    if "법정 최저임금 없음" in _mw_text:
+        sources["min_wage"] = "각국 노동법 기준"
+    elif "보정" in sources["min_wage"] or "HR 확인" in sources["min_wage"]:
+        sources["min_wage"] = "정부 공식 발표"
+    return {
+        "capital": pick("capital"),
+        "population": pick("population"),
+        "gdp": pick("gdp"),
+        "inflation": pick("inflation"),
+        "unemployment": pick("unemployment"),
+        "min_wage": pick("min_wage"),
+        "min_wage_note": "",
+        "sites": auto.get("sites") or [],
+        "stats_source": ("IMF WEO · Trading Economics · Eurostat/ILOSTAT · 정부 공식 발표" if used_auto
+                         else "Hankook Tire Global HR 자체 조사"),
+        "stats_asof": (AUTO_PROFILES_ASOF if used_auto else (meta.get("as_of") or METADATA_ASOF or "")),
+        "sources": sources,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -434,6 +721,10 @@ def _google_news_url_ko(query: str) -> str:
     return f"https://news.google.com/rss/search?q={_q(query)}&hl=ko&gl=KR&ceid=KR:ko"
 
 
+def _google_news_top_url_ko() -> str:
+    return "https://news.google.com/rss?hl=ko&gl=KR&ceid=KR:ko"
+
+
 def _google_news_url_en(query: str) -> str:
     return f"https://news.google.com/rss/search?q={_q(query)}&hl=en-US&gl=US&ceid=US:en"
 
@@ -622,7 +913,7 @@ def make_relevance_checker(country: dict):
     """(title, lang) → bool. 영문 기사는 별칭이 제목에, 한국어 기사는 한글 국가명이 제목에 있어야 통과."""
     code = country.get("code", "")
     name_kr = country.get("name_kr", "")
-    alias_re = _alias_regex(code, query_name(country))
+    alias_re = _alias_regex(code, country.get("name_en", ""))
     reject_re = _reject_regex(code)
 
     def check(title: str, lang: str) -> bool:
@@ -637,12 +928,6 @@ def make_relevance_checker(country: dict):
     return check
 
 
-def query_name(country: dict) -> str:
-    """뉴스 검색에 쓸 영문 국가명. 공식 표기(Türkiye·Czechia)보다 기사에서 흔히 쓰는 이름이 필요할 때
-    config/news_filters.json 의 query_name 으로 지정한다."""
-    return COUNTRY_NEWS_FILTERS.get(country.get("code", ""), {}).get("query_name") or country.get("name_en", "")
-
-
 def _exclusions(code: str) -> str:
     ex = COUNTRY_NEWS_FILTERS.get(code, {}).get("exclude", [])
     return (" " + " ".join(ex)) if ex else ""
@@ -651,6 +936,22 @@ def _exclusions(code: str) -> str:
 # ---------------------------------------------------------------------------
 # 5. 현지 주요 뉴스
 # ---------------------------------------------------------------------------
+def _fallback_headline_item(country: dict) -> dict:
+    name_kr = country.get("name_kr", "")
+    return {
+        "title": FALLBACK_TEXT,
+        "source": "Google News 검색",
+        "link": _google_news_search_link(country.get("name_en", "")),
+        "summary": f"{name_kr} 관련 최신 기사를 찾지 못해 Google 뉴스 검색 결과로 연결됩니다." if name_kr
+                   else "관련 최신 기사를 찾지 못해 Google 뉴스 검색 결과로 연결됩니다.",
+        "lang": "ko",
+        "translated": False,
+        "original_title": "",
+        "published": "",
+        "is_fallback": True,
+    }
+
+
 def sanitize_item(item: dict) -> dict:
     """캐시/아카이브에서 온 항목의 텍스트를 정리(&nbsp; 등)하고 필수 키를 보강."""
     if not isinstance(item, dict):
@@ -714,6 +1015,39 @@ def _pick(candidates: list, lang: str, limit: int, seen: set, check=None, alread
     return picked
 
 
+def get_headlines(country: dict, cached: dict, seen: set) -> list:
+    limit = 3
+    code = country.get("code")
+    try:
+        if code == "KR":
+            picked = _pick(_fetch_feed(_google_news_top_url_ko(), limit * 6), "ko", limit, seen)
+        else:
+            check = make_relevance_checker(country)
+            name_en = country["name_en"]
+            ex = _exclusions(code)
+            picked = []
+            queries = [
+                f'"{name_en}" (economy OR government OR business OR policy OR trade OR market){ex} when:3d',
+                f'"{name_en}"{ex} when:3d',
+                f'"{name_en}"{ex} when:7d',
+            ]
+            for q in queries:
+                if len(picked) >= limit:
+                    break
+                picked = _pick(_fetch_feed(_google_news_url_en(q), 40), "en", limit, seen, check, picked)
+        if picked:
+            return picked
+    except Exception as e:
+        log.warning(f"[{code}] 헤드라인 수집 예외: {e}")
+
+    cached_items = _cached_list((cached or {}).get("headlines"),
+                                None if code == "KR" else make_relevance_checker(country))
+    if cached_items:
+        log.info(f"[{code}] 헤드라인: 새 기사 없음 → 이전 수집 기사 유지")
+        return cached_items
+    return [_fallback_headline_item(country)]
+
+
 # ---------------------------------------------------------------------------
 # 6. 비즈니스 동향
 # ---------------------------------------------------------------------------
@@ -721,7 +1055,7 @@ def _fallback_trend_item(spec: dict, country: dict) -> dict:
     if country.get("code") == "KR":
         link = _google_news_search_link(spec["home_query"], "ko")
     else:
-        link = _google_news_search_link(f'"{query_name(country)}" {spec["en_keywords"]}')
+        link = _google_news_search_link(f'"{country.get("name_en", "")}" {spec["en_keywords"]}')
     return {
         "title": FALLBACK_TEXT,
         "desc": f"{spec.get('tag', '')} 관련 최신 기사를 찾지 못해 Google 뉴스 검색 결과로 연결됩니다. 다음 갱신 시 자동으로 업데이트됩니다.",
@@ -751,7 +1085,7 @@ def _to_trend_item(p: dict) -> dict:
 def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
     code = country.get("code")
     name_kr = country.get("name_kr", "")
-    name_en = query_name(country)
+    name_en = country.get("name_en", "")
     check = make_relevance_checker(country)
     ex = _exclusions(code)
 
@@ -857,7 +1191,7 @@ def get_local_news(country: dict, cached: dict, seen: set) -> dict:
     is_home = code == "KR"
     check = None if is_home else make_relevance_checker(country)
     ex = "" if is_home else _exclusions(code)
-    name = query_name(country)
+    name = country.get("name_en", "")
     cached_news = (cached or {}).get("news") or {}
     out = {}
     for cat in NEWS_CATEGORIES:
@@ -954,63 +1288,99 @@ def save_translation_cache(cache: dict) -> None:
 
 
 GTX_URL = "https://translate.googleapis.com/translate_a/single"
+GTX_ALT_URL = "https://clients5.google.com/translate_a/t"       # Google 번역 보조 주소 (1번이 막힐 때)
 MYMEMORY_URL = "https://api.mymemory.translated.net/get"
+# MyMemory 는 익명이면 하루 약 5천 자 한도. 저장소 Secrets 에 MYMEMORY_EMAIL 을 넣으면 하루 5만 자로 늘어난다.
+MYMEMORY_EMAIL = os.environ.get("MYMEMORY_EMAIL", "").strip()
 TRANSLATE_TIMEOUT = 10
+TRANSLATE_STATS: dict = {}
+
+
+def _json_with_retry(method: str, url: str, **kw):
+    """429(요청 과다)·503 이면 3초, 6초 쉬었다가 다시 시도한다."""
+    for attempt in range(3):
+        r = requests.request(method, url, timeout=TRANSLATE_TIMEOUT, headers={"User-Agent": HTTP_USER_AGENT}, **kw)
+        if r.status_code in (429, 503) and attempt < 2:
+            time.sleep(3 * (attempt + 1))
+            continue
+        r.raise_for_status()
+        return r.json()
 
 
 def _translate_google(text: str) -> str:
-    """Google 번역 공개 엔드포인트(client=gtx)를 타임아웃을 명시해 직접 호출.
-    (deep-translator는 내부 요청에 타임아웃이 없어 멈출 수 있어 사용하지 않음)"""
-    r = requests.post(GTX_URL, params={"client": "gtx", "sl": "auto", "tl": "ko", "dt": "t"},
-                      data={"q": text}, timeout=TRANSLATE_TIMEOUT,
-                      headers={"User-Agent": HTTP_USER_AGENT})
-    r.raise_for_status()
-    data = r.json()
+    """Google 번역 공개 엔드포인트(client=gtx). 줄바꿈으로 묶은 여러 문장도 한 번에 번역된다."""
+    data = _json_with_retry("POST", GTX_URL, params={"client": "gtx", "sl": "auto", "tl": "ko", "dt": "t"},
+                            data={"q": text})
     return "".join(seg[0] for seg in (data[0] or []) if seg and seg[0])
 
 
+def _translate_google_alt(text: str) -> str:
+    """Google 번역 보조 주소. 응답 형태가 여러 가지라 첫 번째 문자열을 꺼낸다."""
+    data = _json_with_retry("GET", GTX_ALT_URL, params={"client": "dict-chrome-ex", "sl": "auto", "tl": "ko", "q": text})
+    if isinstance(data, dict):
+        return "".join(s.get("trans", "") for s in data.get("sentences", []) if isinstance(s, dict))
+    while isinstance(data, list) and data:
+        data = data[0]
+    return data if isinstance(data, str) else ""
+
+
 def _translate_mymemory(text: str) -> str:
-    r = requests.get(MYMEMORY_URL, params={"q": text[:480], "langpair": "en|ko"},
-                     timeout=TRANSLATE_TIMEOUT, headers={"User-Agent": HTTP_USER_AGENT})
-    r.raise_for_status()
-    out = (r.json().get("responseData") or {}).get("translatedText") or ""
+    params = {"q": text[:480], "langpair": "en|ko"}
+    if MYMEMORY_EMAIL:
+        params["de"] = MYMEMORY_EMAIL
+    data = _json_with_retry("GET", MYMEMORY_URL, params=params)
+    out = (data.get("responseData") or {}).get("translatedText") or ""
     return "" if "MYMEMORY WARNING" in out.upper() else out
 
 
+TRANSLATORS = [_translate_google, _translate_google_alt, _translate_mymemory]
+
+
 def _translate_one(text: str) -> str:
-    """단건 번역: Google 1회 → MyMemory 1회. 실패 시 빈 문자열."""
-    for fn in (_translate_google, _translate_mymemory):
+    """단건 번역: Google → Google 보조 → MyMemory 순서. 계속 실패한 번역기는 이번 실행에서 건너뛴다."""
+    for fn in TRANSLATORS:
+        st = TRANSLATE_STATS.setdefault(fn.__name__, {"ok": 0, "fail": 0, "streak": 0})
+        if st["streak"] >= 4:
+            continue
         try:
             out = fn(text)
             if out and HANGUL_RE.search(out):
+                st["ok"] += 1
+                st["streak"] = 0
                 return out.strip()
+            st["fail"] += 1
+            st["streak"] += 1
         except Exception as e:
+            st["fail"] += 1
+            st["streak"] += 1
             log.warning(f"{fn.__name__} 실패: {e.__class__.__name__}: {str(e)[:120]}")
     return ""
 
 
 def _translate_batch(texts: list):
-    """여러 문장을 줄바꿈으로 묶어 한 번에 번역(최대 2회 시도). 줄 수가 어긋나면 None."""
+    """여러 문장을 줄바꿈으로 묶어 한 번에 번역. 줄 수가 어긋나거나 실패하면 None."""
+    st = TRANSLATE_STATS.setdefault("batch", {"ok": 0, "fail": 0, "streak": 0})
+    if st["streak"] >= 2:                     # 묶음 번역이 연달아 막히면 단건 번역으로만 진행
+        return None
     joined = "\n".join(t.replace("\n", " ") for t in texts)
-    for attempt in range(2):
-        try:
-            out = _translate_google(joined)
-            if out:
-                lines = [ln.strip() for ln in out.split("\n") if ln.strip()]
-                if len(lines) == len(texts):
-                    return lines
-                log.info(f"묶음 번역 줄 수 불일치({len(lines)}≠{len(texts)}) → 단건 번역으로 전환")
-                return None
-        except Exception as e:
-            log.warning(f"묶음 번역 실패({attempt + 1}/2): {e.__class__.__name__}: {str(e)[:120]}")
-        if attempt == 0:
-            time.sleep(2)
+    try:
+        out = _translate_google(joined)
+        lines = [ln.strip() for ln in (out or "").split("\n") if ln.strip()]
+        if len(lines) == len(texts):
+            st["ok"] += 1
+            st["streak"] = 0
+            return lines
+        log.info(f"묶음 번역 줄 수 불일치({len(lines)}≠{len(texts)}) → 단건 번역으로 전환")
+    except Exception as e:
+        log.warning(f"묶음 번역 실패: {e.__class__.__name__}: {str(e)[:120]}")
+    st["fail"] += 1
+    st["streak"] += 1
     return None
 
 
 def translate_texts(texts: list, cache: dict) -> dict:
-    """영문 문장 리스트 → {원문: 번역문}. 캐시 우선, 미번역분만 호출.
-    시간 예산(TRANSLATION_BUDGET_SEC)과 연속 실패 차단으로 전체 실행 시간을 제한한다."""
+    """영문 문장 리스트 → {원문: 번역문}. texts 순서가 곧 우선순위(앞쪽부터 번역).
+    캐시 우선, 미번역분만 호출하며 시간 예산(TRANSLATION_BUDGET_SEC)으로 전체 실행 시간을 제한한다."""
     today = datetime.now(KST).strftime("%Y-%m-%d")
     result = {}
     pending = []
@@ -1039,7 +1409,6 @@ def translate_texts(texts: list, cache: dict) -> dict:
         chunks.append(chunk)
 
     started = time.monotonic()
-    single_fail_streak = 0
     stop_reason = ""
     for ch in chunks:
         if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
@@ -1049,32 +1418,33 @@ def translate_texts(texts: list, cache: dict) -> dict:
         if translated is None:
             translated = []
             for t in ch:
-                if single_fail_streak >= 5 or time.monotonic() - started > TRANSLATION_BUDGET_SEC:
+                if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
                     translated.append("")
                     continue
-                ko = _translate_one(t)
-                single_fail_streak = 0 if ko else single_fail_streak + 1
-                translated.append(ko)
+                translated.append(_translate_one(t))
                 time.sleep(0.3)
-            if single_fail_streak >= 5:
-                stop_reason = "번역 서비스 연속 실패(5건)"
         for src, ko in zip(ch, translated):
             if ko and HANGUL_RE.search(ko):
                 result[src] = ko
                 cache[src] = {"ko": ko, "last": today}
-        if stop_reason:
+        if all(TRANSLATE_STATS.get(fn.__name__, {}).get("streak", 0) >= 4 for fn in TRANSLATORS) \
+                and TRANSLATE_STATS.get("batch", {}).get("streak", 0) >= 2:
+            stop_reason = "모든 번역 서비스 연속 실패"
             break
         time.sleep(0.5)
 
     done = len([t for t in pending if t in result])
-    log.info(f"번역 완료: {done}/{len(pending)}건 성공 ({time.monotonic() - started:.0f}초)")
+    stats = ", ".join(f"{k} 성공 {v['ok']}·실패 {v['fail']}" for k, v in TRANSLATE_STATS.items())
+    log.info(f"번역 완료: {done}/{len(pending)}건 성공 ({time.monotonic() - started:.0f}초) [{stats}]")
     if stop_reason:
         log.warning(f"번역 중단: {stop_reason} — 나머지는 원문 유지, 다음 실행 때 재시도")
     return result
 
-
 def _iter_news_items(countries: list):
     for c in countries:
+        for h in c.get("headlines", []) or []:
+            if isinstance(h, dict):
+                yield h, "summary"
         for lst in (c.get("news") or {}).values():
             for h in lst or []:
                 if isinstance(h, dict):
@@ -1086,29 +1456,27 @@ def _iter_news_items(countries: list):
 
 
 def apply_translations(countries: list) -> None:
-    """lang=en 이면서 아직 번역되지 않은 모든 항목을 일괄 번역해 반영."""
+    """lang=en 이면서 아직 번역되지 않은 기사 제목을 일괄 번역해 반영.
+    - 화면에는 제목만 나오므로 본문 요약은 번역하지 않는다(요청량 절반 감소).
+    - 글로벌 동향 → 최신 기사 순으로 번역해, 시간이 모자라도 브리핑에 나오는 기사부터 번역되게 한다."""
     cache = load_translation_cache()
     targets = []
-    texts = []
-    for item, body_key in _iter_news_items(countries):
+    for item, _body_key in _iter_news_items(countries):
         if item.get("lang") != "en" or item.get("translated"):
             continue
         src_title = item.get("original_title") or item.get("title") or ""
         item["original_title"] = src_title
-        body = item.get(body_key) or ""
-        if body and HANGUL_RE.search(body):
-            body = ""
-        targets.append((item, body_key, src_title, body))
-        texts.append(src_title)
-        if body:
-            texts.append(body)
+        targets.append((item, src_title))
 
     if not targets:
         save_translation_cache(cache)
         return
 
-    mapping = translate_texts(texts, cache)
-    for item, body_key, src_title, body in targets:
+    # 호출부에서 글로벌 동향을 마지막 묶음으로 넘긴다 → 그 항목들을 맨 앞으로
+    global_ids = {id(i) for i, _ in _iter_news_items(countries[-1:])}
+    ordered = sorted(targets, key=lambda t: (0 if id(t[0]) in global_ids else 1, -_date_num(t[0].get("published"))))
+    mapping = translate_texts([t[1] for t in ordered], cache)
+    for item, src_title in targets:
         ko_title = mapping.get(src_title)
         if ko_title:
             item["title"] = ko_title
@@ -1116,9 +1484,12 @@ def apply_translations(countries: list) -> None:
         else:
             item["title"] = src_title
             item["translated"] = False
-        if body:
-            item[body_key] = mapping.get(body, body)
     save_translation_cache(cache)
+
+
+def _date_num(d) -> int:
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", str(d or ""))
+    return int(m.group(1) + m.group(2) + m.group(3)) if m else 0
 
 
 # ---------------------------------------------------------------------------
@@ -1138,7 +1509,7 @@ def load_cache() -> dict:
 def save_cache(data: dict) -> None:
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(CACHE_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, separators=(",", ":"), default=str)
+        json.dump(data, f, ensure_ascii=False, indent=2, default=str)
 
 
 def clean_old_archives(archive_dir: str, max_days: int = ARCHIVE_RETENTION_DAYS) -> None:
@@ -1192,21 +1563,232 @@ def save_archive(data: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
-# 9. 오케스트레이션
+# 9. 구버전 아카이브 마이그레이션 + 텍스트 정리
+# ---------------------------------------------------------------------------
+def _is_legacy_archive(data: dict) -> bool:
+    if not isinstance(data, dict):
+        return True
+    countries = data.get("countries")
+    if not isinstance(countries, list) or len(countries) != len(COUNTRIES):
+        return True
+    for c in countries:
+        if not isinstance(c, dict):
+            return True
+        profile = c.get("profile")
+        if not isinstance(profile, dict) or "min_wage" not in profile:
+            return True
+        fx = c.get("exchange_rate")
+        if not isinstance(fx, dict) or "unit_base" not in fx or "url" not in fx:
+            return True
+        hr_trends = c.get("hr_trends")
+        if not isinstance(hr_trends, list) or len(hr_trends) != len(INDUSTRY_TOPICS):
+            return True
+        for t in hr_trends:
+            if not isinstance(t, dict) or not isinstance(t.get("items"), list):
+                return True
+        if "offices" not in c and "hubs" not in c:
+            return True
+    return False
+
+
+def _migrate_exchange_rate_legacy(old_fx: dict, meta: dict) -> dict:
+    currency = meta["currency"]
+    if currency == "KRW":
+        return {"is_base": True, "unit_base": 1, "decimals": 1, "current_rate": 1.0, "change_pct": 0.0,
+                "history_labels": [], "history_values": [], "source": "기준통화", "url": ""}
+    old_fx = old_fx if isinstance(old_fx, dict) else {}
+    labels = old_fx.get("history_labels") if isinstance(old_fx.get("history_labels"), list) else []
+    values = old_fx.get("history_values") if isinstance(old_fx.get("history_values"), list) else []
+    if len(labels) != len(values):
+        labels, values = [], []
+    try:
+        current_rate = float(old_fx.get("current_rate"))
+    except Exception:
+        current_rate = None
+    try:
+        change_pct = round(float(old_fx.get("change_pct")), 2)
+    except Exception:
+        change_pct = None
+    unit_base = old_fx.get("unit_base") if isinstance(old_fx.get("unit_base"), int) and old_fx.get("unit_base") > 0 \
+        else SMALL_UNIT_CURRENCIES.get(currency, 1)
+    dec = decimals_for(current_rate or 0)
+    return {
+        "is_base": False,
+        "unit_base": unit_base,
+        "decimals": dec,
+        "current_rate": _round_to(current_rate, dec) if current_rate else None,
+        "change_pct": change_pct,
+        "history_labels": [str(x) for x in labels],
+        "history_values": [_round_to(v, dec) for v in values],
+        "source": old_fx.get("source") if not _is_bad_value(old_fx.get("source")) else "이전 데이터(마이그레이션)",
+        "url": _yahoo_finance_url(currency),
+    }
+
+
+def _migrate_profile_legacy(old_profile: dict, meta: dict) -> dict:
+    old_profile = old_profile if isinstance(old_profile, dict) else {}
+    meta_profile = meta.get("meta_profile", {})
+
+    def _clean(key):
+        v = old_profile.get(key)
+        return meta_profile.get(key, "-") if _is_bad_value(v) else v
+
+    return {
+        "capital": _clean("capital"),
+        "population": _clean("population"),
+        "gdp": _clean("gdp"),
+        "inflation": _clean("inflation"),
+        "unemployment": _clean("unemployment"),
+        "min_wage": meta_profile.get("min_wage", _clean("min_wage")),
+        "min_wage_note": "",
+        "stats_source": "Hankook Tire Global HR 자체 조사",
+        "stats_asof": "",
+    }
+
+
+def _migrate_items(old_list, fallback_item: dict, limit: int) -> list:
+    items = []
+    if isinstance(old_list, list):
+        for h in old_list:
+            if isinstance(h, dict) and not _is_bad_value(h.get("title")) and not _is_bad_value(h.get("link")):
+                items.append(sanitize_item({
+                    "title": str(h.get("title")),
+                    "source": str(h.get("source") or "Google News"),
+                    "link": str(h.get("link")),
+                    "summary": str(h.get("summary") or ""),
+                    "desc": str(h.get("desc") or ""),
+                    "lang": str(h.get("lang") or "ko"),
+                    "translated": bool(h.get("translated")) if isinstance(h.get("translated"), bool) else False,
+                    "original_title": str(h.get("original_title") or ""),
+                }))
+    return items[:limit] if items else [fallback_item]
+
+
+def migrate_legacy_archive_file(path: str, date_str: str) -> None:
+    old_data = {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            raw = f.read()
+        if raw.strip():
+            parsed = json.loads(raw)
+            if isinstance(parsed, dict):
+                old_data = parsed
+    except Exception as e:
+        log.warning(f"[migrate] {path} 로드 실패, 전체를 Fallback으로 재구성: {e}")
+
+    old_countries = old_data.get("countries", []) if isinstance(old_data.get("countries"), list) else []
+    old_by_code = {c.get("code"): c for c in old_countries if isinstance(c, dict) and c.get("code")}
+
+    new_countries = []
+    for meta in COUNTRIES:
+        meta = copy.deepcopy(meta)
+        old = old_by_code.get(meta["code"]) or {}
+        old_trends = {t.get("category"): t for t in (old.get("hr_trends") or []) if isinstance(t, dict)}
+        trends = []
+        for spec in INDUSTRY_TOPICS:
+            ot = old_trends.get(spec["category"]) or {}
+            src_list = ot.get("items") if isinstance(ot.get("items"), list) else ([ot] if ot.get("title") else [])
+            trends.append({
+                "category": spec["category"], "tag": spec["tag"], "tag_class": spec["tag_class"],
+                "items": _migrate_items(src_list, _fallback_trend_item(spec, meta), spec["max_items"]),
+            })
+        new_countries.append({
+            "code": meta["code"], "region": meta["region"], "name_kr": meta["name_kr"],
+            "name_en": meta["name_en"], "currency": meta["currency"], "flag": meta["flag"],
+            "offices": meta.get("offices", []), "hubs": meta.get("offices", []),
+            "profile": _migrate_profile_legacy(old.get("profile", {}), meta),
+            "exchange_rate": _migrate_exchange_rate_legacy(old.get("exchange_rate", {}), meta),
+            "headlines": _migrate_items(old.get("headlines"), _fallback_headline_item(meta), 3),
+            "hr_trends": trends,
+        })
+
+    new_data = {
+        "generated_at": old_data.get("generated_at") or f"{date_str}T06:00:00+09:00",
+        "generated_at_display": old_data.get("generated_at_display") or f"{date_str} 06:00 KST",
+        "as_of_display": f"{date_str} 아카이브",
+        "regions": REGIONS,
+        "countries": new_countries,
+    }
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(new_data, f, ensure_ascii=False, default=str)
+    log.info(f"[migrate] {os.path.basename(path)} 최신 스키마로 마이그레이션 ({len(new_countries)}개국)")
+
+
+def _sanitize_archive_data(data: dict) -> bool:
+    """아카이브 내 기사 텍스트의 HTML 엔티티(&nbsp; 등)를 정리. 변경 시 True."""
+    changed = False
+    for c in data.get("countries", []) or []:
+        if not isinstance(c, dict):
+            continue
+        heads = c.get("headlines")
+        if isinstance(heads, list):
+            new = [sanitize_item(h) if isinstance(h, dict) else h for h in heads]
+            if new != heads:
+                c["headlines"] = new
+                changed = True
+        for t in c.get("hr_trends", []) or []:
+            if isinstance(t, dict) and isinstance(t.get("items"), list):
+                new = [sanitize_item(i) if isinstance(i, dict) else i for i in t["items"]]
+                if new != t["items"]:
+                    t["items"] = new
+                    changed = True
+        prof = c.get("profile")
+        if isinstance(prof, dict) and prof.get("stats_asof") == "-":
+            prof["stats_asof"] = ""
+            changed = True
+    return changed
+
+
+def migrate_all_legacy_archives() -> None:
+    if not os.path.isdir(ARCHIVE_DIR):
+        return
+    date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    touched = 0
+    for fname in sorted(os.listdir(ARCHIVE_DIR)):
+        if fname == "index.json" or not fname.endswith(".json") or not date_pattern.match(fname[:-5]):
+            continue
+        date_str = fname[:-5]
+        path = os.path.join(ARCHIVE_DIR, fname)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                raw = f.read()
+            data = json.loads(raw) if raw.strip() else {}
+        except Exception as e:
+            log.warning(f"[migrate] {fname} 로드 실패(재구성): {e}")
+            data = {}
+        try:
+            if _is_legacy_archive(data):
+                migrate_legacy_archive_file(path, date_str)
+                touched += 1
+            elif _sanitize_archive_data(data):
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, default=str)
+                touched += 1
+        except Exception as e:
+            log.error(f"[migrate] {fname} 처리 실패, 다음 파일로 계속: {e}")
+    if touched:
+        log.info(f"[migrate] 아카이브 {touched}건 정리/마이그레이션 완료")
+        clean_old_archives(ARCHIVE_DIR, max_days=ARCHIVE_RETENTION_DAYS)
+
+
+# ---------------------------------------------------------------------------
+# 10. 오케스트레이션
 # ---------------------------------------------------------------------------
 def collect_country(country: dict, cache_by_code: dict, fx_series: dict) -> dict:
     code = country["code"]
     cached = cache_by_code.get(code, {})
     seen: set = set()
+    fixed_sites = FIXED_CONFIG.get(code.upper(), {}).get("sites") or []
+    auto_sites = AUTO_PROFILES.get(code.upper(), {}).get("sites") or []
+    offices = copy.deepcopy(fixed_sites or auto_sites or country.get("offices", []))
     result = {
         "code": code, "region": country["region"], "name_kr": country["name_kr"],
         "name_en": country["name_en"], "currency": country["currency"], "flag": country["flag"],
-        "hubs": list(country.get("hubs", [])),
-        "official_sources": list(country.get("official_sources", [])),
+        "offices": offices, "hubs": offices,
     }
 
     try:
-        result["profile"] = PROFILE.profile_for(code, (cached or {}).get("profile"))
+        result["profile"] = build_profile(country, cached)
     except Exception as e:
         log.error(f"[{code}] 프로필 구성 실패: {e}")
         result["profile"] = (cached or {}).get("profile", {})
@@ -1222,6 +1804,10 @@ def collect_country(country: dict, cache_by_code: dict, fx_series: dict) -> dict
     except Exception as e:
         log.error(f"[{code}] 현지 뉴스 실패: {e}")
         result["news"] = {c["id"]: [] for c in NEWS_CATEGORIES}
+    # 구버전 화면·도구 호환용: 현지 주요 뉴스 상위 3건
+    result["headlines"] = (result["news"].get("pol") or result["news"].get("soc") or [])[:3] \
+        or [_fallback_headline_item(country)]
+    result["official_sources"] = FIXED_CONFIG.get(code.upper(), {}).get("official", [])
 
     try:
         result["hr_trends"] = get_industry_trends(country, cached, seen)
@@ -1240,19 +1826,23 @@ def collect_country(country: dict, cache_by_code: dict, fx_series: dict) -> dict
 
 
 def _build_country_fallback(code: str) -> dict:
-    """국가 단위 수집이 통째로 실패했을 때의 최소 골격 (뉴스 없음, 환율 '수집 실패')."""
-    c = PROFILE.by_code.get(code) or {"code": code, "region": "ALL", "name_kr": code, "name_en": code,
-                                      "currency": "USD", "flag": "un", "hubs": [], "official_sources": []}
+    meta = next((copy.deepcopy(c) for c in COUNTRIES if c["code"] == code), None)
+    if meta is None:
+        meta = {"code": code, "region": "ALL", "name_kr": code, "name_en": code, "currency": "USD",
+                "flag": "un", "offices": [], "meta_profile": {}}
+    offices = meta.get("offices", [])
     return {
-        "code": c["code"], "region": c["region"], "name_kr": c["name_kr"], "name_en": c["name_en"],
-        "currency": c["currency"], "flag": c["flag"],
-        "hubs": list(c.get("hubs", [])), "official_sources": list(c.get("official_sources", [])),
-        "profile": PROFILE.profile_for(code),
-        "exchange_rate": _failed_fx(c["currency"], SMALL_UNIT_CURRENCIES.get(c["currency"], 1)),
-        "news": {cat["id"]: [] for cat in NEWS_CATEGORIES},
+        "code": meta["code"], "region": meta["region"], "name_kr": meta["name_kr"],
+        "name_en": meta["name_en"], "currency": meta["currency"], "flag": meta["flag"],
+        "offices": offices, "hubs": offices,
+        "profile": build_profile(meta, {}),
+        "exchange_rate": _failed_fx(meta["currency"], SMALL_UNIT_CURRENCIES.get(meta["currency"], 1)),
+        "headlines": [_fallback_headline_item(meta)],
+        "news": {c["id"]: [] for c in NEWS_CATEGORIES},
+        "official_sources": FIXED_CONFIG.get(code.upper(), {}).get("official", []),
         "hr_trends": [
             {"category": s["category"], "tag": s["tag"], "tag_class": s["tag_class"],
-             "items": [_fallback_trend_item(s, c)]}
+             "items": [_fallback_trend_item(s, meta)]}
             for s in INDUSTRY_TOPICS
         ],
     }
@@ -1314,6 +1904,10 @@ def main() -> dict:
         save_archive(data)
     except Exception as e:
         log.error(f"아카이브 저장 실패(사이트 생성은 계속): {e}")
+    try:
+        migrate_all_legacy_archives()
+    except Exception as e:
+        log.error(f"아카이브 마이그레이션 오류(무시): {e}")
 
     _log_quality_report(countries_result)
     log.info(f"전체 {len(countries_result)}개국 수집 완료 ({time.time() - started:.0f}초)")
@@ -1332,11 +1926,11 @@ def _log_quality_report(countries: list) -> None:
     """실행 로그에 품질 요약을 남겨 GitHub Actions에서 바로 확인할 수 있게 한다."""
     fx_fail = [c["code"] for c in countries if not c["exchange_rate"].get("is_base")
                and (c["exchange_rate"].get("stale") or not c["exchange_rate"].get("history_values"))]
-    fallback_news = [c["code"] for c in countries if not any((c.get("news") or {}).values())]
+    fallback_news = [c["code"] for c in countries if any(h.get("is_fallback") for h in c.get("headlines", []))]
     en_items = [i for i, _ in _iter_news_items(countries) if i.get("lang") == "en"]
     untranslated = sum(1 for i in en_items if not i.get("translated"))
     log.info(f"[품질] 환율 최신값 미확보: {len(fx_fail)}개국 {fx_fail}")
-    log.info(f"[품질] 현지 뉴스 0건: {len(fallback_news)}개국 {fallback_news}")
+    log.info(f"[품질] 헤드라인 폴백: {len(fallback_news)}개국 {fallback_news}")
     safe = [(c["code"], i.get("safety_tag")) for c in countries for i in (c.get("news") or {}).get("safe", [])]
     log.info(f"[품질] 안전·재난 보도 {len(safe)}건 {safe}")
     log.info(f"[품질] 영문 기사 {len(en_items)}건 중 미번역 {untranslated}건")
