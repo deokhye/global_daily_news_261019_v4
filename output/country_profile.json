@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-20T16:48:44+09:00",
+  "generated_at": "2026-10-21T08:10:58+09:00",
   "countries": [
     {
       "region": "한국",
@@ -10,8 +10,8 @@
       "capital": "서울",
       "population": "51.6백만 명",
       "gdp": "2,245.8십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "2.9% (2026.09)",
+      "unemployment": "2.6% (2026.09)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Global Headquarters (Seongnam)",
@@ -68,10 +68,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "KOR",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "2.9",
+          "previous_value": "3.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/south-korea/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "KOR",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "2.6",
+          "previous_value": "2.7",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/south-korea/unemployment-rate"
         }
       }
     },
@@ -84,8 +98,8 @@
       "capital": "베이징",
       "population": "1,401.7백만 명",
       "gdp": "21,546.4십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "0.9% (2026.09)",
+      "unemployment": "5.2% (2026.09)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire China Headquarters (Shanghai)",
@@ -142,10 +156,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "CHN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "0.9",
+          "previous_value": "0.8",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/china/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "CHN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "5.2",
+          "previous_value": "5.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/china/unemployment-rate"
         }
       }
     },
@@ -158,8 +186,8 @@
       "capital": "워싱턴 D.C.",
       "population": "342.8백만 명",
       "gdp": "32,642.4십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.7% (2026.09)",
+      "unemployment": "4.2% (2026.09)",
       "min_wage": "USD 1,257 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire America Corp. (Nashville)",
@@ -213,10 +241,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "USA",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.7",
+          "previous_value": "3.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/united-states/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "USA",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.2",
+          "previous_value": "4.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/united-states/unemployment-rate"
         }
       }
     },
@@ -229,8 +271,8 @@
       "capital": "오타와",
       "population": "41.4백만 명",
       "gdp": "2,490.3십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.1% (2026.09)",
+      "unemployment": "6.5% (2026.09)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Canada Corp. (Brampton)"
@@ -282,10 +324,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "CAN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.1",
+          "previous_value": "3.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/canada/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "CAN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "6.5",
+          "previous_value": "6.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/canada/unemployment-rate"
         }
       }
     },
@@ -298,8 +354,8 @@
       "capital": "베를린",
       "population": "83.3백만 명",
       "gdp": "5,471.3십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.3% (2026.09)",
+      "unemployment": "6.4% (2026.09)",
       "min_wage": "EUR 2,343 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire Europe Headquarters (Neu-Isenburg)",
@@ -353,10 +409,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "DEU",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.3",
+          "previous_value": "2.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/germany/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "DEU",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "6.4",
+          "previous_value": "6.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/germany/unemployment-rate"
         }
       }
     },
@@ -369,8 +439,8 @@
       "capital": "부다페스트",
       "population": "9.5백만 명",
       "gdp": "265.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "1.6% (2026.09)",
+      "unemployment": "4.8% (2026.08)",
       "min_wage": "HUF 322,800 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hungary Plant (Rácalmás)",
@@ -423,10 +493,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "HUN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "1.6",
+          "previous_value": "1.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/hungary/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "HUN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "4.8",
+          "previous_value": "4.6",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/hungary/unemployment-rate"
         }
       }
     },
@@ -439,8 +523,8 @@
       "capital": "런던",
       "population": "69.8백만 명",
       "gdp": "4,268.4십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.1% (2026.08)",
+      "unemployment": "4.7% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tyre U.K. Ltd. (Daventry)"
@@ -492,10 +576,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "GBR",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "3.1",
+          "previous_value": "2.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/united-kingdom/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "GBR",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "4.7",
+          "previous_value": "4.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/united-kingdom/unemployment-rate"
         }
       }
     },
@@ -508,8 +606,8 @@
       "capital": "파리",
       "population": "69.1백만 명",
       "gdp": "3,554.2십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.1% (2026.09)",
+      "unemployment": "8.3% (2026 Q2)",
       "min_wage": "EUR 1,867 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook France S.A.R.L. (Villeurbanne)"
@@ -561,10 +659,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "FRA",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.1",
+          "previous_value": "2.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/france/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "FRA",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "8.3",
+          "previous_value": "8.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/france/unemployment-rate"
         }
       }
     },
@@ -577,8 +689,8 @@
       "capital": "로마",
       "population": "58.9백만 명",
       "gdp": "2,701.7십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.2% (2026.09)",
+      "unemployment": "6.2% (2026.08)",
       "min_wage": "법정 최저임금 없음 (단체협약으로 결정)",
       "sites": [
         "Hankook Tire Italia S.R.L. (Sesto San Giovanni)"
@@ -630,10 +742,24 @@
           "note": "법정 최저임금 없음 — 단체협약으로 결정"
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "ITA",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.2",
+          "previous_value": "3.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/italy/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "ITA",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "6.2",
+          "previous_value": "6.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/italy/unemployment-rate"
         }
       }
     },
@@ -646,8 +772,8 @@
       "capital": "마드리드",
       "population": "49.9백만 명",
       "gdp": "2,085.3십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.9% (2026.09)",
+      "unemployment": "9.9% (2026 Q2)",
       "min_wage": "EUR 1,425 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook España, S.A. (Madrid)"
@@ -699,10 +825,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "ESP",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.9",
+          "previous_value": "4.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/spain/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "ESP",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "9.87",
+          "previous_value": "10.83",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/spain/unemployment-rate"
         }
       }
     },
@@ -715,8 +855,8 @@
       "capital": "암스테르담",
       "population": "18.1백만 명",
       "gdp": "1,423.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.4% (2026.09)",
+      "unemployment": "4.0% (2026.09)",
       "min_wage": "EUR 2,338 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire Netherlands B.V. (Hoofddorp)"
@@ -768,10 +908,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "NLD",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.4",
+          "previous_value": "3.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/netherlands/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "NLD",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.0",
+          "previous_value": "4.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/netherlands/unemployment-rate"
         }
       }
     },
@@ -784,8 +938,8 @@
       "capital": "바르샤바",
       "population": "36.3백만 명",
       "gdp": "1,133.1십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.1% (2026.09)",
+      "unemployment": "5.8% (2026.08)",
       "min_wage": "PLN 4,806 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire Polska Sp. z o.o. (Warsaw)"
@@ -837,10 +991,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "POL",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.1",
+          "previous_value": "3.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/poland/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "POL",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "5.8",
+          "previous_value": "5.8",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/poland/unemployment-rate"
         }
       }
     },
@@ -853,8 +1021,8 @@
       "capital": "스톡홀름",
       "population": "10.8백만 명",
       "gdp": "745.1십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "1.1% (2026.09)",
+      "unemployment": "8.1% (2026.09)",
       "min_wage": "법정 최저임금 없음 (단체협약으로 결정)",
       "sites": [
         "Hankook Tire Sweden AB (Upplands Väsby)"
@@ -906,10 +1074,24 @@
           "note": "법정 최저임금 없음 — 단체협약으로 결정"
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "SWE",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "1.1",
+          "previous_value": "0.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/sweden/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "SWE",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "8.1",
+          "previous_value": "8.5",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/sweden/unemployment-rate"
         }
       }
     },
@@ -922,8 +1104,8 @@
       "capital": "모스크바",
       "population": "143.4백만 명",
       "gdp": "2,861.2십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "6.3% (2026.09)",
+      "unemployment": "2.2% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Rus LLC (Moscow)"
@@ -975,10 +1157,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "RUS",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "6.3",
+          "previous_value": "6.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/russia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "RUS",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "2.2",
+          "previous_value": "2.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/russia/unemployment-rate"
         }
       }
     },
@@ -991,8 +1187,8 @@
       "capital": "앙카라",
       "population": "86.2백만 명",
       "gdp": "1,818.0십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "29.7% (2026.09)",
+      "unemployment": "7.8% (2026.08)",
       "min_wage": "TRY 33,030 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Lastikleri A.S. (Istanbul)"
@@ -1044,10 +1240,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "TUR",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "29.73",
+          "previous_value": "31.51",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/turkey/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "TUR",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "7.8",
+          "previous_value": "8.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/turkey/unemployment-rate"
         }
       }
     },
@@ -1060,8 +1270,8 @@
       "capital": "프라하",
       "population": "10.8백만 명",
       "gdp": "428.0십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "2.5% (2026.09)",
+      "unemployment": "5.0% (2026.09)",
       "min_wage": "CZK 22,400 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire Ceska Republika s.r.o. (Prague)"
@@ -1113,10 +1323,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "CZE",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "2.5",
+          "previous_value": "1.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/czech-republic/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "CZE",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "5.0",
+          "previous_value": "5.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/czech-republic/unemployment-rate"
         }
       }
     },
@@ -1129,7 +1353,7 @@
       "capital": "키이우",
       "population": "32.4백만 명",
       "gdp": "229.4십억 USD",
-      "inflation": "-",
+      "inflation": "10.0% (2026.09)",
       "unemployment": "-",
       "min_wage": "UAH 8,647 / 월급 (2026-07-01 시행)",
       "sites": [
@@ -1182,10 +1406,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "UKR",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "10.0",
+          "previous_value": "8.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/ukraine/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "UKR",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "",
+          "value": "",
+          "previous_value": "",
+          "status": "미갱신 (파싱 실패: 최신 값의 기준 기간을 찾지 못함)",
+          "source_url": "https://ko.tradingeconomics.com/ukraine/unemployment-rate"
         }
       }
     },
@@ -1198,8 +1436,8 @@
       "capital": "빈",
       "population": "9.2백만 명",
       "gdp": "616.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.6% (2026.09)",
+      "unemployment": "7.1% (2026.09)",
       "min_wage": "법정 최저임금 없음 (단체협약으로 결정)",
       "sites": [
         "Hankook Tire Austria GmbH (Schwechat)"
@@ -1251,10 +1489,24 @@
           "note": "법정 최저임금 없음 — 단체협약으로 결정"
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "AUT",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.6",
+          "previous_value": "3.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/austria/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "AUT",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "7.1",
+          "previous_value": "7.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/austria/unemployment-rate"
         }
       }
     },
@@ -1267,8 +1519,8 @@
       "capital": "베오그라드",
       "population": "6.5백만 명",
       "gdp": "111.2십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.1% (2026.09)",
+      "unemployment": "7.2% (2026 Q2)",
       "min_wage": "RSD 87,207 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire d.o.o. Beograd (Belgrade)"
@@ -1320,10 +1572,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "SRB",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.1",
+          "previous_value": "2.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/serbia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "SRB",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "7.2",
+          "previous_value": "8.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/serbia/unemployment-rate"
         }
       }
     },
@@ -1336,8 +1602,8 @@
       "capital": "부쿠레슈티",
       "population": "19.0백만 명",
       "gdp": "470.1십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "6.6% (2026.09)",
+      "unemployment": "6.4% (2026.08)",
       "min_wage": "RON 4,325 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire Romania S.R.L. (Bucharest)"
@@ -1389,10 +1655,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "ROU",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "6.6",
+          "previous_value": "6.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/romania/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "ROU",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "6.4",
+          "previous_value": "6.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/romania/unemployment-rate"
         }
       }
     },
@@ -1405,8 +1685,8 @@
       "capital": "라바트",
       "population": "38.0백만 명",
       "gdp": "195.6십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "-0.3% (2026.08)",
+      "unemployment": "9.5% (2026 Q2)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Morocco SAS (Casablanca)"
@@ -1458,10 +1738,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "MAR",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "-0.3",
+          "previous_value": "-0.6",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/morocco/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "MAR",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "9.5",
+          "previous_value": "10.8",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/morocco/unemployment-rate"
         }
       }
     },
@@ -1474,8 +1768,8 @@
       "capital": "자그레브",
       "population": "3.9백만 명",
       "gdp": "115.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.7% (2026.09)",
+      "unemployment": "3.4% (2026.08)",
       "min_wage": "EUR 1,050 / 월급 (2026-07-01 시행)",
       "sites": [
         "Hankook Tire Zagreb d.o.o. (Zagreb)"
@@ -1527,10 +1821,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "HRV",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.7",
+          "previous_value": "4.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/croatia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "HRV",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "3.4",
+          "previous_value": "3.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/croatia/unemployment-rate"
         }
       }
     },
@@ -1543,8 +1851,8 @@
       "capital": "멕시코시티",
       "population": "134.4백만 명",
       "gdp": "2,176.2십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.5% (2026.09)",
+      "unemployment": "3.0% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire de México S.A. de C.V. (Mexico City)"
@@ -1596,10 +1904,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "MEX",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.45",
+          "previous_value": "3.26",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/mexico/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "MEX",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "3.0",
+          "previous_value": "2.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/mexico/unemployment-rate"
         }
       }
     },
@@ -1612,8 +1934,8 @@
       "capital": "보고타",
       "population": "53.4백만 명",
       "gdp": "572.7십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "6.3% (2026.09)",
+      "unemployment": "9.4% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Colombia Ltda. (Bogotá)"
@@ -1665,10 +1987,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "COL",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "6.29",
+          "previous_value": "6.24",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/colombia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "COL",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "9.4",
+          "previous_value": "8.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/colombia/unemployment-rate"
         }
       }
     },
@@ -1681,8 +2017,8 @@
       "capital": "산티아고",
       "population": "20.2백만 명",
       "gdp": "402.2십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.1% (2026.09)",
+      "unemployment": "9.6% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Chile SpA (Santiago)"
@@ -1734,10 +2070,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "CHL",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.1",
+          "previous_value": "4.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/chile/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "CHL",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "9.6",
+          "previous_value": "9.5",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/chile/unemployment-rate"
         }
       }
     },
@@ -1750,8 +2100,8 @@
       "capital": "브라질리아",
       "population": "214.1백만 명",
       "gdp": "2,654.8십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.6% (2026.09)",
+      "unemployment": "5.3% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire do Brasil (São Paulo)"
@@ -1803,10 +2153,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "BRA",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.58",
+          "previous_value": "4.22",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/brazil/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "BRA",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "5.3",
+          "previous_value": "5.3",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/brazil/unemployment-rate"
         }
       }
     },
@@ -1819,7 +2183,7 @@
       "capital": "파나마시티",
       "population": "4.6백만 명",
       "gdp": "96.5십억 USD",
-      "inflation": "-",
+      "inflation": "2.8% (2026.08)",
       "unemployment": "-",
       "min_wage": "-",
       "sites": [
@@ -1872,10 +2236,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "PAN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "2.8",
+          "previous_value": "2.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/panama/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "PAN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "",
+          "value": "",
+          "previous_value": "",
+          "status": "미갱신 (파싱 실패: 최신 값의 기준 기간을 찾지 못함)",
+          "source_url": "https://ko.tradingeconomics.com/panama/unemployment-rate"
         }
       }
     },
@@ -1888,8 +2266,8 @@
       "capital": "자카르타",
       "population": "287.2백만 명",
       "gdp": "1,480.0십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "3.3% (2026.09)",
+      "unemployment": "4.7% (2026 Q1)",
       "min_wage": "-",
       "sites": [
         "Indonesia Plant (Cikarang)",
@@ -1942,10 +2320,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "IDN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "3.28",
+          "previous_value": "3.19",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/indonesia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "IDN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q1",
+          "value": "4.68",
+          "previous_value": "4.85",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/indonesia/unemployment-rate"
         }
       }
     },
@@ -1958,8 +2350,8 @@
       "capital": "도쿄",
       "population": "122.7백만 명",
       "gdp": "4,342.0십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "1.9% (2026.08)",
+      "unemployment": "2.5% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Japan Corp. (Osaka)"
@@ -2011,10 +2403,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "JPN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "1.9",
+          "previous_value": "1.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/japan/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "JPN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "2.5",
+          "previous_value": "2.4",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/japan/unemployment-rate"
         }
       }
     },
@@ -2027,8 +2433,8 @@
       "capital": "캔버라",
       "population": "28.1백만 명",
       "gdp": "2,110.7십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "4.0% (2026.08)",
+      "unemployment": "4.7% (2026.09)",
       "min_wage": "-",
       "sites": [
         "Hankook Tyre Australia Pty. Ltd. (Sydney)"
@@ -2080,10 +2486,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "AUS",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "4.0",
+          "previous_value": "3.5",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/australia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "AUS",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "4.7",
+          "previous_value": "4.7",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/australia/unemployment-rate"
         }
       }
     },
@@ -2096,8 +2516,8 @@
       "capital": "쿠알라룸푸르",
       "population": "34.2백만 명",
       "gdp": "547.1십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "1.8% (2026.09)",
+      "unemployment": "2.9% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Malaysia Sdn. Bhd. (Kuala Lumpur)"
@@ -2149,10 +2569,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "MYS",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "1.8",
+          "previous_value": "1.9",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/malaysia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "MYS",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "2.9",
+          "previous_value": "3.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/malaysia/unemployment-rate"
         }
       }
     },
@@ -2165,8 +2599,8 @@
       "capital": "방콕",
       "population": "71.6백만 명",
       "gdp": "599.1십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "2.8% (2026.09)",
+      "unemployment": "1.0% (2026 Q1)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Thailand Co., Ltd. (Bangkok)"
@@ -2218,10 +2652,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "THA",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "2.82",
+          "previous_value": "2.53",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/thailand/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "THA",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q1",
+          "value": "1.0",
+          "previous_value": "0.94",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/thailand/unemployment-rate"
         }
       }
     },
@@ -2234,8 +2682,8 @@
       "capital": "하노이",
       "population": "103.1백만 명",
       "gdp": "542.1십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "5.1% (2026.09)",
+      "unemployment": "2.2% (2026 Q2)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Vietnam Co., Ltd. (Ho Chi Minh City)"
@@ -2287,10 +2735,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "VNM",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "5.08",
+          "previous_value": "4.89",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/vietnam/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "VNM",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "2.22",
+          "previous_value": "2.23",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/vietnam/unemployment-rate"
         }
       }
     },
@@ -2303,8 +2765,8 @@
       "capital": "타이베이",
       "population": "23.2백만 명",
       "gdp": "1,019.6십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "2.7% (2026.09)",
+      "unemployment": "3.3% (2026.08)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Taiwan Co., Ltd. (Taipei)"
@@ -2356,10 +2818,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "TWN",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "2.73",
+          "previous_value": "2.05",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/taiwan/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "TWN",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "3.32",
+          "previous_value": "3.33",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/taiwan/unemployment-rate"
         }
       }
     },
@@ -2372,8 +2848,8 @@
       "capital": "싱가포르",
       "population": "6.1백만 명",
       "gdp": "667.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "2.3% (2026.08)",
+      "unemployment": "1.9% (2026 Q2)",
       "min_wage": "법정 최저임금 없음 (업종별 점진임금모델(PWM) 적용)",
       "sites": [
         "Hankook Tire Singapore Pte. Ltd. (Singapore)"
@@ -2425,10 +2901,24 @@
           "note": "법정 최저임금 없음 — 업종별 점진임금모델(PWM) 적용"
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "SGP",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-08",
+          "value": "2.3",
+          "previous_value": "2.2",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/singapore/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "SGP",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "1.9",
+          "previous_value": "2.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/singapore/unemployment-rate"
         }
       }
     },
@@ -2441,7 +2931,7 @@
       "capital": "아부다비",
       "population": "11.6백만 명",
       "gdp": "661.0십억 USD",
-      "inflation": "-",
+      "inflation": "2.0% (2025.11)",
       "unemployment": "-",
       "min_wage": "법정 최저임금 없음 (자국민 대상 기준만 있음)",
       "sites": [
@@ -2494,10 +2984,24 @@
           "note": "법정 최저임금 없음 — 자국민 대상 기준만 있음"
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "ARE",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2025-11",
+          "value": "2.04",
+          "previous_value": "1.61",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/united-arab-emirates/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "ARE",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "",
+          "value": "",
+          "previous_value": "",
+          "status": "미갱신 (파싱 실패: 최신 값의 기준 기간을 찾지 못함)",
+          "source_url": "https://ko.tradingeconomics.com/united-arab-emirates/unemployment-rate"
         }
       }
     },
@@ -2510,8 +3014,8 @@
       "capital": "카이로",
       "population": "110.1백만 명",
       "gdp": "442.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "13.9% (2026.09)",
+      "unemployment": "5.8% (2026 Q2)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire and Technology Egypt LLC (Cairo)"
@@ -2563,10 +3067,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "EGY",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "13.9",
+          "previous_value": "14.5",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/egypt/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "EGY",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "5.8",
+          "previous_value": "6.0",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/egypt/unemployment-rate"
         }
       }
     },
@@ -2579,8 +3097,8 @@
       "capital": "리야드",
       "population": "36.7백만 명",
       "gdp": "1,343.3십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "1.9% (2026.09)",
+      "unemployment": "3.0% (2026 Q2)",
       "min_wage": "법정 최저임금 없음 (자국민 대상 기준만 있음)",
       "sites": [
         "Hankook Tire Co., Ltd. Jeddah Office (Jeddah)"
@@ -2632,10 +3150,24 @@
           "note": "법정 최저임금 없음 — 자국민 대상 기준만 있음"
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "SAU",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "1.9",
+          "previous_value": "1.8",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/saudi-arabia/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "SAU",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "3.0",
+          "previous_value": "3.1",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/saudi-arabia/unemployment-rate"
         }
       }
     },
@@ -2648,8 +3180,8 @@
       "capital": "아스타나",
       "population": "20.6백만 명",
       "gdp": "397.9십억 USD",
-      "inflation": "-",
-      "unemployment": "-",
+      "inflation": "9.3% (2026.09)",
+      "unemployment": "4.5% (2026 Q2)",
       "min_wage": "-",
       "sites": [
         "Hankook Tire Co., Ltd. Almaty Office (Almaty)"
@@ -2701,10 +3233,24 @@
           "note": ""
         },
         "inflation": {
-          "status": "데이터 없음"
+          "iso3": "KAZ",
+          "indicator": "inflation",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-09",
+          "value": "9.3",
+          "previous_value": "9.8",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/kazakhstan/inflation-cpi"
         },
         "unemployment": {
-          "status": "데이터 없음"
+          "iso3": "KAZ",
+          "indicator": "unemployment",
+          "snapshot_date": "2026-10-01",
+          "ref_period": "2026-Q2",
+          "value": "4.5",
+          "previous_value": "4.5",
+          "status": "정상",
+          "source_url": "https://ko.tradingeconomics.com/kazakhstan/unemployment-rate"
         }
       }
     }
@@ -2720,24 +3266,6 @@
       "출처 URL": ""
     },
     {
-      "iso3": "KOR",
-      "국가": "한국",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "KOR",
-      "국가": "한국",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "CHN",
       "국가": "중국",
       "항목": "최저임금",
@@ -2747,100 +3275,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "CHN",
-      "국가": "중국",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "CHN",
-      "국가": "중국",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "USA",
-      "국가": "미국",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "USA",
-      "국가": "미국",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "CAN",
       "국가": "캐나다",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "CAN",
-      "국가": "캐나다",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "CAN",
-      "국가": "캐나다",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "DEU",
-      "국가": "독일",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "DEU",
-      "국가": "독일",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "HUN",
-      "국가": "헝가리",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "HUN",
-      "국가": "헝가리",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -2855,42 +3293,6 @@
       "출처 URL": ""
     },
     {
-      "iso3": "GBR",
-      "국가": "영국",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "GBR",
-      "국가": "영국",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "FRA",
-      "국가": "프랑스",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "FRA",
-      "국가": "프랑스",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "ITA",
       "국가": "이탈리아",
       "항목": "최저임금",
@@ -2900,102 +3302,12 @@
       "출처 URL": ""
     },
     {
-      "iso3": "ITA",
-      "국가": "이탈리아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "ITA",
-      "국가": "이탈리아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "ESP",
-      "국가": "스페인",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "ESP",
-      "국가": "스페인",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "NLD",
-      "국가": "네덜란드",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "NLD",
-      "국가": "네덜란드",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "POL",
-      "국가": "폴란드",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "POL",
-      "국가": "폴란드",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "SWE",
       "국가": "스웨덴",
       "항목": "최저임금",
       "상태": "법정 최저임금 없음 / 검토 필요: 보정 파일 확인일 비어 있음",
       "값": "법정 최저임금 없음 (단체협약으로 결정)",
       "출처": "각국 노동법 기준",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "SWE",
-      "국가": "스웨덴",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "SWE",
-      "국가": "스웨덴",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
       "출처 URL": ""
     },
     {
@@ -3003,69 +3315,6 @@
       "국가": "러시아",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "RUS",
-      "국가": "러시아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "RUS",
-      "국가": "러시아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "TUR",
-      "국가": "튀르키예",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "TUR",
-      "국가": "튀르키예",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "CZE",
-      "국가": "체코",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "CZE",
-      "국가": "체코",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "UKR",
-      "국가": "우크라이나",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3074,10 +3323,10 @@
       "iso3": "UKR",
       "국가": "우크라이나",
       "항목": "실업률",
-      "상태": "데이터 없음",
+      "상태": "미갱신 (파싱 실패: 최신 값의 기준 기간을 찾지 못함)",
       "값": "-",
-      "출처": "",
-      "출처 URL": ""
+      "출처": "Trading Economics",
+      "출처 URL": "https://ko.tradingeconomics.com/ukraine/unemployment-rate"
     },
     {
       "iso3": "AUT",
@@ -3089,100 +3338,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "AUT",
-      "국가": "오스트리아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "AUT",
-      "국가": "오스트리아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "SRB",
-      "국가": "세르비아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "SRB",
-      "국가": "세르비아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "ROU",
-      "국가": "루마니아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "ROU",
-      "국가": "루마니아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "MAR",
       "국가": "모로코",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "MAR",
-      "국가": "모로코",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "MAR",
-      "국가": "모로코",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "HRV",
-      "국가": "크로아티아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "HRV",
-      "국가": "크로아티아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3197,46 +3356,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "MEX",
-      "국가": "멕시코",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "MEX",
-      "국가": "멕시코",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "COL",
       "국가": "콜롬비아",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "COL",
-      "국가": "콜롬비아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "COL",
-      "국가": "콜롬비아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3251,46 +3374,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "CHL",
-      "국가": "칠레",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "CHL",
-      "국가": "칠레",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "BRA",
       "국가": "브라질",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "BRA",
-      "국가": "브라질",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "BRA",
-      "국가": "브라질",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3307,44 +3394,17 @@
     {
       "iso3": "PAN",
       "국가": "파나마",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "PAN",
-      "국가": "파나마",
       "항목": "실업률",
-      "상태": "데이터 없음",
+      "상태": "미갱신 (파싱 실패: 최신 값의 기준 기간을 찾지 못함)",
       "값": "-",
-      "출처": "",
-      "출처 URL": ""
+      "출처": "Trading Economics",
+      "출처 URL": "https://ko.tradingeconomics.com/panama/unemployment-rate"
     },
     {
       "iso3": "IDN",
       "국가": "인도네시아",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "IDN",
-      "국가": "인도네시아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "IDN",
-      "국가": "인도네시아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3359,46 +3419,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "JPN",
-      "국가": "일본",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "JPN",
-      "국가": "일본",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "AUS",
       "국가": "호주",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "AUS",
-      "국가": "호주",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "AUS",
-      "국가": "호주",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3413,46 +3437,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "MYS",
-      "국가": "말레이시아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "MYS",
-      "국가": "말레이시아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "THA",
       "국가": "태국",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "THA",
-      "국가": "태국",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "THA",
-      "국가": "태국",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3467,46 +3455,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "VNM",
-      "국가": "베트남",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "VNM",
-      "국가": "베트남",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "TWN",
       "국가": "대만",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "TWN",
-      "국가": "대만",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "TWN",
-      "국가": "대만",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3521,24 +3473,6 @@
       "출처 URL": ""
     },
     {
-      "iso3": "SGP",
-      "국가": "싱가포르",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "SGP",
-      "국가": "싱가포르",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "ARE",
       "국가": "아랍에미리트",
       "항목": "최저임금",
@@ -3550,44 +3484,17 @@
     {
       "iso3": "ARE",
       "국가": "아랍에미리트",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "ARE",
-      "국가": "아랍에미리트",
       "항목": "실업률",
-      "상태": "데이터 없음",
+      "상태": "미갱신 (파싱 실패: 최신 값의 기준 기간을 찾지 못함)",
       "값": "-",
-      "출처": "",
-      "출처 URL": ""
+      "출처": "Trading Economics",
+      "출처 URL": "https://ko.tradingeconomics.com/united-arab-emirates/unemployment-rate"
     },
     {
       "iso3": "EGY",
       "국가": "이집트",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "EGY",
-      "국가": "이집트",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "EGY",
-      "국가": "이집트",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
@@ -3602,46 +3509,10 @@
       "출처 URL": ""
     },
     {
-      "iso3": "SAU",
-      "국가": "사우디아라비아",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "SAU",
-      "국가": "사우디아라비아",
-      "항목": "실업률",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
       "iso3": "KAZ",
       "국가": "카자흐스탄",
       "항목": "최저임금",
       "상태": "미갱신 (보정 파일 없음; Eurostat 대상 아님; ILOSTAT 요청 실패: HTTP 400; 직전 값 없음)",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "KAZ",
-      "국가": "카자흐스탄",
-      "항목": "인플레이션",
-      "상태": "데이터 없음",
-      "값": "-",
-      "출처": "",
-      "출처 URL": ""
-    },
-    {
-      "iso3": "KAZ",
-      "국가": "카자흐스탄",
-      "항목": "실업률",
-      "상태": "데이터 없음",
       "값": "-",
       "출처": "",
       "출처 URL": ""
