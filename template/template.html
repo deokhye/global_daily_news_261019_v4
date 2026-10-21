@@ -81,6 +81,20 @@
   .b-red { color: var(--red); background: var(--red-bg); }
   .b-amber { color: var(--amber); background: var(--amber-bg); }
   .b-ind { color: var(--accent-dark); background: #FFEDD5; }
+  .b-own { color: #fff; background: var(--accent); }
+  .b-comp { color: #7C2D12; background: #FED7AA; }
+  .b-site { color: #1E40AF; background: #DBEAFE; }
+  .b-gray { color: var(--sub); background: var(--line-soft); }
+  .also { font-size: 12px; color: var(--muted); }
+  .top-list { list-style: none; margin: 4px 0 0; padding: 0; }
+  .top-list li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
+  .top-list li:last-child { border-bottom: 0; padding-bottom: 2px; }
+  .top-list .rk { flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--accent-bg); color: var(--accent-dark);
+                  font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .top-list li:first-child .rk { background: var(--accent); color: #fff; }
+  .top-list .body { min-width: 0; flex: 1; }
+  .top-list .ttl { font-size: 16px; }
+  .card.top-card { border-color: var(--accent-line); }
   .b-tr { border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; font-size: 11px; color: var(--muted); }
   .ctry-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; font-size: 14px; color: var(--text); cursor: pointer; }
   .ctry-link:hover { color: var(--accent); text-decoration: underline; }
@@ -303,13 +317,29 @@
     if (!n) n = { pol: c.headlines, soc: [], safe: [] };   // 구버전 아카이브 호환
     return { pol: realItems(n.pol), soc: realItems(n.soc), safe: realItems(n.safe) };
   }
+  // 당사·경쟁사·거점 인근 배지 (수집 단계에서 붙인 표시)
+  function extraBadges(i) {
+    return (i.own ? '<span class="badge b-own">한국타이어</span>' : '') +
+      (i.competitor ? '<span class="badge b-comp">경쟁사 · ' + esc(i.competitor) + '</span>' : '') +
+      (i.near_site ? '<span class="badge b-site" title="거점 도시: ' + esc(i.near_site) + '">거점 인근</span>' : '');
+  }
+  // 같은 사건을 보도한 다른 매체 수
+  function alsoNote(i) {
+    var also = Array.isArray(i.also) ? i.also : [];
+    var n = typeof i.source_count === 'number' ? i.source_count - 1 : also.length;
+    if (n <= 0) return '';
+    var names = also.map(function (a) { return a.source; }).filter(Boolean).join(', ');
+    return '<span class="also"' + (names ? ' title="' + esc(names) + '"' : '') + '>외 ' + n + '개 매체</span>';
+  }
+  // 중요도 점수 → 최신순 (점수가 없는 옛 데이터는 최신순)
+  function byScore(a, b) { return (Number(b.score) || 0) - (Number(a.score) || 0) || byNewest(a, b); }
   function trBadge(i) { return i.translated ? '<span class="b-tr" title="원문: ' + esc(i.original_title || '') + '">자동번역</span>' : ''; }
   function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
   function articleLink(i, inner) {
     return '<a class="item' + (isOld(i) ? ' old' : '') + '" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>';
   }
   function metaLine(i, extra) {
-    return '<div class="meta"><span class="src">' + esc(i.source || '') + '</span><span>' + relDate(i.published) + '</span>' + (extra || '') + trBadge(i) + '</div>';
+    return '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + (extra || '') + extraBadges(i) + trBadge(i) + '</div>';
   }
 
   // ------------------------------------------------------------- state & routing
@@ -369,15 +399,46 @@
   }
   function feedRow(g, badges, tab) {
     var i = g.item;
-    return '<div class="item"><div class="meta">' + countryButtons(g.countries, tab) + badges + '</div>' +
+    return '<div class="item"><div class="meta">' + countryButtons(g.countries, tab) + badges + extraBadges(i) + '</div>' +
       '<a class="ttl sm" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer">' + esc(i.title) + '</a>' +
-      '<div class="meta"><span class="src">' + esc(i.source || '') + '</span><span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
+      '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
   }
   // 오늘의 브리핑에는 최근 기사만: 0 = 오늘만, 1 = 오늘·어제 (보고 있는 날짜 기준)
   // 수집이 오전 5시 20분이라 '오늘만'으로 하면 자정~새벽 5시 기사만 남아 거의 비게 된다.
   var BRIEF_MAX_DAYS = 1;
   function isFresh(i) { var n = daysAgo(i.published); return n !== null && n <= BRIEF_MAX_DAYS; }
   function freshItems(list) { return list.filter(isFresh); }
+  // ------------------------------------------------------------- 오늘 핵심 브리핑
+  var KIND = {
+    safe: { label: '안전·재난', cls: 'b-red', tab: 'safe' }, hr: { label: 'HR·노동', cls: 'b-law', tab: '' },
+    ind: { label: '업계 동향', cls: 'b-ind', tab: '' }, auto: { label: '완성차·타이어', cls: 'b-ind', tab: '' },
+    pol: { label: '정치·경제', cls: 'b-gray', tab: 'pol' }, soc: { label: '사회·문화', cls: 'b-gray', tab: 'soc' }
+  };
+  function topBriefingHtml(scope) {
+    if (!Array.isArray(DASHBOARD.top_briefing)) return '';          // 이 기능 이전의 아카이브
+    var inScope = {}; scope.forEach(function (c) { inScope[c.code] = true; });
+    var list = DASHBOARD.top_briefing.filter(function (t) {
+      if (!t || !t.title || !isFresh(t)) return false;
+      if (state.org === 'ALL') return true;
+      return (t.countries || []).some(function (code) { return inScope[code]; });
+    });
+    var h = '<section class="card top-card" aria-labelledby="top-h"><div class="card-head"><h2 id="top-h">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"></path></svg>' +
+      '오늘 핵심 브리핑</h2><span class="note">중요도 순 · 같은 사건은 1건으로 묶음</span></div>';
+    if (!list.length) return h + '<p class="empty">' + (state.org === 'ALL' ? '오늘 핵심 이슈로 꼽힌 보도가 없습니다.' : '선택한 조직에는 오늘 핵심 이슈가 없습니다.') + '</p></section>';
+    h += '<ol class="top-list">' + list.map(function (t, idx) {
+      var k = KIND[t.kind] || KIND.pol;
+      var kindBadge = t.kind === 'safe' && t.safety_tag ? safetyBadge(t.safety_tag) : '<span class="badge ' + k.cls + '">' + k.label + '</span>';
+      var ctry = (t.countries || []).map(byCode).filter(Boolean);
+      return '<li><span class="rk">' + (idx + 1) + '</span><div class="body">' +
+        '<div class="meta">' + kindBadge + (t.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(t) +
+        (ctry.length ? countryButtons(ctry, k.tab) : '') + '</div>' +
+        '<a class="ttl" href="' + esc(safeUrl(t.link)) + '" target="_blank" rel="noopener noreferrer">' + esc(t.title) + '</a>' +
+        '<div class="meta"><span class="src">' + esc(t.source || '') + '</span>' + alsoNote(t) + '<span>' + relDate(t.published) + '</span>' + trBadge(t) + '</div>' +
+        '</div></li>';
+    }).join('') + '</ol></section>';
+    return h;
+  }
   function renderBriefing() {
     var scope = scopeCountries();
     // 국가별로 그날 가장 중요한 1건만: 안전은 심각도 → 최신순, HR은 법·제도 → 최신순
@@ -385,9 +446,9 @@
     var sevRank = function (i) { var k = SAFETY_PRIORITY.indexOf(normTag(i.safety_tag)); return k === -1 ? SAFETY_PRIORITY.length : k; };
     var safetyRows = [], hrRows = [];
     scope.forEach(function (c) {
-      var s = freshItems(news(c).safe).sort(function (a, b) { return sevRank(a) - sevRank(b) || newer(a, b); })[0];
+      var s = freshItems(news(c).safe).sort(function (a, b) { return sevRank(a) - sevRank(b) || byScore(a, b); })[0];
       if (s) safetyRows.push({ item: s, country: c });
-      var r = freshItems(trend(c, 'HR & LABOR')).sort(function (a, b) { return (b.law ? 1 : 0) - (a.law ? 1 : 0) || newer(a, b); })[0];
+      var r = freshItems(trend(c, 'HR & LABOR')).sort(function (a, b) { return (b.law ? 1 : 0) - (a.law ? 1 : 0) || byScore(a, b); })[0];
       if (r) hrRows.push({ item: r, country: c });
     });
     var byDate = function (a, b) { return newer(a.item, b.item); };
@@ -406,39 +467,42 @@
     var dateLabel = isNaN(d) ? currentDate : d.getFullYear() + '년 ' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 (' + '일월화수목금토'.charAt(d.getDay()) + ')';
 
     var h = '<div class="page-title"><h2>' + esc(dateLabel) + ' 브리핑</h2><span class="note">' + esc(DASHBOARD.as_of_display || '') + ' · ' + esc(scopeLabel) + '</span></div>';
+    h += topBriefingHtml(scope);
     h += '<section class="orgs" aria-label="조직 선택">' + orgs.map(function (o) {
       return '<button type="button" class="org" data-org="' + esc(o.key) + '" aria-pressed="' + (o.key === state.org) + '"><b>' + esc(o.label) + '</b>' +
         '<span class="l"><span>' + o.count + '개국</span>' + (o.alerts ? '<span class="badge b-red" title="현지 안전 동향 국가 수">⚠ ' + o.alerts + '</span>' : '') + '</span></button>';
     }).join('') + '</section>';
 
-    // '전체': 왼쪽 = 현지 안전 동향 / 오른쪽 = HR·노동 + 그 아래 글로벌 완성차·타이어
+    // '전체': 왼쪽 = 안전 / 오른쪽 = HR + 그 아래 글로벌 동향
     // 조직 선택: 안전·HR 2열 + 글로벌 동향 하단(전체 폭)
     var wide = state.org === 'ALL';
     var cardCls = wide ? 'card' : 'card half';
-    var safetyHtml = '<section class="' + cardCls + '" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
+    var sec = '';
+    sec += '<section class="' + cardCls + '" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5H2.5z"></path><path d="M12 10v4M12 17.5v.01"></path></svg>' +
       '현지 안전 동향 <span class="count" style="color:#fff;background:#B91C1C">' + safety.length + '</span></h2>' +
       '<span class="note">국가별 주요 안전 보도</span></div>';
-    safetyHtml += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
+    sec += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' 주요 안전 보도가 없습니다.</p>';
-    safetyHtml += '</section>';
-    var hrHtml = '<section class="' + cardCls + '" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
+    sec += '</section>';
+    var safetyHtml = sec; sec = '';
+    sec += '<section class="' + cardCls + '" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
       'HR·노동 주요 소식 <span class="count b-law">' + hr.length + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
-    hrHtml += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
+    sec += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' HR·노동 소식이 없습니다.</p>';
-    hrHtml += '</section>';
+    sec += '</section>';
+    var hrHtml = sec; sec = '';
 
     var gi = freshItems(realItems(DASHBOARD.global_industry));
-    var giHtml = '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
-    giHtml += gi.length ? '<div class="' + (wide ? 'gi-list' : 'grid-2') + '">' + gi.map(function (i) {
+    sec += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
+    sec += gi.length ? '<div class="' + (wide ? 'gi-list' : 'grid-2') + '">' + gi.map(function (i) {
       return articleLink(i, metaLine(i, '<span class="badge b-ind">' + esc(i.tag || '완성차') + '</span>') + '<span class="ttl sm">' + esc(i.title) + '</span>');
     }).join('') + '</div>' : '<p class="empty">' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' 보도된 글로벌 동향이 없습니다.</p>';
-    giHtml += '</section>';
-
+    sec += '</section>';
     h += wide
-      ? '<div class="row-2"><div class="col-half">' + safetyHtml + '</div><div class="col-half">' + hrHtml + giHtml + '</div></div>'
-      : '<div class="row-2">' + safetyHtml + hrHtml + '</div>' + giHtml;
+      ? '<div class="row-2"><div class="col-half">' + safetyHtml + '</div><div class="col-half">' + hrHtml + sec + '</div></div>'
+      : '<div class="row-2">' + safetyHtml + hrHtml + '</div>' + sec;
     document.getElementById('main').innerHTML = h;
   }
 
@@ -545,10 +609,10 @@
     if (!c) { document.getElementById('main').innerHTML = '<p class="empty">국가 데이터가 없습니다.</p>'; return; }
     var p = c.profile || {}, src = p.sources || {}, fx = c.exchange_rate || {};
     var mw = minWageText(p.min_wage);
-    var sites = (c.hubs && c.hubs.length) ? c.hubs : (c.offices || []);
+    var sites = (c.hubs && c.hubs.length) ? c.hubs : (c.offices || []);   // offices: 구버전 아카이브 호환
     var nw = news(c);
     if (!nw[state.tab]) state.tab = DEFAULT_TAB;
-    var hr = trend(c, 'HR & LABOR').slice().sort(byNewest), auto = trend(c, 'AUTO MARKET').slice().sort(byNewest);
+    var hr = trend(c, 'HR & LABOR').slice().sort(byScore), auto = trend(c, 'AUTO MARKET').slice().sort(byScore);
     var official = Array.isArray(c.official_sources) ? c.official_sources : [];
 
     var h = '<section class="card" aria-label="국가 개요" style="padding:18px 24px"><div class="overview">' +
