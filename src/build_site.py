@@ -22,6 +22,7 @@ from markupsafe import Markup
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # python src/xxx.py 외 실행 방식 대비
 from profile_overlay import REGIONS, ProfileContext
+import news_rules as NR
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("build_site")
@@ -96,6 +97,7 @@ def build() -> None:
     dashboard = {
         "as_of_display": data.get("as_of_display", ""),
         "generated_at": data.get("generated_at", ""),
+        "max_age_days": NR.rules().max_age,
         "regions": data.get("regions") or REGIONS,
         "top_briefing": data.get("top_briefing", []),
         "countries": data.get("countries", []),
