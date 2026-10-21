@@ -701,6 +701,7 @@ def _cached_list(cached_list, check=None) -> list:
             title = (it.get("original_title") or it.get("title", "")) if lang == "en" else it.get("title", "")
             if not check(title, lang):
                 continue
+        it["_cached"] = True        # 이전 수집분 표시 (오래된 기사 판정용, 저장 전에 지움)
         out.append(it)
     return out
 
@@ -743,12 +744,19 @@ def rank_items(items: list, kind: str, country: dict = None) -> list:
     today = _today_kst()
     iso3 = (country or {}).get("iso3", "")
     code = (country or {}).get("code", "")
+    kept = []
     for it in items:
-        if not isinstance(it, dict) or it.get("is_fallback"):
+        if not isinstance(it, dict):
             continue
-        r.annotate(it, kind, iso3)
-        it["score"] = r.score(it, kind, today, code)
-    return sorted(items, key=lambda i: (-(i.get("score") or 0), _neg_date(i.get("published"))))
+        if not it.get("is_fallback"):
+            if r.too_old(it, kind, today):          # 분류별 최대 기사 나이 초과 (config: max_age_days)
+                REJECT_STATS["오래된 기사"] = REJECT_STATS.get("오래된 기사", 0) + 1
+                continue
+            r.annotate(it, kind, iso3)
+            it["score"] = r.score(it, kind, today, code)
+        it.pop("_cached", None)
+        kept.append(it)
+    return sorted(kept, key=lambda i: (-(i.get("score") or 0), _neg_date(i.get("published"))))
 
 
 def _neg_date(d) -> str:
@@ -858,6 +866,8 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
             for it in items:
                 it["law"] = (not it.get("is_fallback")) and is_law_item(it)
         items = rank_items(items, "hr" if is_hr else "auto", country)
+        if not items:
+            items = [_fallback_trend_item(spec, country)]
 
         trends.append({
             "category": spec["category"],
@@ -909,6 +919,8 @@ SAFETY_TAGS = [
 ]
 # 안전 태그를 붙이지 않을 문맥(훈련·과거사·문화 콘텐츠 등)
 SAFETY_EXCLUDE = re.compile(r"(?i)\bdrill\b|\banniversary\b|\bmuseum\b|\bfilm\b|\bmovie\b|\bgame\b|\bnovel\b|"
+                            r"\bcontracts?\b|\bprocure|\bpurchas|\barms (deal|sale)|\bdefen[cs]e (contract|deal|budget|spending|industry|firm)|"
+                            r"\bnew batch\b|\borders? (new|more|additional|\d)|\bodds\b|\bbetting\b|\bsportsbook|방산|수주|도입 계약|"
                             r"\bWorld War\b|\bwar (crimes? )?memorial|훈련|기념|영화|게임")
 
 LAW_RE = re.compile(r"(?i)\blaws?\b|\bbill\b|\bact\b|\bamend|\bregulation|\bdecree|\blegislat|\blabou?r code|"
@@ -1010,13 +1022,40 @@ def get_global_industry(previous: list) -> list:
     return rank_items(items, "ind")[:10]
 
 
+def is_good_translation(src: str, ko: str) -> bool:
+    """번역 결과가 '대부분 한국어'인지. 날짜만 한글로 바뀌고 나머지는 원문 그대로인 결과
+    (예: '2026년 11월 20일, CGIL PROCLAMA LO SCIOPERO')나 엉터리 음차를 걸러낸다."""
+    if not ko:
+        return False
+    hangul = len(HANGUL_RE.findall(ko))
+    other = sum(1 for ch in ko if ch.isalpha() and not HANGUL_RE.match(ch))
+    if hangul < 2:
+        return False
+    if hangul / (hangul + other) < 0.4:
+        return False
+    return _norm_title(ko) != _norm_title(src)
+
+
+def _prep_for_translation(text: str) -> str:
+    """대문자로만 쓴 단어(CGIL PROCLAMA LO SCIOPERO)는 번역기가 약어로 보고 그대로 두므로,
+    제목의 절반 이상이 대문자일 때 5글자 이상 대문자 단어를 소문자로 바꿔 보낸다 (약어 CGIL 등은 유지)."""
+    words = re.findall(r"[^\W\d_]+", text or "")
+    upper = [w for w in words if len(w) >= 2 and w.isupper()]
+    if not words or len(upper) / len(words) < 0.5:
+        return text
+    return re.sub(r"[^\W\d_]{5,}", lambda m: m.group(0).capitalize() if m.group(0).isupper() else m.group(0), text)
+
+
 def load_translation_cache() -> dict:
     try:
         if os.path.exists(TRANSLATION_CACHE_PATH):
             with open(TRANSLATION_CACHE_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f)
             if isinstance(data, dict):
-                return {k: v for k, v in data.items() if isinstance(v, dict) and v.get("ko")}
+                good = {k: v for k, v in data.items() if isinstance(v, dict) and is_good_translation(k, v.get("ko", ""))}
+                if len(good) < len(data):
+                    log.info(f"번역 캐시에서 품질이 낮은 번역 {len(data) - len(good)}건을 지우고 다시 번역합니다")
+                return good
     except Exception as e:
         log.warning(f"번역 캐시 로드 실패(무시): {e}")
     return {}
@@ -1097,14 +1136,18 @@ TRANSLATORS = [_translate_google, _translate_google_alt, _translate_mymemory]
 
 def _translate_one(text: str) -> str:
     """단건 번역: Google → Google 보조 → MyMemory 순서. 계속 실패한 번역기는 이번 실행에서 건너뛴다."""
+    prepped = _prep_for_translation(text)
+    if prepped != text:
+        _TEXT_LANG.setdefault(prepped, _TEXT_LANG.get(text, "en"))
     for fn in TRANSLATORS:
         st = TRANSLATE_STATS.setdefault(fn.__name__, {"ok": 0, "fail": 0, "streak": 0})
         if st["streak"] >= 4:
             continue
         try:
-            out = fn(text)
+            # Google 은 원문 언어를 알려 주면 짧은 제목도 정확해진다
+            out = fn(prepped, _sl(_TEXT_LANG.get(text, "auto"))) if fn is _translate_google else fn(prepped)
             st["streak"] = 0          # 응답이 왔으면 서비스는 살아 있음 (연속 장애로 세지 않음)
-            if out and HANGUL_RE.search(out):
+            if is_good_translation(text, out or ""):
                 st["ok"] += 1
                 return out.strip()
             st["fail"] += 1           # 고유명사만 있는 제목 등 — 다음 번역기로 넘어감
@@ -1120,7 +1163,7 @@ def _translate_batch(texts: list, lang: str = "auto"):
     st = TRANSLATE_STATS.setdefault("batch", {"ok": 0, "fail": 0, "streak": 0})
     if st["streak"] >= 2:                     # 묶음 번역이 연달아 막히면 단건 번역으로만 진행
         return None
-    joined = "\n".join(t.replace("\n", " ") for t in texts)
+    joined = "\n".join(_prep_for_translation(t).replace("\n", " ") for t in texts)
     try:
         out = _translate_google(joined, _sl(lang))
         lines = [ln.strip() for ln in (out or "").split("\n") if ln.strip()]
@@ -1183,14 +1226,14 @@ def translate_texts(texts: list, cache: dict) -> dict:
         translated = _translate_batch(ch, lang) or [""] * len(ch)
         # 묶음 번역에서 한글이 안 나온 줄(번역 실패·원문 그대로)은 한 건씩 다시 시도
         for i, t in enumerate(ch):
-            if translated[i] and HANGUL_RE.search(translated[i]):
+            if is_good_translation(t, translated[i]):
                 continue
             if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
                 break
             translated[i] = _translate_one(t)
             time.sleep(0.3)
         for src, ko in zip(ch, translated):
-            if ko and HANGUL_RE.search(ko):
+            if is_good_translation(src, ko):
                 result[src] = ko
                 cache[src] = {"ko": ko, "last": today}
         if all(TRANSLATE_STATS.get(fn.__name__, {}).get("streak", 0) >= 4 for fn in TRANSLATORS) \
@@ -1225,8 +1268,13 @@ def apply_translations(countries: list) -> None:
     cache = load_translation_cache()
     targets = []
     for item, _body_key in _iter_news_items(countries):
-        if item.get("lang", "ko") == "ko" or item.get("translated"):
+        if item.get("lang", "ko") == "ko":
             continue
+        if item.get("translated"):
+            if is_good_translation(item.get("original_title") or "", item.get("title") or ""):
+                continue
+            item["translated"] = False          # 이전 실행의 반쪽 번역 → 원문으로 되돌려 다시 번역
+            item["title"] = item.get("original_title") or item.get("title") or ""
         src_title = item.get("original_title") or item.get("title") or ""
         item["original_title"] = src_title
         targets.append((item, src_title))

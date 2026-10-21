@@ -118,6 +118,8 @@ class NewsRules:
         self.hr = raw.get("hr") or {}
         aliases = {k: v for k, v in (raw.get("city_aliases") or {}).items() if not k.startswith("_") and isinstance(v, list)}
         self.site_city_re = {iso3: _name_list_regex(names) for iso3, names in _load_site_cities(aliases).items()}
+        ages = raw.get("max_age_days") or {}
+        self.max_age = {k: int(v) for k, v in ages.items() if not k.startswith("_") and str(v).lstrip("-").isdigit()}
         tb = raw.get("top_briefing") or {}
         self.top_count = int(tb.get("count", 5))
         self.top_max_days = int(tb.get("max_days", 1))
@@ -153,6 +155,16 @@ class NewsRules:
         if self.is_gossip(t):
             return "연예·스포츠"
         return ""
+
+    def too_old(self, item: dict, kind: str, today: str) -> bool:
+        """분류별 최대 기사 나이를 넘었는지. 날짜를 모르는 기사는 이전 수집분(_cached)일 때만 오래된 것으로 본다."""
+        limit = self.max_age.get(kind)
+        if limit is None:
+            return False
+        n = days_between(item.get("published"), today)
+        if n is None:
+            return bool(item.get("_cached"))
+        return n > limit
 
     # ------------------------------------------------------------------ 표시(배지)
     def competitor_of(self, title: str) -> str:
