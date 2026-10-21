@@ -34,12 +34,12 @@ OUTPUT_PATH = os.path.join(BASE_DIR, "docs", "index.html")
 KST = timezone(timedelta(hours=9))
 
 FALLBACK_HTML = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Global HR Insight</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Global Daily News</title>
 <style>body{{font-family:system-ui,sans-serif;background:#F4F5F7;color:#334155;display:flex;align-items:center;
 justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box}}
 .box{{max-width:560px;background:#fff;border:1px solid #E2E8F0;border-radius:20px;padding:40px 32px;text-align:center}}
 pre{{text-align:left;font-size:12px;background:#F1F5F9;border-radius:8px;padding:12px;white-space:pre-wrap;word-break:break-all}}</style>
-</head><body><div class="box"><h1>Global HR Insight</h1>
+</head><body><div class="box"><h1>Global Daily News</h1>
 <p>사이트를 만드는 중 문제가 생겨 임시 안내 페이지를 표시합니다. 다음 자동 갱신 때 복구됩니다.</p>
 <pre>{timestamp}\n{error}</pre></div></body></html>"""
 
