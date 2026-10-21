@@ -34,6 +34,26 @@
     ]
   },
 
+  "non_news": {
+    "_설명": "뉴스가 아닌 매거진·화보·여행/라이프스타일 콘텐츠 제외 (철저히 뉴스 중심). 업계 전문지(Automotive News 등)는 여기에 넣지 마세요.",
+    "source_patterns": [
+      "magazine", "매거진", "잡지", "\\bmag\\b", "\\bweekly\\b", "월간", "주간(조선|동아|경향|한국|매경|한경|현대)",
+      "travel", "traveller", "lifestyle", "living", "여행", "라이프"
+    ],
+    "sources": [
+      "National Geographic", "Smithsonian", "Atlas Obscura", "Lonely Planet", "Condé Nast", "Conde Nast", "Time Out",
+      "Vogue", "Elle", "Esquire", "GQ", "Harper's Bazaar", "Vanity Fair", "Rolling Stone", "The Atlantic", "The New Yorker",
+      "Architectural Digest", "Popular Science", "Popular Mechanics", "Scientific American", "Discover", "Wired",
+      "Reader's Digest", "TIME", "Monocle", "Tatler", "Cosmopolitan", "Marie Claire", "Travel + Leisure", "Afar",
+      "Outside", "Men's Health", "Women's Health", "Good Housekeeping", "Allure", "Hypebeast", "Highsnobiety"
+    ],
+    "title_patterns": [
+      "\\[(포토|화보|영상|카드뉴스|그래픽|여행|르포|기획|매거진)\\]", "\\bin pictures\\b", "^photos?\\s*[:|]", "\\bphoto (essay|gallery)\\b",
+      "^(watch|video)\\s*[:|]", "\\bgallery\\b", "\\btravel guide\\b", "\\bthings to do\\b", "\\bbest places\\b",
+      "\\bbucket list\\b", "\\bweekend getaway\\b", "\\bwhere to (eat|stay|go)\\b", "가볼 만한 곳", "여행지", "맛집"
+    ]
+  },
+
   "sources": {
     "_설명": "blocked: 보도자료 배포·시장조사 광고·콘텐츠 농장(수집 안 함). trusted: 주요 통신사·일간지(우선 노출). 매체 이름 일부만 맞아도 적용됩니다.",
     "blocked": [
