@@ -38,14 +38,14 @@
     "_설명": "뉴스가 아닌 매거진·화보·여행/라이프스타일 콘텐츠 제외 (철저히 뉴스 중심). 업계 전문지(Automotive News 등)는 여기에 넣지 마세요.",
     "source_patterns": [
       "magazine", "매거진", "잡지", "\\bmag\\b", "\\bweekly\\b", "월간", "주간(조선|동아|경향|한국|매경|한경|현대)",
-      "travel", "traveller", "lifestyle", "living", "여행", "라이프"
+      "travel", "traveller", "lifestyle", "living", "여행", "라이프", "sportsbook", "betting", "\\bodds\\b", "\\bcasino"
     ],
     "sources": [
       "National Geographic", "Smithsonian", "Atlas Obscura", "Lonely Planet", "Condé Nast", "Conde Nast", "Time Out",
       "Vogue", "Elle", "Esquire", "GQ", "Harper's Bazaar", "Vanity Fair", "Rolling Stone", "The Atlantic", "The New Yorker",
       "Architectural Digest", "Popular Science", "Popular Mechanics", "Scientific American", "Discover", "Wired",
       "Reader's Digest", "TIME", "Monocle", "Tatler", "Cosmopolitan", "Marie Claire", "Travel + Leisure", "Afar",
-      "Outside", "The Justice Gap", "Men's Health", "Women's Health", "Good Housekeeping", "Allure", "Hypebeast", "Highsnobiety"
+      "Outside", "The Justice Gap", "FanDuel", "DraftKings", "BetMGM", "Oddschecker", "Covers", "Action Network", "Men's Health", "Women's Health", "Good Housekeeping", "Allure", "Hypebeast", "Highsnobiety"
     ],
     "title_patterns": [
       "\\[(포토|화보|영상|카드뉴스|그래픽|여행|르포|기획|매거진)\\]", "\\bin pictures\\b", "^photos?\\s*[:|]", "\\bphoto (essay|gallery)\\b",
@@ -130,6 +130,11 @@
     "_설명": "거점 도시의 다른 표기 (sites.csv 의 city 와 함께 제목에서 찾습니다).",
     "Seongnam": ["성남", "판교"], "Daejeon": ["대전"], "Geumsan": ["금산"], "Taean": ["태안"],
     "Clarksville": ["Tennessee"], "Rácalmás": ["Racalmas", "Dunaújváros"], "Cikarang": ["Bekasi"]
+  },
+
+  "max_age_days": {
+    "_설명": "분류별로 이 날짜보다 오래된 기사는 화면에서 뺍니다 (수집일 기준). 날짜를 알 수 없는 기사는 새로 수집된 경우에만 남기고, 이전 수집분을 다시 쓸 때는 뺍니다.",
+    "safe": 3, "pol": 7, "soc": 7, "hr": 14, "auto": 14, "ind": 7
   },
 
   "top_briefing": {
