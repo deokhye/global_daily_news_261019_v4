@@ -106,6 +106,9 @@
   .b-tr { border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; font-size: 11px; color: var(--muted); }
   .ctry-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; font-size: 14px; color: var(--text); cursor: pointer; }
   .ctry-link:hover { color: var(--accent); text-decoration: underline; }
+  .more-btn { display: block; width: 100%; margin-top: 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 10px;
+              background: #FBFBFC; color: var(--sub); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .more-btn:hover { background: var(--accent-bg); border-color: var(--accent-line); color: var(--accent-dark); }
   .row-2 { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
   .row-2 > .main-col { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
   .row-2 > .side-col { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
@@ -400,6 +403,7 @@
     pickRegion: null,
     tab: DEFAULT_TAB,
     amount: '1',
+    expand: {},          // 오늘의 브리핑 '더보기' 펼침 상태 (safe / hr)
     pickerOpen: storeGet('ghr.pickerOpen', '1') === '1'
   };
   function readHash() {
@@ -559,7 +563,7 @@
   // ------------------------------------------------------------- 현지 안전 동향 고르기
   // 국가별 대표 1건 → 같은 기사·같은 전쟁(서로의 나라 이름이 제목에 함께 나오는 무력충돌)은 1건으로 묶기
   // → 실제 피해·발생 > 심각한 재난(무력충돌·자연재해·대형사고) > 여러 매체·여러 나라 보도 > 중요도 순
-  var FRONT_MAX = 10;
+  var FRONT_MAX = 8;          // 현지 안전 동향·HR 주요 소식 첫 화면 건수 (나머지는 '더보기')
   var newer = function (a, b) { return String(b.published || '').localeCompare(String(a.published || '')); };
   var sevRank = function (i) { var k = SAFETY_PRIORITY.indexOf(normTag(i.safety_tag)); return k === -1 ? SAFETY_PRIORITY.length : k; };
   function nSources(i) { return 1 + (Array.isArray(i.also) ? i.also.length : 0); }
@@ -591,6 +595,13 @@
         (nSources(b.item) + b.countries.length) - (nSources(a.item) + a.countries.length) || byScore(a.item, b.item);
     });
   }
+  // FRONT_MAX(8건)가 넘으면 목록 아래 '더보기 (N건) ▾' — 누르면 그 자리에서 펼치고 '접기 ▴'
+  function moreButton(key, total) {
+    if (total <= FRONT_MAX) return '';
+    var open = !!state.expand[key];
+    return '<button type="button" class="more-btn" data-more="' + key + '" aria-expanded="' + open + '">' +
+      (open ? '접기 ▴' : '더보기 (' + (total - FRONT_MAX) + '건) ▾') + '</button>';
+  }
   function topLinks() {
     var ex = {};
     (Array.isArray(DASHBOARD.top_briefing) ? DASHBOARD.top_briefing : []).forEach(function (t) { if (t && t.link) ex[t.link] = 1; });
@@ -606,20 +617,13 @@
       if (r) hrRows.push({ item: r, country: c });
     });
     var byDate = function (a, b) { return newer(a.item, b.item); };
-    var safetyFull = safetyGroups(scope, {});          // 건수는 주요 브리핑에 올라간 기사까지 모두 셈 (카드 ⚠ 숫자와 같은 기준)
     var safetyAll = safetyGroups(scope, excluded);     // 목록은 주요 브리핑과 겹치는 기사를 빼고 표시
-    var safety = safetyAll.slice(0, FRONT_MAX);
-    var hrFullRows = [];
-    scope.forEach(function (c) {
-      var r = freshItems(trend(c, 'HR & LABOR'))[0];
-      if (r) hrFullRows.push({ item: r, country: c });
-    });
-    var hrCount = groupByLink(hrFullRows).length;
+    var safety = state.expand.safe ? safetyAll : safetyAll.slice(0, FRONT_MAX);
     var hrAll = groupByLink(hrRows).sort(function (a, b) { return (b.item.law ? 1 : 0) - (a.item.law ? 1 : 0) || byScore(a.item, b.item) || byDate(a, b); });
-    var hr = hrAll.slice(0, FRONT_MAX);
+    var hr = state.expand.hr ? hrAll : hrAll.slice(0, FRONT_MAX);
 
     // 조직 카드의 ⚠ 숫자 = 그 조직 나라가 포함된 '안전 보도 건수' (아래 목록과 같은 기준)
-    var allGroups = safetyGroups(COUNTRIES, {});
+    var allGroups = safetyGroups(COUNTRIES, excluded);   // 카드 ⚠ = 아래 목록 건수 (주요 브리핑에 올라간 기사 제외)
     var alertCount = {};
     allGroups.forEach(function (g) {
       var regs = {}; g.countries.forEach(function (c) { regs[c.region] = 1; });
@@ -644,17 +648,19 @@
     var sec = '';
     sec += '<section class="' + cardCls + '" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5H2.5z"></path><path d="M12 10v4M12 17.5v.01"></path></svg>' +
-      '현지 안전 동향 <span class="count" style="color:#fff;background:#B91C1C">' + safetyFull.length + '</span></h2>' +
+      '현지 안전 동향 <span class="count" style="color:#fff;background:#B91C1C">' + safetyAll.length + '</span></h2>' +
       '<span class="note">국가별 주요 안전 보도</span></div>';
     sec += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' 주요 안전 보도가 없습니다.</p>';
+    sec += moreButton('safe', safetyAll.length);
     sec += '</section>';
     var safetyHtml = sec; sec = '';
     sec += '<section class="' + cardCls + '" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
-      'HR·노동 주요 소식 <span class="count b-law">' + hrCount + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
+      'HR·노동 주요 소식 <span class="count b-law">' + hrAll.length + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
     sec += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' HR·노동 소식이 없습니다.</p>';
+    sec += moreButton('hr', hrAll.length);
     sec += '</section>';
     var hrHtml = sec; sec = '';
 
@@ -883,9 +889,18 @@
 
   // ------------------------------------------------------------- 이벤트
   document.addEventListener('click', function (e) {
-    var el = e.target.closest('[data-org],[data-go],[data-region],[data-code],[data-newstab]');
+    var el = e.target.closest('[data-org],[data-go],[data-region],[data-code],[data-newstab],[data-more]');
     if (!el) return;
-    if (el.hasAttribute('data-org')) { state.org = el.getAttribute('data-org'); renderBriefing(); return; }
+    if (el.hasAttribute('data-more')) {
+      var key = el.getAttribute('data-more'), open = !state.expand[key];
+      state.expand[key] = open;
+      var y = window.scrollY, sectionTop = el.closest('section').getBoundingClientRect().top + y;
+      renderBriefing();
+      if (!open) window.scrollTo(0, Math.min(y, sectionTop - 80));   // 접으면 그 목록 위치로
+      else window.scrollTo(0, y);
+      return;
+    }
+    if (el.hasAttribute('data-org')) { state.org = el.getAttribute('data-org'); state.expand = {}; renderBriefing(); return; }
     if (el.hasAttribute('data-go')) { go(el.getAttribute('data-go'), el.getAttribute('data-gotab') || ''); return; }
     if (el.hasAttribute('data-region')) {
       // 권역을 누르면 그 권역의 첫 번째 국가(위계순)를 바로 보여준다. 예: 미주 → 미국, 전체 → 한국
@@ -936,6 +951,7 @@
 
   // ------------------------------------------------------------- 날짜(아카이브) 조회
   function applyDataset(d, dateStr) {
+    state.expand = {};
     DASHBOARD = d;
     REGIONS = (d.regions || REGIONS).filter(function (r) { return r && r.key; });
     COUNTRIES = d.countries || [];
