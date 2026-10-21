@@ -45,7 +45,7 @@
       "Vogue", "Elle", "Esquire", "GQ", "Harper's Bazaar", "Vanity Fair", "Rolling Stone", "The Atlantic", "The New Yorker",
       "Architectural Digest", "Popular Science", "Popular Mechanics", "Scientific American", "Discover", "Wired",
       "Reader's Digest", "TIME", "Monocle", "Tatler", "Cosmopolitan", "Marie Claire", "Travel + Leisure", "Afar",
-      "Outside", "Men's Health", "Women's Health", "Good Housekeeping", "Allure", "Hypebeast", "Highsnobiety"
+      "Outside", "The Justice Gap", "Men's Health", "Women's Health", "Good Housekeeping", "Allure", "Hypebeast", "Highsnobiety"
     ],
     "title_patterns": [
       "\\[(포토|화보|영상|카드뉴스|그래픽|여행|르포|기획|매거진)\\]", "\\bin pictures\\b", "^photos?\\s*[:|]", "\\bphoto (essay|gallery)\\b",
