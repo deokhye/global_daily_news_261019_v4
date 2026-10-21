@@ -32,6 +32,15 @@
   .date-box label { font-size: 12px; color: var(--sub); font-weight: 700; }
   .date-box input { height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px; font-size: 14px; font-family: inherit; }
   .date-box.loading { opacity: .5; pointer-events: none; }
+  .date-nav { width: 36px; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; background: #fff; color: var(--sub);
+              font-size: 14px; cursor: pointer; font-family: inherit; }
+  .date-nav:disabled { opacity: .35; cursor: default; }
+  .search-box { display: flex; align-items: center; flex: 0 1 300px; min-width: 200px; }
+  .search-box input { width: 100%; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px 0 34px; font-size: 14px;
+                      font-family: inherit; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 11px center; }
+  #stale { background: #FEF3C7; color: #92400E; border-bottom: 1px solid #FDE68A; font-size: 13px; font-weight: 600; text-align: center; padding: 9px 16px; }
+  .b-orig { border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; font-size: 11px; color: var(--muted); }
+  .notice { font-size: 12px; color: var(--muted); text-align: center; margin: 6px 0 0; }
   nav.tabs { display: flex; gap: 4px; }
   nav.tabs a { padding: 12px 18px; font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 3px solid transparent; }
   nav.tabs a:hover { text-decoration: none; color: var(--text); }
@@ -164,6 +173,15 @@
   }
   @media (max-width: 640px) {
     .wrap, .top-row { padding-left: 16px; padding-right: 16px; }
+    .search-box { order: 3; flex: 1 1 100%; }
+    .date-box { margin-left: auto; }
+    .date-box label { display: none; }
+    .page-title h2 { font-size: 21px; }
+    .top-list .ttl { font-size: 15px; }
+    .top-list li { gap: 10px; }
+    .meta { row-gap: 4px; }
+    .seg button { min-height: 40px; }
+    nav.tabs a { padding: 12px 14px; }
     .orgs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .kpis, .grid-2 { grid-template-columns: minmax(0, 1fr); }
     .card { padding: 18px; }
@@ -187,9 +205,14 @@
         <p>한국타이어 39개국 HR·현지 정세 데일리 브리핑</p>
       </div>
     </div>
+    <form class="search-box" id="search-form" role="search" onsubmit="return false">
+      <input type="search" id="search-input" placeholder="기사 검색 (예: 파업, minimum wage)" aria-label="기사 검색" enterkeyhint="search">
+    </form>
     <div class="date-box" id="date-box">
       <label for="briefDatePicker">일자</label>
+      <button type="button" class="date-nav" id="date-prev" aria-label="이전 날">◀</button>
       <input type="date" id="briefDatePicker" value="{{ generated_at_date }}" min="{{ archive_min_date }}" max="{{ archive_max_date }}">
+      <button type="button" class="date-nav" id="date-next" aria-label="다음 날">▶</button>
     </div>
   </div>
   <div class="wrap">
@@ -199,6 +222,7 @@
     </nav>
   </div>
 </header>
+<div id="stale" class="hidden" role="status"></div>
 <div class="picker hidden" id="picker">
     <div class="wrap picker-inner">
       <div class="picker-row">
@@ -213,6 +237,7 @@
 <main class="wrap" id="main"></main>
 
 <footer>
+  <div style="margin-bottom:6px">해외 기사 제목은 자동 번역되어 표현이 어색하거나 정확하지 않을 수 있습니다. 정확한 내용은 원문을 확인해 주세요.</div>
   <div>© Hankook Tire &amp; Technology - Global HR Team · 매일 오전 6시(KST) 수집</div>
   <div id="sync-display-text" style="margin-top: 6px;">{{ as_of_display }}</div>
 </footer>
@@ -302,26 +327,46 @@
   function byCode(code) { return COUNTRIES.find(function (c) { return c.code === code; }); }
   // 연예·가십 기사 숨김 (수집 단계에서도 거르지만, 이미 수집된 과거 데이터에도 적용)
   var GOSSIP = /연예|아이돌|걸그룹|보이그룹|가수|드라마|예능|열애|결혼식|이혼|컴백|앨범|뮤직비디오|데뷔|소속사|방송인|유튜버|인플루언서|셀럽|스캔들|팬미팅|콘서트|오디션|(^|[^가-힣])배우(?![다고며는기])|celebrit|\bsinger\b|\bactor\b|\bactress\b|k-?pop|\bidol\b|girl group|boy band|\balbum\b|\bconcert\b|reality (show|tv)|\bdating\b|divorce|\bwedding\b|box office|\brapper\b|influencer|red carpet|gossip|love is blind|kardashian/i;
-  function realItems(list) {
+  // 번역 결과가 '대부분 한국어'인지 (수집 단계와 같은 기준). 반쪽 번역이면 원문 제목을 보여 준다.
+  function goodKo(t) {
+    t = String(t || '');
+    var h = (t.match(/[가-힣]/g) || []).length;
+    var o = (t.match(/[A-Za-zÀ-ɏ\u0400-\u04FF\u4E00-\u9FFF\u3040-\u30FF\u0E00-\u0E7F]/g) || []).length;
+    return h >= 2 && h / (h + o) >= 0.4;
+  }
+  function showTitle(i) {
+    if (!i || i.lang === 'ko' || !i.lang) return i;
+    if (i.translated && goodKo(i.title)) return i;
+    if (!i.original_title) return i;
+    var o = {}; for (var k in i) o[k] = i[k];
+    o.title = i.original_title; o.translated = false; o._orig = true;
+    return o;
+  }
+  // 분류별 최대 기사 나이 (config/news_rules.json → max_age_days, 보고 있는 날짜 기준)
+  var MAX_AGE_DEFAULT = { safe: 3, pol: 7, soc: 7, hr: 14, auto: 14, ind: 7 };
+  function withinAge(i, kind) {
+    var lim = (INITIAL_DASHBOARD.max_age_days || MAX_AGE_DEFAULT)[kind]; if (lim === undefined) return true;
+    var n = daysAgo(i.published); return n === null || n <= lim;
+  }
+  function realItems(list, kind) {
     return (Array.isArray(list) ? list : []).filter(function (i) {
       return i && i.title && !i.is_fallback && i.title !== FALLBACK_TITLE &&
-        !GOSSIP.test(i.title) && !GOSSIP.test(i.original_title || '');
-    });
+        !GOSSIP.test(i.title) && !GOSSIP.test(i.original_title || '') && (!kind || withinAge(i, kind));
+    }).map(showTitle);
   }
   function trend(c, cat) {
     var t = (c.hr_trends || []).find(function (x) { return x && x.category === cat; });
-    return realItems(t ? t.items : []);
+    return realItems(t ? t.items : [], cat === 'HR & LABOR' ? 'hr' : 'auto');
   }
   function news(c) {
     var n = c.news;
     if (!n) n = { pol: c.headlines, soc: [], safe: [] };   // 구버전 아카이브 호환
-    return { pol: realItems(n.pol), soc: realItems(n.soc), safe: realItems(n.safe) };
+    return { pol: realItems(n.pol, 'pol'), soc: realItems(n.soc, 'soc'), safe: realItems(n.safe, 'safe') };
   }
   // 당사·경쟁사·거점 인근 배지 (수집 단계에서 붙인 표시)
   function extraBadges(i) {
-    return (i.own ? '<span class="badge b-own">한국타이어</span>' : '') +
-      (i.competitor ? '<span class="badge b-comp">경쟁사 · ' + esc(i.competitor) + '</span>' : '') +
-      (i.near_site ? '<span class="badge b-site" title="거점 도시: ' + esc(i.near_site) + '">거점 인근</span>' : '');
+    // 거점 인근·한국타이어 배지는 표시하지 않음 (중요도 점수·정렬에는 그대로 반영)
+    return i.competitor ? '<span class="badge b-comp" title="' + esc(i.competitor) + '">경쟁사</span>' : '';
   }
   // 같은 사건을 보도한 다른 매체 수
   function alsoNote(i) {
@@ -333,13 +378,15 @@
   }
   // 중요도 점수 → 최신순 (점수가 없는 옛 데이터는 최신순)
   function byScore(a, b) { return (Number(b.score) || 0) - (Number(a.score) || 0) || byNewest(a, b); }
-  function trBadge(i) { return i.translated ? '<span class="b-tr" title="원문: ' + esc(i.original_title || '') + '">자동번역</span>' : ''; }
+  // '자동번역' 배지는 쓰지 않고(하단 안내 한 줄로 대체), 번역이 안 돼 원문을 보여 줄 때만 '원문' 표시
+  function trBadge(i) { return i._orig ? '<span class="b-orig" title="번역되지 않아 원문 제목을 표시합니다">원문</span>' : ''; }
+  function origTitleAttr(i) { return i.translated && i.original_title ? ' title="원문: ' + esc(i.original_title) + '"' : ''; }
   function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
   function articleLink(i, inner) {
-    return '<a class="item' + (isOld(i) ? ' old' : '') + '" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer">' + inner + '</a>';
+    return '<a class="item' + (isOld(i) ? ' old' : '') + '" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + inner + '</a>';
   }
-  function metaLine(i, extra) {
-    return '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + (extra || '') + extraBadges(i) + trBadge(i) + '</div>';
+  function metaLine(i, extra, onlyExtra) {
+    return '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + (extra || '') + (onlyExtra ? '' : extraBadges(i)) + trBadge(i) + '</div>';
   }
 
   // ------------------------------------------------------------- state & routing
@@ -353,6 +400,12 @@
     pickerOpen: storeGet('ghr.pickerOpen', '1') === '1'
   };
   function readHash() {
+    var sq = /^#\/search\/(.*)$/.exec(location.hash || '');
+    if (sq) {
+      state.view = 'search';
+      try { state.q = decodeURIComponent(sq[1]); } catch (e) { state.q = sq[1]; }
+      return;
+    }
     var m = /^#\/country(?:\/([A-Z]{2}))?(?:\/(pol|soc|safe))?/.exec(location.hash || '');
     if (m) {
       state.view = 'country';
@@ -375,7 +428,68 @@
     document.getElementById('tab-country').classList.toggle('active', state.view === 'country');
     document.getElementById('tab-country').setAttribute('href', '#/country/' + state.code);
     document.getElementById('picker').classList.toggle('hidden', state.view !== 'country');
-    if (state.view === 'country') { renderPicker(); renderCountry(); } else { renderBriefing(); }
+    var si = document.getElementById('search-input');
+    if (state.view === 'search') { if (si.value !== state.q) si.value = state.q || ''; } else if (document.activeElement !== si) { si.value = ''; }
+    renderStale();
+    if (state.view === 'country') { renderPicker(); renderCountry(); }
+    else if (state.view === 'search') { renderSearch(); }
+    else { renderBriefing(); }
+  }
+
+  // ------------------------------------------------------------- 데이터가 오래됐을 때 안내
+  // 최신 화면을 보고 있는데 오늘(KST) 오전 7시가 지나도록 오늘 수집분이 없으면 '마지막 갱신' 안내를 띄운다.
+  function kstNow() { var d = new Date(Date.now() + 9 * 3600 * 1000); return { date: d.toISOString().slice(0, 10), hour: d.getUTCHours() }; }
+  function renderStale() {
+    var el = document.getElementById('stale');
+    var now = kstNow();
+    var gen = String(INITIAL_DASHBOARD.generated_at || '');
+    var stale = currentDate === INITIAL_DATE && gen && gen.slice(0, 10) < now.date && now.hour >= 7;
+    el.classList.toggle('hidden', !stale);
+    if (stale) {
+      el.textContent = '오늘 데이터가 아직 갱신되지 않았습니다 · 마지막 갱신: ' + gen.slice(5, 7) + '/' + gen.slice(8, 10) + ' ' + gen.slice(11, 16) +
+        ' (화면은 마지막 수집 기준입니다)';
+    }
+  }
+
+  // ------------------------------------------------------------- 키워드 검색 (보고 있는 날짜의 전체 국가 기사)
+  var SEARCH_KIND = { safe: '안전·재난', pol: '정치·경제', soc: '사회·문화', hr: 'HR·노동', auto: '완성차·타이어', ind: '업계 동향' };
+  function allArticles() {
+    var out = [], seen = {};
+    function add(i, kind, c) {
+      var key = String(i.link || i.title).toLowerCase();
+      if (seen[key]) { if (c && seen[key].countries.indexOf(c) === -1) seen[key].countries.push(c); return; }
+      seen[key] = { item: i, kind: kind, countries: c ? [c] : [] }; out.push(seen[key]);
+    }
+    COUNTRIES.forEach(function (c) {
+      var n = news(c);
+      ['safe', 'pol', 'soc'].forEach(function (k) { n[k].forEach(function (i) { add(i, k, c); }); });
+      trend(c, 'HR & LABOR').forEach(function (i) { add(i, 'hr', c); });
+      trend(c, 'AUTO MARKET').forEach(function (i) { add(i, 'auto', c); });
+    });
+    realItems(DASHBOARD.global_industry, 'ind').forEach(function (i) { add(i, 'ind', null); });
+    return out;
+  }
+  function renderSearch() {
+    var q = String(state.q || '').trim();
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    var hits = !words.length ? [] : allArticles().filter(function (g) {
+      var hay = (g.item.title + ' ' + (g.item.original_title || '') + ' ' + (g.item.source || '') + ' ' +
+                 g.countries.map(function (c) { return c.name_kr + ' ' + c.name_en; }).join(' ')).toLowerCase();
+      return words.every(function (w) { return hay.indexOf(w) !== -1; });
+    }).sort(function (a, b) { return byNewest(a.item, b.item); });
+    var h = '<div class="page-title"><h2>‘' + esc(q) + '’ 검색 결과 ' + hits.length + '건</h2><span class="note">' +
+      esc(currentDate) + ' 수집 데이터의 전체 국가 기사에서 찾았습니다 · 제목·원문 제목·매체·국가명</span></div>';
+    h += '<section class="card">';
+    h += hits.length ? hits.map(function (g) {
+      var i = g.item;
+      var kindBadge = g.kind === 'safe' && i.safety_tag ? safetyBadge(i.safety_tag) : '<span class="badge b-gray">' + SEARCH_KIND[g.kind] + '</span>';
+      return '<div class="item"><div class="meta">' + kindBadge + (i.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(i) +
+        (g.countries.length ? countryButtons(g.countries, g.kind === 'safe' || g.kind === 'pol' || g.kind === 'soc' ? g.kind : '') : '<b>글로벌</b>') + '</div>' +
+        '<a class="ttl" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + esc(i.title) + '</a>' +
+        '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
+    }).join('') : '<p class="empty">' + (words.length ? '찾는 단어가 들어간 기사가 없습니다. 다른 단어(영어·한국어)로 찾아보세요.' : '검색어를 입력해 주세요.') + '</p>';
+    h += '</section>';
+    document.getElementById('main').innerHTML = h;
   }
 
   // ------------------------------------------------------------- 오늘의 브리핑
@@ -400,7 +514,7 @@
   function feedRow(g, badges, tab) {
     var i = g.item;
     return '<div class="item"><div class="meta">' + countryButtons(g.countries, tab) + badges + extraBadges(i) + '</div>' +
-      '<a class="ttl sm" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer">' + esc(i.title) + '</a>' +
+      '<a class="ttl sm" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + esc(i.title) + '</a>' +
       '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
   }
   // 오늘의 브리핑에는 최근 기사만: 0 = 오늘만, 1 = 오늘·어제 (보고 있는 날짜 기준)
@@ -418,22 +532,21 @@
     if (!Array.isArray(DASHBOARD.top_briefing)) return '';          // 이 기능 이전의 아카이브
     var inScope = {}; scope.forEach(function (c) { inScope[c.code] = true; });
     var list = DASHBOARD.top_briefing.filter(function (t) {
-      if (!t || !t.title || !isFresh(t)) return false;
+      if (!t || !t.title || !isFresh(t) || GOSSIP.test(t.title)) return false;
       if (state.org === 'ALL') return true;
       return (t.countries || []).some(function (code) { return inScope[code]; });
-    });
+    }).map(showTitle);
     var h = '<section class="card top-card" aria-labelledby="top-h"><div class="card-head"><h2 id="top-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"></path></svg>' +
-      '오늘 핵심 브리핑</h2><span class="note">중요도 순 · 같은 사건은 1건으로 묶음</span></div>';
-    if (!list.length) return h + '<p class="empty">' + (state.org === 'ALL' ? '오늘 핵심 이슈로 꼽힌 보도가 없습니다.' : '선택한 조직에는 오늘 핵심 이슈가 없습니다.') + '</p></section>';
+      '오늘 주요 브리핑</h2></div>';
+    if (!list.length) return h + '<p class="empty">' + (state.org === 'ALL' ? '오늘 주요 이슈로 꼽힌 보도가 없습니다.' : '선택한 조직에는 오늘 주요 이슈가 없습니다.') + '</p></section>';
     h += '<ol class="top-list">' + list.map(function (t, idx) {
       var k = KIND[t.kind] || KIND.pol;
       var kindBadge = t.kind === 'safe' && t.safety_tag ? safetyBadge(t.safety_tag) : '<span class="badge ' + k.cls + '">' + k.label + '</span>';
       var ctry = (t.countries || []).map(byCode).filter(Boolean);
       return '<li><span class="rk">' + (idx + 1) + '</span><div class="body">' +
-        '<div class="meta">' + kindBadge + (t.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(t) +
-        (ctry.length ? countryButtons(ctry, k.tab) : '') + '</div>' +
-        '<a class="ttl" href="' + esc(safeUrl(t.link)) + '" target="_blank" rel="noopener noreferrer">' + esc(t.title) + '</a>' +
+        '<div class="meta">' + kindBadge + (ctry.length ? countryButtons(ctry, k.tab) : '') + '</div>' +
+        '<a class="ttl" href="' + esc(safeUrl(t.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(t) + '>' + esc(t.title) + '</a>' +
         '<div class="meta"><span class="src">' + esc(t.source || '') + '</span>' + alsoNote(t) + '<span>' + relDate(t.published) + '</span>' + trBadge(t) + '</div>' +
         '</div></li>';
     }).join('') + '</ol></section>';
@@ -494,10 +607,13 @@
     sec += '</section>';
     var hrHtml = sec; sec = '';
 
-    var gi = freshItems(realItems(DASHBOARD.global_industry));
+    var gi = freshItems(realItems(DASHBOARD.global_industry, 'ind'));
     sec += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
     sec += gi.length ? '<div class="' + (wide ? 'gi-list' : 'grid-2') + '">' + gi.map(function (i) {
-      return articleLink(i, metaLine(i, '<span class="badge b-ind">' + esc(i.tag || '완성차') + '</span>') + '<span class="ttl sm">' + esc(i.title) + '</span>');
+      // 경쟁사 기사는 '경쟁사' 배지 하나만 (분류 배지와 경쟁사 배지가 겹치지 않게)
+      // 분류 배지 하나만 (경쟁사 / 타이어 / EV / 시장전망 / 완성차)
+      var tagBadge = (i.competitor || i.tag === '경쟁사') ? '<span class="badge b-comp">경쟁사</span>' : '<span class="badge b-ind">' + esc(i.tag || '완성차') + '</span>';
+      return articleLink(i, metaLine(i, tagBadge, true) + '<span class="ttl sm">' + esc(i.title) + '</span>');
     }).join('') + '</div>' : '<p class="empty">' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' 보도된 글로벌 동향이 없습니다.</p>';
     sec += '</section>';
     h += wide
@@ -693,6 +809,30 @@
     if (el.hasAttribute('data-code')) { state.pickRegion = null; go(el.getAttribute('data-code')); return; }
     if (el.hasAttribute('data-newstab')) { state.tab = el.getAttribute('data-newstab'); renderCountry(); }
   });
+  document.getElementById('search-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var q = document.getElementById('search-input').value.trim();
+    if (q) location.hash = '#/search/' + encodeURIComponent(q);
+  });
+  document.getElementById('search-input').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('search-form').dispatchEvent(new Event('submit')); }
+  });
+  function shiftDate(days) {
+    var input = document.getElementById('briefDatePicker');
+    var d = new Date((input.value || currentDate) + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + days);
+    var v = d.toISOString().slice(0, 10);
+    if ((input.min && v < input.min) || (input.max && v > input.max)) return;
+    input.value = v;
+    input.dispatchEvent(new Event('change'));
+  }
+  function updateDateNav() {
+    var input = document.getElementById('briefDatePicker');
+    document.getElementById('date-prev').disabled = !!input.min && currentDate <= input.min;
+    document.getElementById('date-next').disabled = !!input.max && currentDate >= input.max;
+  }
+  document.getElementById('date-prev').addEventListener('click', function () { shiftDate(-1); });
+  document.getElementById('date-next').addEventListener('click', function () { shiftDate(1); });
   document.getElementById('picker-toggle').addEventListener('click', function () {
     state.pickerOpen = !state.pickerOpen; storeSet('ghr.pickerOpen', state.pickerOpen ? '1' : '0'); renderPicker();
   });
@@ -713,6 +853,7 @@
     document.getElementById('sync-display-text').textContent = d.as_of_display || (dateStr + ' 아카이브');
     if (!byCode(state.code)) state.code = (COUNTRIES[0] || {}).code;
     render();
+    updateDateNav();
   }
   document.getElementById('briefDatePicker').addEventListener('change', function (e) {
     var input = e.target, dateStr = input.value;
@@ -730,6 +871,7 @@
 
   readHash();
   render();
+  updateDateNav();
 })();
 </script>
 </body>
