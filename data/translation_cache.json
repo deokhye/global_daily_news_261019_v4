@@ -1,6 +1,6 @@
 {
 "\"Strajk włoski\". Wiceszef MSZ: prezydent szuka kolejnych pretekstów": {
-"ko": "\"스트라이크 브워스키\". Wiceszef MSZ: 대통령 szuka kolejnych pretekstów",
+"ko": "\"이탈리아 파업\". 외교부 차관 : 대통령은 더 많은 변명을 찾고 있습니다",
 "last": "2026-10-21"
 },
 "#Daily_Brief: Four family members, including pregnant teenager, killed in #UAE drone strike in #Somalia’s #Puntland: Report Four members of a Somali pastoralist family, including a 13-year-old boy, a seven-year-old child and a 17-year-old pregnant girl, wer": {
@@ -40,7 +40,7 @@
 "last": "2026-10-21"
 },
 "20 NOVEMBRE 2026, CGIL PROCLAMA LO SCIOPERO GENERALE": {
-"ko": "2026년 11월 20일, CGIL PROCLAMA LO SCIOPERO Generale",
+"ko": "2026년 11월 20일, CGIL, 총파업 선포",
 "last": "2026-10-21"
 },
 "2024 Country Reports on Human Rights Practices: Panama": {
@@ -87,12 +87,20 @@
 "ko": "국가 비전 위기? 미국은 현재 눈 건강 위험에 대해 폴란드와 루마니아와 함께 순위를 매기고 있습니다.",
 "last": "2026-10-20"
 },
+"A Turkish Muslim Student Finds Asylum And A New Home In Israel": {
+"ko": "터키 무슬림 학생이 이스라엘에서 망명과 새 집을 찾았습니다",
+"last": "2026-10-21"
+},
 "A family ‘coolcation’ in Arctic Sweden": {
 "ko": "북극 스웨덴의 가족 'coolcation'",
 "last": "2026-10-21"
 },
 "A propos - Egypt involvement in Yemen 'may actually weaken Cairo's regional role', expert says": {
 "ko": "제안 - 이집트의 예멘 개입은 '실제로 카이로의 지역 역할을 약화시킬 수 있다'고 전문가는 말합니다.",
+"last": "2026-10-21"
+},
+"A student protest movement has gripped Serbia for two years. This weekend it will try to take power": {
+"ko": "학생 시위 운동이 2년 동안 세르비아를 사로잡았습니다. 이번 주말에는 권력을 장악하려고 할 것입니다",
 "last": "2026-10-21"
 },
 "A trader just placed a $13K bet on Aleksandar Vučić becoming Serbia's next prime minister": {
@@ -152,7 +160,7 @@
 "last": "2026-10-21"
 },
 "Andrii Sybiha held phone talks with Minister for Foreign Affairs of Sweden Maria Malmer Stenergard": {
-"ko": "Andrii Sybiha는 스웨덴 외무부 장관 Maria Malmer Stenergard와 전화 회담을 가졌습니다.",
+"ko": "안드리 시비하(Andrii Sybiha)는 마리아 말머 스테네르가르드(Maria Malmer Stenergard) 스웨덴 외무장관과 전화 통화를 했습니다.",
 "last": "2026-10-21"
 },
 "Anti-Putin messages disrupt nationwide school assessments in Russia": {
@@ -239,6 +247,10 @@
 "ko": "오스트리아와 튀르키예: 새로운 협력 단계",
 "last": "2026-10-21"
 },
+"Austria blames migration for riots in France and Italy": {
+"ko": "오스트리아, 프랑스와 이탈리아 폭동의 원인이 이주 때문이라고 비난",
+"last": "2026-10-21"
+},
 "Austria's democracy index drops for 4th consecutive year: Study": {
 "ko": "오스트리아 민주주의 지수 4년 연속 하락: 연구",
 "last": "2026-10-21"
@@ -269,6 +281,14 @@
 },
 "BPJPH: 17 Oktober 2026 Produk Makanan-Minuman UMK Harus Sudah Bersertifikat Halal, Bagaimana dengan Produk Luar Negeri?": {
 "ko": "BPJPH: 2026년 10월 17일 MSE 식음료 제품은 할랄 인증을 받아야 합니다. 외국 제품은 어떻습니까?",
+"last": "2026-10-21"
+},
+"BPJS Ketenagakerjaan Bayarkan Manfaat Rp68,24 Triliun Sepanjang 2025": {
+"ko": "BPJS 고용은 2025년 동안 IDR 68.24조의 혜택을 제공합니다.",
+"last": "2026-10-21"
+},
+"BPJS Ketenagakerjaan Hadirkan Program Peka Di Palangka Raya, Bekali Ahli Waris Dan Calon Pensiunan Berwirausaha": {
+"ko": "BPJS 고용은 팔랑카 라야(Palangka Raya)에서 민감한 프로그램을 제시하여 상속인과 퇴직 예정자가 기업가가 될 수 있도록 지원합니다.",
 "last": "2026-10-21"
 },
 "BYU Alumna Combines AI, Healthcare, and Hope in Brazil": {
@@ -339,6 +359,10 @@
 "ko": "폐경기에 대한 신체 이미지: 싱가포르의 그래픽 소설가들이 금기시되는 여성 건강 주제에 대해 두려움 없이 토론합니다.",
 "last": "2026-10-21"
 },
+"Bolivia prioritizes two rail projects with Chile after presidential talks": {
+"ko": "볼리비아, 대통령 회담 후 칠레와의 두 가지 철도 프로젝트 우선순위",
+"last": "2026-10-21"
+},
 "Bosnian Serb authorities boost neighboring Serbia's populist leader ahead of a key election": {
 "ko": "보스니아 세르비아 당국은 주요 선거를 앞두고 이웃 세르비아의 포퓰리즘 지도자를 강화합니다.",
 "last": "2026-10-21"
@@ -361,10 +385,6 @@
 },
 "Brazil’s love affair with cellphones turns theft into an election flashpoint": {
 "ko": "휴대폰에 대한 브라질의 애정은 도난을 선거 인화점으로 바꿉니다.",
-"last": "2026-10-21"
-},
-"Bridgestone Expands “easytrack” to MRO Operations with SR Technics Spain": {
-"ko": "Bridgestone, SR Technics Spain과 함께 MRO 운영으로 \"easytrack\" 확장",
 "last": "2026-10-21"
 },
 "Bridging the gap: Western student earns Fulbright to study wildfire science in Australia": {
@@ -447,6 +467,10 @@
 "ko": "Carney는 Albertans가 독립의 길을 고려할 때 캐나다를 통일하기 위해 싸웁니다.",
 "last": "2026-10-20"
 },
+"Celebrations in Malaysia for the Nine Emperor Gods Festival": {
+"ko": "말레이시아에서 열리는 구천황제 축제",
+"last": "2026-10-21"
+},
 "Central Australia storm: 400 claims lodged, but much of the damage sits outside the count": {
 "ko": "센트럴오스트레일리아 폭풍우: 400건의 피해 보상 청구가 접수되었지만, 피해의 상당 부분이 피해 보상 범위를 벗어났습니다.",
 "last": "2026-10-21"
@@ -481,6 +505,10 @@
 },
 "China says US' DeepSeek ban disregards Xi-Trump consensus": {
 "ko": "중국, 미국의 DeepSeek 금지가 Xi-Trump 합의를 무시한다고 말함",
+"last": "2026-10-21"
+},
+"China says it is 'safeguarding order' around Taiwan-controlled South China Sea atoll": {
+"ko": "중국은 대만이 통제하는 남중국해 환초 주변의 '질서를 보호하고 있다'고 밝혔습니다.",
 "last": "2026-10-21"
 },
 "China says it is ‘safeguarding order’ around Taiwan-controlled South China Sea atoll": {
@@ -608,7 +636,7 @@
 "last": "2026-10-21"
 },
 "Concedieri în IT-ul de pariuri sportive: Betfair urmează să renunțe la aproximativ 300 de angajați din Cluj, care lucrează pentru regiunea UK & Irlanda": {
-"ko": "IT-ul de pariuri 낚시를 좋아하는 경우: Betfair urmează să renunśe la aproximativ 300 de angajaşi din Cluj, care lucrează pentru regiunea UK & Irlanda",
+"ko": "스포츠 베팅 IT의 중복: Betfair는 영국 및 아일랜드 지역에서 일하는 Cluj의 약 300명의 직원을 해고할 예정입니다.",
 "last": "2026-10-21"
 },
 "Continental Tire Targets Growth, Sustainability in Mexico": {
@@ -665,6 +693,10 @@
 },
 "Croatia's AD Plastik in 9.3 mln euro deals with Stellantis": {
 "ko": "스텔란티스와 930만 유로의 크로아티아의 AD 플라스틱 거래",
+"last": "2026-10-21"
+},
+"Culture Club: Raja Casablanca": {
+"ko": "문화 클럽: 라자 카사블랑카",
 "last": "2026-10-21"
 },
 "Czech Car Production Already Tops One Million This Year": {
@@ -741,6 +773,10 @@
 },
 "Down to Earth - Indonesia continues to battle wildfires, with nearly 2 million hectares burned": {
 "ko": "지구까지 - 인도네시아는 거의 2백만 헥타르가 태워진 산불과 계속 싸우고 있습니다.",
+"last": "2026-10-21"
+},
+"Dozens of women, IVF doctors arrested in Turkey over alleged international egg trafficking network": {
+"ko": "국제 난자 밀매 네트워크 혐의로 수십 명의 여성과 IVF 의사가 터키에서 체포되었습니다.",
 "last": "2026-10-21"
 },
 "Drone strike and fire on ship in Romanian waters raise fears that war in Ukraine is spreading": {
@@ -888,15 +924,11 @@
 "last": "2026-10-21"
 },
 "Emirates Motor Company and Captain AI introduce AI-powered customer communication across WhatsApp and website": {
-"ko": "Emirates Motor Company와 Captain AI, WhatsApp과 웹사이트 전반에 걸쳐 AI 기반 고객 커뮤니케이션 도입",
+"ko": "에미레이트 자동차 회사와 Captain AI는 WhatsApp 및 웹 사이트에서 AI 기반 고객 커뮤니케이션을 소개합니다.",
 "last": "2026-10-21"
 },
 "Emirati pangenome maps regional genome variation at chromosome scale": {
 "ko": "Emirati pangenome은 염색체 규모로 지역 게놈 변이를 매핑합니다.",
-"last": "2026-10-21"
-},
-"En grève le 13 octobre ! - SNES - Syndicat National des Enseignements de Second degré": {
-"ko": "En grève le 10월 13일! - SNES - 2급 소위의 Syndicat National",
 "last": "2026-10-21"
 },
 "England - Politics, Monarchy, Parliament": {
@@ -991,6 +1023,10 @@
 "ko": "파이낸셜타임스(Financial Times) 직원들이 영국과 미국에서 함께 뭉쳤습니다.",
 "last": "2026-10-21"
 },
+"Finnish team wins World Olive Picking Championship in Croatia": {
+"ko": "핀란드 팀, 크로아티아 세계 올리브 따기 챔피언십 우승",
+"last": "2026-10-21"
+},
 "Firefly Drops to €25,900 in the Netherlands in Year-End Stock Deal": {
 "ko": "Firefly, 연말 주식 거래에서 네덜란드에서 €25,900로 하락",
 "last": "2026-10-21"
@@ -1053,6 +1089,10 @@
 },
 "France in flames, Germany in decline, Europe in denial": {
 "ko": "불타는 프랑스, 쇠퇴하는 독일, 부정하는 유럽",
+"last": "2026-10-21"
+},
+"France is divided over who to blame for weekend riots and what to learn from them": {
+"ko": "프랑스는 주말 폭동의 책임을 누구에게 돌리고, 그로부터 무엇을 배울 것인가를 두고 의견이 갈리고 있습니다.",
 "last": "2026-10-21"
 },
 "France riot damage doubles: Who pays for thousands of destroyed shops?": {
@@ -1219,12 +1259,20 @@
 "ko": "정부, 말기 질환 정의 변경 확인 | 영국 | 글로벌 로펌",
 "last": "2026-10-21"
 },
+"Gracie Bon Defends Earthquake Rubble Photos in Panama": {
+"ko": "Gracie Bon은 파나마에서 지진 잔해 사진을 방어합니다.",
+"last": "2026-10-21"
+},
 "Grevă japoneză în justiția din Republica Moldova pentru creșterea salariilor": {
 "ko": "급여 인상을 위해 몰도바 공화국에서 일본의 범죄",
 "last": "2026-10-21"
 },
 "Grève du 5 novembre : « La victoire est à notre portée », revendique Thomas Vacheron, secrétaire confédéral de la CGT": {
 "ko": "11월 5일 파업: \"승리는 우리 손 안에 있다\"고 CGT 연방장관 토마스 바쉐론이 주장",
+"last": "2026-10-21"
+},
+"Gwanghwamun's 'Garden of Gratitude' Attracts 500,000 Visitors... Sweden Also Donates Stone": {
+"ko": "광화문 '감사의 정원' 관람객 50만명…스웨덴도 돌 기증",
 "last": "2026-10-21"
 },
 "HE GCCSG Meets with the UK Minister of State for Trade and Discusses FTA Developments and Ways to Strengthen Economic and Trade Relations Between the Two Sides": {
@@ -1293,6 +1341,10 @@
 },
 "Houthis Strike Military Training Camp as UAE Joins Saudi-Led Attacks on Yemen": {
 "ko": "UAE가 예멘에 대한 사우디 주도 공격에 합류함에 따라 후티 반군 파업 군사 훈련 캠프",
+"last": "2026-10-21"
+},
+"Houthis launch fresh strikes on Saudi Arabia": {
+"ko": "후티 반군, 사우디아라비아에 새로운 공격 개시",
 "last": "2026-10-21"
 },
 "How Colombia's flower industry is working to close gender gaps": {
@@ -1383,6 +1435,10 @@
 "ko": "헝가리: 언론 개혁 속에서 진상 규명 임무를 수행하는 국제 연합",
 "last": "2026-10-20"
 },
+"Hungary’s Magyar vows accountability for Orbán era while holding firm on migration": {
+"ko": "헝가리의 마자르인, 이민에 대한 확고한 입장을 유지하면서 오르반 시대에 대한 책임을 다짐",
+"last": "2026-10-21"
+},
 "Hurricane Trudy lashes Mexico’s Pacific coast with heavy rain and strong winds": {
 "ko": "허리케인 '트루디' 가 폭우와 강풍으로 멕시코 태평양 연안을 강타하다",
 "last": "2026-10-21"
@@ -1451,6 +1507,10 @@
 "ko": "인플레이션으로는 미국의 부채 문제를 해결할 수 없다, 트럼프 대통령",
 "last": "2026-10-21"
 },
+"Ini 5 Kemajuan dan 3 Potensi Masalah dalam UU Pelindungan Ketenagakerjaan": {
+"ko": "고용보호법의 5가지 진전과 3가지 문제점",
+"last": "2026-10-21"
+},
 "Insight: Spain's rush to clear Ceuta migrant backlog raises rights concerns": {
 "ko": "통찰력: 스페인이 Ceuta 이민자 잔고를 해소하기 위해 서두르면서 권리 우려가 제기됨",
 "last": "2026-10-21"
@@ -1491,6 +1551,10 @@
 "ko": "이탈리아 미디어 아트 페스티벌 2026: 이탈리아와 베네수엘라의 디지털 아트, 혁신 및 국제 전시회",
 "last": "2026-10-21"
 },
+"Italy Deploys 500 Troops to Milan and Criminalizes Violent Protest After Weekend Riots": {
+"ko": "이탈리아, 밀라노에 병력 500명 배치, 주말 폭동 이후 폭력 시위 불법화",
+"last": "2026-10-21"
+},
 "Italy Faces Parallel Protests in the North and South": {
 "ko": "이탈리아, 남북 병행 시위 직면",
 "last": "2026-10-20"
@@ -1501,6 +1565,10 @@
 },
 "Italy and US align on energy security, with nuclear power in focus": {
 "ko": "이탈리아와 미국은 원자력에 중점을 두고 에너지 안보에 중점을 두고 있습니다.",
+"last": "2026-10-21"
+},
+"Italy approves sweeping security measures in response to protests": {
+"ko": "이탈리아, 시위에 대응해 전면적인 보안 조치 승인",
 "last": "2026-10-21"
 },
 "Italy best selling car market in 2026": {
@@ -1523,6 +1591,10 @@
 "ko": "이탈리아는 시위를 저지하기 위해 500명의 군인을 밀라노로 보냅니다.",
 "last": "2026-10-21"
 },
+"Italy's Cafe Med treats patients to free medical advice": {
+"ko": "이탈리아의 Cafe Med는 환자에게 무료 의료 상담을 제공합니다.",
+"last": "2026-10-21"
+},
 "Italy's Meloni approves tougher anti-riot laws after Milan violence": {
 "ko": "이탈리아의 멜로니 (Meloni) 는 밀라노 폭력 사태 이후 더욱 엄격해진 폭동 방지법을 승인했다.",
 "last": "2026-10-21"
@@ -1533,10 +1605,6 @@
 },
 "Italy, Austria Order Military Versions of INEOS Grenadier 4×4": {
 "ko": "이탈리아, 오스트리아 INEOS 척탄병 4 × 4 군용 버전 주문",
-"last": "2026-10-21"
-},
-"Italy: The Cafe Med": {
-"ko": "이탈리아: The Cafe Med",
 "last": "2026-10-21"
 },
 "Italy’s lack of available factories limits Chinese automakers’ expansion plans": {
@@ -1563,6 +1631,10 @@
 "ko": "일본 수출은 9월 성장률이 16.7%로 둔화되면서 큰 폭의 부진을 기록했습니다.",
 "last": "2026-10-21"
 },
+"Japan records a trade deficit as oil imports soar because of conflict in the Middle East": {
+"ko": "일본, 중동 갈등으로 원유 수입 급증해 무역적자 기록",
+"last": "2026-10-21"
+},
 "Japan shifting to wage-driven inflation phase, finance minister says": {
 "ko": "일본 재무장관 \"임금주도 인플레이션 국면으로 전환 중\"",
 "last": "2026-10-21"
@@ -1572,6 +1644,14 @@
 "last": "2026-10-21"
 },
 "Japan to Provide Malaysia with Counterdrone System": {
+"ko": "일본, 말레이시아에 대응 드론 시스템 제공",
+"last": "2026-10-21"
+},
+"Japan to drop term ‘abnormal delivery’ to ease emotional burden on parents": {
+"ko": "일본, 부모 정신적 부담 덜어주기 위해 '비정상 출산' 용어 폐지",
+"last": "2026-10-21"
+},
+"Japan to provide Malaysia with counterdrone system": {
 "ko": "일본, 말레이시아에 대응 드론 시스템 제공",
 "last": "2026-10-21"
 },
@@ -1651,16 +1731,12 @@
 "ko": "스웨덴 국왕 노동자, 단체교섭 거부로 파업 돌입",
 "last": "2026-10-21"
 },
-"Kongsberg Automotive cleared in Russia sanctions inquiry": {
-"ko": "Kongsberg Automotive, 러시아 제재 조사 통과",
-"last": "2026-10-21"
-},
 "Koning Vera Breast CT Receives Licensure from Health Canada for Breast Imaging in Canada": {
 "ko": "Koning Vera Breast CT, 캐나다 유방 영상에 대한 캐나다 보건부로부터 면허 취득",
 "last": "2026-10-21"
 },
 "Koning gets Health Canada license for Vera breast CT system": {
-"ko": "Koning, Vera 유방 CT 시스템에 대한 Health Canada 면허 취득",
+"ko": "Koning, Vera 유방 CT 시스템에 대해 캐나다 보건부 허가 획득",
 "last": "2026-10-21"
 },
 "Korean Embassy in Romania hosts National Foundation Day event": {
@@ -1807,8 +1883,8 @@
 "ko": "스웨덴에서 홍역 발생: 예방 접종을 받지 않은 어린이의 대부분 사례",
 "last": "2026-10-21"
 },
-"Meeting between Foreign Minister MOTEGI and H.E. Dato' Seri Haji Mohamed Khaled bin Nordin, Minister of Defence of Malaysia": {
-"ko": "MOTEGI 외무장관과 H.E. Dato' Seri Haji Mohamed Khaled bin Nordin, 말레이시아 국방부 장관",
+"Meloni Won’t Run With Italy’s Far Right in 2027, Minister Says": {
+"ko": "멜로니 장관은 2027년 이탈리아 극우와 함께 출마하지 않을 것이라고 말했다",
 "last": "2026-10-21"
 },
 "Meloni convenes security meeting after riots in Italy": {
@@ -1887,12 +1963,20 @@
 "ko": "마일레이는 선거를 앞두고 극우 지지를 위해 스페인으로 여행을 떠납니다.",
 "last": "2026-10-21"
 },
+"MindFlex Education: A Home Tutor Costs Singapore Families a Median of S$390 a Month, Rising from S$325 at Primary to S$553 at Junior College": {
+"ko": "MindFlex 교육: 가정 교사 비용은 싱가포르 가족의 월 중간값 S$390이며, 초등학생 S$325에서 단기 대학 S$553로 인상됩니다.",
+"last": "2026-10-21"
+},
 "Mindestlohn für Menschen mit Behinderung: Gericht vertagt Entscheidung": {
 "ko": "장애인 최저임금: 법원 결정 연기",
 "last": "2026-10-21"
 },
 "Minimálbér 2027: kimondták, elmarad a beígért fizetésemelés – nem láttunk még olyat Magyarországon, amire a Tisza-kormány készül": {
-"ko": "최소 2027: kimondták, elmarad a beígért fizetésemelés – 연중에 Magyarországon은 Tisza-kormány Készül을 좋아합니다.",
+"ko": "최저 임금 2027: 약속된 급여 인상은 일어나지 않을 것이라고 합니다. 헝가리에서는 Tisza 정부가 준비하고 있는 그런 것을 본 적이 없습니다.",
+"last": "2026-10-21"
+},
+"Mobilisation du 5 novembre 2026 : préavis de grève": {
+"ko": "2026년 11월 5일 동원 : 파업 예고",
 "last": "2026-10-21"
 },
 "Montero Mining closes C$1.5M private placement to fund Chile exploration": {
@@ -1999,10 +2083,6 @@
 "ko": "루마니아에서 7번 실종된 후 흑해에서 드론 공격을 해결하기 위한 NATO",
 "last": "2026-10-21"
 },
-"Nano-X Imaging (NASDAQ: NNOX) Subsidiary Signs Distribution Agreement to Commercialize HealthOST in Italy": {
-"ko": "Nano-X Imaging (NASDAQ: NNOX) 자회사, 이탈리아 HealthOST 상용화를 위한 유통 계약 체결",
-"last": "2026-10-20"
-},
 "Napokon belül kiderül, mekkora lehet a minimálbér jövőre": {
 "ko": "마침내 그 내부가 드러날 것입니다. Mekkora는 미니멀리스트의 미래일지도 모릅니다.",
 "last": "2026-10-21"
@@ -2010,6 +2090,10 @@
 "National Security & Investing in China Tech": {
 "ko": "국가 안보 및 중국 기술 투자",
 "last": "2026-10-20"
+},
+"National Transfer Accounts: How Ageing Will Reshape Malaysia's Economy": {
+"ko": "국민이전계정: 고령화가 말레이시아 경제를 어떻게 변화시킬 것인가",
+"last": "2026-10-21"
 },
 "Nationwide strike in Colombia challenges right-wing regime": {
 "ko": "콜롬비아의 전국적인 파업은 우익 정권에 도전한다",
@@ -2028,7 +2112,7 @@
 "last": "2026-10-21"
 },
 "Nemcsak a minimálbéresek kapnak több fizetést 2027-től: kiderült, kinek mennyivel nő a nettója az szja-csökkentés után": {
-"ko": "Nemcsak a minimolbéresek kapnak több fizetést 2027-tól: kiderült, kinek mennyivel n행 a nettója az szja-csökkentés után",
+"ko": "2027년부터 급여 더 많이 받는 사람은 최저임금 노동자만이 아니다. SJA 축소 후 누구의 순이익이 얼마나 늘어날지 밝혀졌다.",
 "last": "2026-10-21"
 },
 "Nerves rattled in Japan as alert for magnitude 9.9 quake withdrawn minutes later": {
@@ -2123,10 +2207,6 @@
 "ko": "선택한 날짜의 공식 환율 | 러시아 은행",
 "last": "2026-10-20"
 },
-"Ogilvy Taipei + Ogilvy Singapore strike Gold at LIA": {
-"ko": "Ogilvy Taiwan + Ogilvy Singapore가 LIA에서 금메달을 획득했습니다.",
-"last": "2026-10-21"
-},
 "One dies in wildfire as Turkey continues containment effort": {
 "ko": "터키가 봉쇄 노력을 계속함에 따라 산불로 사망합니다.",
 "last": "2026-10-21"
@@ -2145,10 +2225,6 @@
 },
 "Orbán allies protest in Hungary against plans to oust President Tamás Sulyok": {
 "ko": "헝가리에서 타마스 술료크 대통령 축출 계획에 반대하는 오르반 동맹국들의 시위",
-"last": "2026-10-21"
-},
-"Our gala heats up with Chile Lindo empanadas, Latin tunes from DJ Lizzy al Toque": {
-"ko": "DJ Lizzy al Toque의 라틴 선율, 칠레 Lindo empanadas로 뜨거워지는 갈라",
 "last": "2026-10-21"
 },
 "PAHO brings together professionals from seven countries to strengthen outbreak response through a GOARN training in Colombia": {
@@ -2215,8 +2291,16 @@
 "ko": "노동 보호 강화, 경찰청장, 경찰 수준 고용 데스크 35개 개설",
 "last": "2026-10-21"
 },
+"Permanent Delegate of Ukraine to UNESCO (October 2026)": {
+"ko": "유네스코 주재 우크라이나 대표 (2026년 10월)",
+"last": "2026-10-21"
+},
 "Philadelphia Union, Alejandro Bedoya and Geiner Martinez organize Earthquake Relief Drive for Colombia": {
 "ko": "필라델피아 연합, Alejandro Bedoya 및 Geiner Martinez는 콜롬비아를 위한 지진 구호 활동을 조직했습니다.",
+"last": "2026-10-21"
+},
+"Phát triển đoàn viên Công đoàn gắn với chăm lo thiết thực cho người lao động": {
+"ko": "노동조합원 육성은 근로자에 ​​대한 실질적인 배려와 연관되어 있다.",
 "last": "2026-10-21"
 },
 "Podle výpočtu ČT vzroste minimální mzda od ledna o 2500 korun na 24 900": {
@@ -2230,6 +2314,10 @@
 "Poland orders Russians, Belarusians to leave over attempt to defy karate ban": {
 "ko": "폴란드는 러시아인, 벨라루스인들에게 가라데 금지령에 저항하기 위해 떠날 것을 명령한다.",
 "last": "2026-10-20"
+},
+"Poland says it’s unable to supply Ukraine with patriot missiles": {
+"ko": "폴란드는 우크라이나에 패트리어트 미사일을 공급할 수 없다고 밝혔습니다.",
+"last": "2026-10-21"
 },
 "Poland warns Russia is planning drone or rocket strikes on NATO territory": {
 "ko": "폴란드, 러시아가 나토 영토에 드론 또는 로켓 공격을 계획하고 있다고 경고",
@@ -2253,6 +2341,10 @@
 },
 "Pope Leo urges Ukraine-Russia humanitarian cooperation as Russian strike kills children at playground": {
 "ko": "러시아 공습으로 놀이터에서 어린이 사망하자 교황 레오, 우크라이나-러시아 인도주의적 협력 촉구",
+"last": "2026-10-21"
+},
+"Pourquoi faire grève en collège le 13 octobre ? - SNES - Syndicat National des Enseignements de Second degré": {
+"ko": "왜 10월 13일에 대학에서 파업을 합니까? - SNES - 전국중등교육연맹",
 "last": "2026-10-21"
 },
 "Powerful Earthquake Shakes Southern Panama": {
@@ -2287,6 +2379,10 @@
 "ko": "네덜란드의 카타리나-아말리아 공주가 군사 승진을 하다",
 "last": "2026-10-20"
 },
+"Probleme pentru Barcelona înaintea meciului cu Real Madrid: grevă chiar în ziua cu El Clasico": {
+"ko": "레알 마드리드를 앞둔 바르셀로나의 문제: 클라시코 당일 파업",
+"last": "2026-10-21"
+},
 "Proclamazione sciopero generale nazionale indetto per l'intera giornata del 30 ottobre 2026": {
 "ko": "2026년 10월 30일 하루 종일 전국 총파업을 선포합니다.",
 "last": "2026-10-21"
@@ -2311,6 +2407,10 @@
 "ko": "2026년 11월 1일부터 12월 31일까지 UFSE CGT 파업 통지",
 "last": "2026-10-21"
 },
+"Puglia, anche i pescatori di Manfredonia in sciopero il 22 ottobre": {
+"ko": "만프레도니아의 어부인 풀리아(Puglia)도 10월 22일 파업에 돌입했습니다.",
+"last": "2026-10-21"
+},
 "Putin elevates finance minister amid mounting budget pressures": {
 "ko": "푸틴, 예산 압박이 가중되는 가운데 재무장관 승진",
 "last": "2026-10-21"
@@ -2320,7 +2420,7 @@
 "last": "2026-10-21"
 },
 "Płaca minimalna w 2027 roku. Znacząca podwyżka od stycznia. Znamy kwoty 20.10.2026": {
-"ko": "Płaca Minimalna w 2027 roku. Znacząca podwyżka od stycznia. 즈나미 콰티 2026.10.20",
+"ko": "2027년 최저임금. 1월보다 대폭 인상. 2026년 10월 20일 금액을 알고 있습니다.",
 "last": "2026-10-21"
 },
 "Qualitative study finds Swedish employer-funded insurance holders retain willingness to fund public healthcare": {
@@ -2337,10 +2437,6 @@
 },
 "RIT Croatia student representatives join RIT’s Global Consortium in Rochester": {
 "ko": "RIT 크로아티아 학생 대표가 로체스터에 위치한 RIT 글로벌 컨소시엄에 가입합니다.",
-"last": "2026-10-21"
-},
-"RTPR advises ENGIE Romania on sale of ENGIE Building Solutions S.R.L. to BMF Grup": {
-"ko": "RTPR은 ENGIE 루마니아에 ENGIE Building Solutions S.R.L. 을 BMF GRUP에 판매할 것을 권고합니다.",
 "last": "2026-10-21"
 },
 "Researchers explore the valuable connection between birds, memory and territory in Chile": {
@@ -2443,6 +2539,10 @@
 "ko": "러시아 공격 캠페인 평가, 2026년 6월 23일",
 "last": "2026-10-21"
 },
+"Russian drone strike kills three near Kyiv, Ukrainian prosecutors say": {
+"ko": "러시아의 드론 공격으로 키예프 근처에서 3명이 사망했다고 우크라이나 검찰이 밝혔습니다.",
+"last": "2026-10-21"
+},
 "Russian missile and drone blitz kills 4 in Ukraine as Zelenskyy seeks help in Norway": {
 "ko": "Zelenskyy가 노르웨이에서 도움을 요청함에 따라 우크라이나에서 러시아 미사일 및 무인 항공기 기습으로 4 명이 사망했습니다.",
 "last": "2026-10-21"
@@ -2475,12 +2575,20 @@
 "ko": "사우디아라비아, 17억 8천만 달러 규모의 첫 번째 호텔 투자 프로젝트 발표",
 "last": "2026-10-21"
 },
+"Saudi Arabia postpones big investor conference to 2027 as Iran-backed Houthis escalate attacks on kingdom": {
+"ko": "사우디아라비아, 이란 지원 후티 반군의 왕국 공격 확대로 대규모 투자자 회의를 2027년으로 연기",
+"last": "2026-10-21"
+},
 "Saudi Arabia says it has intercepted a ballistic missile aimed at Riyadh": {
 "ko": "사우디아라비아가 리야드를 겨냥한 탄도미사일을 요격했다고 밝혔습니다.",
 "last": "2026-10-21"
 },
 "Saudi Arabia says it thwarted a missile strike on Medina, and other Middle East developments": {
 "ko": "사우디아라비아는 메디나에 대한 미사일 공격과 기타 중동 개발을 좌절시켰다고 밝혔습니다.",
+"last": "2026-10-21"
+},
+"Saudi Arabia to be guest of honor at Algeria fair — Asharq Al-Awsat": {
+"ko": "알제리 박람회의 주빈으로 사우디아라비아 — Asharq Al-Awsat",
 "last": "2026-10-21"
 },
 "Saudi Arabia unveils $106,000 luxury electric cars as Houthi attacks threaten Vision 2030": {
@@ -2505,10 +2613,6 @@
 },
 "Sciopero / Dal 19 al 22 ottobre lezioni a frequenza obbligatoria da remoto": {
 "ko": "파업 / 10월 19일부터 22일까지 원격수업 의무화",
-"last": "2026-10-21"
-},
-"Sciopero autotrasportatori, le proteste rallentano anche la produzione di pasta": {
-"ko": "Sciopero autotrasportatori, le 시위e rallentano anche la produzione di 파스타",
 "last": "2026-10-21"
 },
 "Seatrade Cruise Asia heads to Malaysia for the first time": {
@@ -2551,6 +2655,10 @@
 "ko": "극심한 태풍 '참피' 대만 상륙",
 "last": "2026-10-21"
 },
+"Severe soil drought covers 46% of Czechia as rain nears": {
+"ko": "비가 가까워지면서 심각한 토양 가뭄이 체코의 46%를 뒤덮었습니다.",
+"last": "2026-10-21"
+},
 "Siam Legal International Clarifies Thailand Privilege Background Check Timelines as Screening Expands to Five Agencies": {
 "ko": "Siam Legal International, 심사가 5개 기관으로 확대됨에 따라 태국 특권 배경 확인 일정을 명확히 했습니다.",
 "last": "2026-10-21"
@@ -2591,6 +2699,10 @@
 "ko": "싱가포르의 AI 지원 성장으로 식품 서비스의 부담 완화",
 "last": "2026-10-21"
 },
+"Singapore: Grant launched to boost adoption of new health tech": {
+"ko": "싱가포르: 새로운 의료 기술 채택을 촉진하기 위해 Grant 출시",
+"last": "2026-10-21"
+},
 "Six Charts That Explain the Forces Shaping China’s Economy": {
 "ko": "중국 경제를 형성하는 힘을 설명하는 6가지 차트",
 "last": "2026-10-21"
@@ -2609,6 +2721,10 @@
 },
 "South Korean Netizens Protest *The Assassin(s)* in Singapore": {
 "ko": "한국 네티즌들의 싱가포르 *암살자* 시위",
+"last": "2026-10-21"
+},
+"South Sudan suffers drone strike, Romania finally gets a government, Colombia revives sea beef with Nicaragua": {
+"ko": "남수단은 드론 공격을 받고, 루마니아는 마침내 정부를 얻었고, 콜롬비아는 니카라과와 함께 바다 쇠고기를 되살렸습니다.",
 "last": "2026-10-21"
 },
 "Spain (EDEN) v England (STORM) Odds": {
@@ -2643,10 +2759,6 @@
 "ko": "스페인이 서둘러 세우타 이주민 잔고 해제를 추진하면서 인권에 대한 우려가 제기되고 있다.",
 "last": "2026-10-20"
 },
-"Spania: Apel la grevă generală pe 11 noiembrie lansat de sindicate": {
-"ko": "스페인: Apel la grevă Generală pe 11 noiembrie lansat de sindicate.",
-"last": "2026-10-21"
-},
 "Spanish left-wing chaos dampens Sánchez’s hopes of election miracle": {
 "ko": "스페인 좌익의 혼란은 산체스의 선거 기적에 대한 희망을 약화시킵니다.",
 "last": "2026-10-21"
@@ -2675,6 +2787,10 @@
 "ko": "Stellantis Italy 생산량은 2 년간의 감소 후 2026 년에 반등했다고 Union은 말합니다.",
 "last": "2026-10-20"
 },
+"Storm Austen will produce heavy rainfall and strong winds from October 22-23 across the United Kingdom; expect travel delays.": {
+"ko": "Storm Austen은 10월 22일부터 23일까지 영국 전역에 걸쳐 폭우와 강풍을 일으킬 것입니다. 여행 지연이 예상됩니다.",
+"last": "2026-10-21"
+},
 "Storm Drives Another War Damaged Tanker Ashore in Turkey": {
 "ko": "폭풍이 터키의 또 다른 전쟁으로 손상된 유조선 해안을 몰고 간다.",
 "last": "2026-10-20"
@@ -2684,7 +2800,7 @@
 "last": "2026-10-21"
 },
 "Streik an der Mailänder Scala: Premiere in Gefahr": {
-"ko": "Streik an der Mailänder Scala: Gefahr 초연",
+"ko": "밀라노 라 스칼라에서의 파업: 위험에 처한 초연",
 "last": "2026-10-21"
 },
 "Strengthening Thailand’s Public Health Workforce through Essential Public Health Functions": {
@@ -2697,6 +2813,10 @@
 },
 "Strikes, historic bonuses strain collective bargaining in Chile’s mining sector": {
 "ko": "파업과 역사적인 보너스로 인해 칠레 광산 부문의 단체 교섭이 어려워졌습니다.",
+"last": "2026-10-21"
+},
+"Student exchange event seeks to spur China-US youth friendship": {
+"ko": "학생 교류 행사로 중미 청년 우호 증진 도모",
 "last": "2026-10-21"
 },
 "Sudan and Ukraine TPS Remain in Effect While Employers Await Formal DHS Guidance": {
@@ -2759,6 +2879,10 @@
 "ko": "제24회 FICM에서 오스카상을 수상한 칠레 대표 THE MELTDOWN",
 "last": "2026-10-21"
 },
+"Taiwan expands local US cooperation in trade, defense education": {
+"ko": "대만, 무역, 국방 교육 분야에서 미국 현지 협력 확대",
+"last": "2026-10-21"
+},
 "Taiwan's President Lauds Country's Hardware Resilience Amid Tariffs, Supply Chain Shifts": {
 "ko": "대만 대통령, 관세와 공급망 변화 속에서도 국가의 하드웨어 탄력성을 높이 평가",
 "last": "2026-10-21"
@@ -2788,7 +2912,7 @@
 "last": "2026-10-21"
 },
 "Tata Motors Passenger Vehicles Ltd (TMPV), along with its subsidiary Tata Passenger Electric Mobility Ltd (TPEM), partnered with Netherlands-based automaker Stellantis through a definitive agreement to develop vehicles for 50+ global markets to expand th": {
-"ko": "Tata Motors Passenger Vehicles Ltd (TMPV) 는 자회사인 Tata Passenger Electric Mobility Ltd (TPEM) 와 함께 네덜란드에 본사를 둔 자동차 제조업체 Stellantis와 파트너십을 체결했습니다.",
+"ko": "TMPV(Tata Motors Passenger Vehicles Ltd)는 자회사인 Tata Passenger Electric Mobility Ltd(TPEM)와 함께 네덜란드에 본사를 둔 자동차 제조업체인 Stellantis와 파트너십을 맺고 50개 이상의 글로벌 시장을 위한 차량을 개발하기로 최종 합의했습니다.",
 "last": "2026-10-21"
 },
 "Team from UNC Charlotte shares AI literacy for STEM education expertise at Malmö University, Sweden": {
@@ -2800,7 +2924,7 @@
 "last": "2026-10-21"
 },
 "Tesla Roadster UAE bookings open with Dhs210,000 reservation": {
-"ko": "Tesla Roadster UAE 예약은 Dhs210,000 예약으로 시작됩니다",
+"ko": "테슬라 로드스터 아랍에미리트 (Tesla Roadster UAE) Dhs210,000 예약으로 예약 가능",
 "last": "2026-10-21"
 },
 "Thai and Dutch diplomats focused on Thai-EU FTA by year’s end": {
@@ -2841,6 +2965,10 @@
 },
 "Thailand warns citizens to avoid protest areas in Greece and Italy": {
 "ko": "태국, 시민들에게 그리스와 이탈리아의 시위 지역을 피하라고 경고",
+"last": "2026-10-21"
+},
+"Thailand’s Economy in 2026–2027: Where Real Estate Opportunities Are Emerging": {
+"ko": "2026~2027년 태국 경제: 부동산 기회가 떠오르는 곳",
 "last": "2026-10-21"
 },
 "The Architecture Of The El Mansouri Government: Party Arithmetic, State Engineering And The Sovereign Core In Morocco’s Twelfth Legislature - Analysis": {
@@ -2931,6 +3059,14 @@
 "ko": "타이거에어 타이완과 에바항공, 노조와 단체협약 체결",
 "last": "2026-10-21"
 },
+"Today in Austria: A roundup of the latest news on Wednesday": {
+"ko": "오늘의 오스트리아: 수요일 최신 뉴스 모음",
+"last": "2026-10-21"
+},
+"Today in History—October 17: Albert Einstein Arrives in the United States": {
+"ko": "역사 속 오늘 - 10월 17일: 알베르트 아인슈타인이 미국에 도착",
+"last": "2026-10-21"
+},
 "Tokayev Offers Condolences Over Fatal School Roof Collapse in Pakistan": {
 "ko": "Tokayev는 파키스탄에서 치명적인 학교 지붕 붕괴에 대해 애도를 표합니다",
 "last": "2026-10-21"
@@ -2941,6 +3077,10 @@
 },
 "Toyota masters mixed conditions to clinch the crown in Spain": {
 "ko": "도요타는 스페인에서 왕관을 씌우기 위해 혼합 조건을 마스터합니다",
+"last": "2026-10-21"
+},
+"Toyota presses EU to count Japan, UK, Turkey as ‘Made in Europe’ to receive EV benefits": {
+"ko": "토요타, 유럽연합에 일본, 영국, 터키를 '메이드 인 유럽'으로 간주해 전기차 혜택을 받도록 압박",
 "last": "2026-10-21"
 },
 "Trabajo da el primer paso para subir el salario mínimo antes de las elecciones generales": {
@@ -3035,6 +3175,10 @@
 "ko": "타일러 코웬 (Tyler Cowen): 미국에는 아프리카 이민자가 필요합니다.",
 "last": "2026-10-20"
 },
+"Typhoon Champi Could Approach Japan’s Kyushu as Early as Monday": {
+"ko": "태풍 참피, 이르면 월요일 일본 규슈 접근 가능",
+"last": "2026-10-21"
+},
 "Typhoon Narra wreaks havoc in China, Vietnam as rains lead to floods": {
 "ko": "태풍 나라(Narra)가 중국과 베트남에 큰 피해를 입혔고, 폭우로 인해 홍수가 발생했습니다.",
 "last": "2026-10-21"
@@ -3111,6 +3255,10 @@
 "ko": "영국, '방어적' 공중 순찰을 통해 후티 반군에 맞서 사우디아라비아에 대한 군사 지원 확대",
 "last": "2026-10-21"
 },
+"UK fighter jets to protect Saudi Arabia from Houthi attacks": {
+"ko": "영국 전투기, 후티 공격으로부터 사우디아라비아 보호",
+"last": "2026-10-21"
+},
 "UK retail sales growth eases as consumers await Budget measures": {
 "ko": "소비자들이 예산 조치를 기다리면서 영국 소매 판매 성장이 완화됨",
 "last": "2026-10-21"
@@ -3167,6 +3315,10 @@
 "ko": "USCIS: 우크라이나 TPS는 계속됩니다(현재는)",
 "last": "2026-10-21"
 },
+"UU Pelindungan Ketenagakerjaan Ubah Aturan Outsourcing, Jenis Pekerjaan Penunjang Diperketat": {
+"ko": "고용 보호법에 따라 아웃소싱 규정 변경, 지원 업무 유형 강화",
+"last": "2026-10-21"
+},
 "Ukraine and Russia Trade Drone and Missile Strikes After Trump Waives Sanctions on Moscow": {
 "ko": "트럼프 모스크바 제재 포기 후 우크라이나와 러시아 무역 무인기 및 미사일 공격",
 "last": "2026-10-21"
@@ -3189,6 +3341,10 @@
 },
 "Ukraine war briefing: New Hungary PM signals shift away from Kremlin after massive drone attack on Ukraine": {
 "ko": "우크라이나 전쟁 브리핑: 우크라이나에 대한 대규모 드론 공격 이후 새로운 헝가리 총리 신호가 크렘린에서 멀어졌습니다.",
+"last": "2026-10-21"
+},
+"Ukraine: Parliament approves removal of VAT exemption for low-value parcels": {
+"ko": "우크라이나: 의회, 저가 소포에 대한 VAT 면제 폐지 승인",
 "last": "2026-10-21"
 },
 "Ukraine’s military robots are getting tires that can’t go flat": {
@@ -3235,6 +3391,10 @@
 "ko": "영국: UN 전문가, 항의권의 조직적 침식에 경고",
 "last": "2026-10-21"
 },
+"United Kingdom: border force - further strike action 17-19 February": {
+"ko": "영국: 국경군 - 2월 17~19일 추가 파업 조치",
+"last": "2026-10-21"
+},
 "United States Announces Additional $1 Million in Earthquake Relief for Panama, Bringing Total Humanitarian Assistance to $6 Million": {
 "ko": "미국, 파나마 지진 구호에 $ 1 백만 추가 발표, 인도적 지원 총액 $ 6 백만",
 "last": "2026-10-21"
@@ -3279,6 +3439,10 @@
 "ko": "베트남, 우크라이나에 인도적 지원 패키지 제공",
 "last": "2026-10-21"
 },
+"Vietnam raises $371 million in government bond auction": {
+"ko": "베트남, 국채 경매에서 3억 7,100만 달러 모금",
+"last": "2026-10-21"
+},
 "Vietnam to provide $500,000 in humanitarian aid to Ukraine, Kyiv says": {
 "ko": "베트남, 우크라이나에 인도적 지원 50만 달러 제공할 예정",
 "last": "2026-10-21"
@@ -3289,6 +3453,10 @@
 },
 "Vietnam’s Strategic Ambition(s)": {
 "ko": "베트남의 전략적 야망",
+"last": "2026-10-21"
+},
+"Visit to Indonesia": {
+"ko": "인도네시아 방문",
 "last": "2026-10-21"
 },
 "Volkswagen will laut IG Metall Gehälter bis 2030 einfrieren": {
@@ -3321,10 +3489,6 @@
 },
 "Warehouse workers in Canada approve collective bargaining agreement with Walmart": {
 "ko": "캐나다 창고 근로자, 월마트와 단체 교섭 계약 승인",
-"last": "2026-10-21"
-},
-"Warner Music Austria and ADA Central Europe strike distribution and studio deal with Vienna indie label Tonherd": {
-"ko": "Warner Music Austria와 ADA Central Europe이 비엔나 인디 레이블 Tonherd와 배급 및 스튜디오 계약을 체결했습니다.",
 "last": "2026-10-21"
 },
 "Watch Can Japan’s Economy Afford Takaichi’s Gamble?": {
@@ -3383,6 +3547,10 @@
 "ko": "휠러 딜러 월드 투어: 세르비아: 유고 55",
 "last": "2026-10-21"
 },
+"Who Gets to Tell Colombia’s Story? National Museum on Frontline Over Historical Memory": {
+"ko": "누가 콜롬비아의 이야기를 전할 수 있나요? 역사적 기억을 둘러싼 최전선에 선 국립박물관",
+"last": "2026-10-21"
+},
 "Why Has Tokyo’s Response to Kremlin Challenges Been So Muted?": {
 "ko": "크렘린의 도전에 대한 도쿄의 대응이 왜 이토록 무뎌졌을까요?",
 "last": "2026-10-21"
@@ -3393,6 +3561,10 @@
 },
 "Why are French police so violent? Their job is to protect the state, not the people": {
 "ko": "프랑스 경찰은 왜 그렇게 폭력적일까요? 그들의 임무는 국민이 아닌 국가를 보호하는 것입니다.",
+"last": "2026-10-21"
+},
+"Why are protests sweeping across Europe, from Spain to Portugal, France and Albania?": {
+"ko": "스페인에서 포르투갈, 프랑스, ​​알바니아에 이르기까지 유럽 전역에서 시위가 휩쓸고 있는 이유는 무엇입니까?",
 "last": "2026-10-21"
 },
 "Why more Chinese firms are eyeing Thailand over Vietnam after trade war 2.0": {
@@ -3496,7 +3668,11 @@
 "last": "2026-10-21"
 },
 "Zvýšení platů o 6 % a 12 miliard navíc. Zdravotnické odbory píšou Babišovi": {
-"ko": "Zvýšení platů o 6% a 120억 항해. Zdravotnické 이상한 píšou Babišovi",
+"ko": "급여 6% 인상, 120억 추가. 보건 조합은 Babiš에게 편지를 보냅니다.",
+"last": "2026-10-21"
+},
+"[Gen-AI Analysis] SKF opens new Ceramic Process Laboratory at R&D center in Houten, Netherlands": {
+"ko": "[Gen-AI 분석] SKF, 네덜란드 Houten R&D 센터에 새로운 세라믹 공정 연구소 개설",
 "last": "2026-10-21"
 },
 "easyJet adds further connections from the United Kingdom": {
@@ -3551,32 +3727,36 @@
 "ko": "‘핵 브라질’ 미사일 제안, 아늑한 볼소나로-트럼프 관계 노출",
 "last": "2026-10-21"
 },
+"“There Are No Trade Unions in Vietnam”": {
+"ko": "“베트남에는 노동조합이 없다”",
+"last": "2026-10-21"
+},
 "グリーンな企業賃上げ環境整備支援事業補助金について": {
 "ko": "앞으로는 많은 일들이 일어날 것입니다.",
 "last": "2026-10-21"
 },
 "中国“数据找人”催缴社保民众喊负担重– 普通话主页": {
-"ko": "중국“security找人”催生社保security喊来city重–普communicapages",
+"ko": "중국의 '데이터 사냥꾼'은 사람들에게 사회 보장 비용을 지불하라고 촉구하고 사람들은 부담이 무겁다고 불평합니다 – 중국어 홈페이지",
 "last": "2026-10-21"
 },
 "江苏最低工资标准公布": {
 "ko": "이런 게 아니고 아름다운 일이에요.",
 "last": "2026-10-21"
 },
-"生活改善する賃上げへ/全労連 春闘構想案を発表 | しんぶん赤旗": {
-"ko": "生活改善案を発表/전체労連 春闘構想案を発表 | しんぶん赤旗",
-"last": "2026-10-21"
-},
 "社保基金会原党组成员、副理事长王文灵严重违纪违法被开除党籍和公职": {
-"ko": "社保基金会原党组成员, 副理事长王文灵严违纪违法被开除党籍화공용",
-"last": "2026-10-21"
-},
-"米マイクロンの台湾・桃園労組、22日にスト開始 賞与巡り対立": {
-"ko": "米마이크론の台湾・桃郡労組、22日にest開始 賞与巡り対立",
+"ko": "왕원링(王文陵) 전 당원이자 사회보장재단 부회장은 기율과 법률을 심각하게 위반해 당과 공직에서 제명됐다.",
 "last": "2026-10-21"
 },
 "賃上げ率5%以上目標、連合が27年春季労使交渉で検討 中小は6%以上": {
-"ko": "賃上率 5% 이상 목표, 連合が27年春季労使交渉Descend masmasmas",
+"ko": "임금 인상률 5% 이상 목표, 연합이 27년 춘계노사 협상에서 검토 중소는 6% 이상",
+"last": "2026-10-21"
+},
+"連合、賃上げ要求「５％以上」で調整 ４年連続、持続的上昇へ―２７年春闘": {
+"ko": "연합, 임금 인상 요구 「5% 이상」으로 조정 4년 연속, 지속적 상승에-27년 춘투",
+"last": "2026-10-21"
+},
+"鹿児島県の最低賃金について": {
+"ko": "가고시마현의 최저임금에 대해서",
 "last": "2026-10-21"
 }
 }
