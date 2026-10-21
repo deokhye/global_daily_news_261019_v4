@@ -1,7 +1,7 @@
 """
 collector.py
 ------------
-Global HR Insight — 한국타이어 39개국 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
+Global Daily News — 한국타이어 39개국 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
 
 입력 (모두 config/, src/profile_overlay.py 가 읽음)
   countries.csv · country_codes.csv · sites.csv · official_sources.csv · manual_profile.json
@@ -48,6 +48,8 @@ import pytz
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # python src/xxx.py 외 실행 방식 대비
 from profile_overlay import REGIONS, ProfileContext, is_bad_value
+import news_rules as NR
+from news_rules import add_also, key_title, similar
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 log = logging.getLogger("collector")
@@ -438,6 +440,12 @@ def _google_news_url_en(query: str) -> str:
     return f"https://news.google.com/rss/search?q={_q(query)}&hl=en-US&gl=US&ceid=US:en"
 
 
+def _google_news_url_local(query: str, spec: dict) -> str:
+    """현지어 Google 뉴스(예: hl=de&gl=DE&ceid=DE:de)."""
+    return (f"https://news.google.com/rss/search?q={_q(query)}"
+            f"&hl={_q(spec['hl'])}&gl={_q(spec['gl'])}&ceid={_q(spec['ceid'])}")
+
+
 def _google_news_search_link(query: str, lang: str = "en") -> str:
     if lang == "ko":
         return f"https://news.google.com/search?q={_q(query)}&hl=ko&gl=KR&ceid=KR:ko"
@@ -477,18 +485,20 @@ def strip_source_suffix(title: str, source: str = ""):
     return title, source
 
 
-# 연예·가십 기사 제외 (모든 뉴스 분류 공통). 제목에 걸리면 수집하지 않는다.
-GOSSIP_RE = re.compile(
-    r"연예|아이돌|걸그룹|보이그룹|가수|(?<![가-힣])배우(?![다고며는기])|드라마|예능|열애|결혼식|이혼|컴백|앨범|뮤직비디오|"
-    r"데뷔|소속사|방송인|유튜버|인플루언서|셀럽|스캔들|팬미팅|콘서트|오디션|"
-    r"(?i:\bcelebrit|\bsinger\b|\bactor\b|\bactress\b|\bk-?pop\b|\bidol\b|girl group|boy band|\balbum\b|"
-    r"\bconcert\b|reality (show|tv)|\bdating\b|\bdivorce|\bwedding\b|box office|\brapper\b|\binfluencer|"
-    r"\bred carpet|\bpaparazzi|\bgossip|\bLove Is Blind\b|\bBachelor\b|\bKardashian)"
-)
-
-
+# 연예·가십·스포츠·의견·과거 시점·차단 매체 제외 규칙은 src/news_rules.py + config/news_rules.json
 def is_gossip(title: str) -> bool:
-    return bool(GOSSIP_RE.search(title or ""))
+    """연예·가십 + config/news_rules.json 의 noise(스포츠 등)."""
+    return NR.rules().is_gossip(title)
+
+
+REJECT_STATS: dict = {}   # 제외 사유별 건수 (품질 로그용)
+
+
+def reject_reason(title: str, source: str = "") -> str:
+    reason = NR.rules().reject_reason(title, source)
+    if reason:
+        REJECT_STATS[reason] = REJECT_STATS.get(reason, 0) + 1
+    return reason
 
 
 def _parse_entry(entry) -> dict:
@@ -684,10 +694,10 @@ def _cached_list(cached_list, check=None) -> list:
         if not isinstance(x, dict) or x.get("is_fallback") or x.get("title") == FALLBACK_TEXT:
             continue
         it = sanitize_item(x)
-        if is_gossip(it.get("original_title") or it.get("title", "")) or is_gossip(it.get("title", "")):
+        if NR.rules().reject_reason(key_title(it), it.get("source", "")) or is_gossip(it.get("title", "")):
             continue
-        if check:
-            lang = it.get("lang", "ko")
+        lang = it.get("lang", "ko")
+        if check and lang in ("ko", "en"):          # 현지어 기사는 현지판 검색이라 국가명 검사를 하지 않는다
             title = (it.get("original_title") or it.get("title", "")) if lang == "en" else it.get("title", "")
             if not check(title, lang):
                 continue
@@ -696,22 +706,54 @@ def _cached_list(cached_list, check=None) -> list:
 
 
 def _pick(candidates: list, lang: str, limit: int, seen: set, check=None, already: list = None) -> list:
+    """후보 중 조건에 맞는 기사를 limit 개까지 고른다.
+    - 국가 관련성·의견/과거/연예·스포츠/차단 매체 제외
+    - 이미 고른 기사와 같은 사건이면 새로 넣지 않고 그 기사의 also(다른 매체)에 붙인다"""
     picked = list(already or [])
     for it in candidates:
-        if len(picked) >= limit:
-            break
-        if check and not check(it.get("title", ""), lang):
+        title = it.get("title", "")
+        if check and not check(title, lang):
             continue
-        if is_gossip(it.get("title", "")):
+        if reject_reason(title, it.get("source", "")):
             continue
         if _is_seen(it, seen):
             continue
+        twin = next((p for p in picked if similar(key_title(p), title)), None)
+        if twin is not None:
+            add_also(twin, it)
+            _mark_seen(it, seen)
+            continue
+        if len(picked) >= limit:
+            continue          # 자리는 찼어도 같은 사건 보도(also)를 모으려고 끝까지 본다
         it["lang"] = lang
         it["translated"] = False
-        it["original_title"] = it["title"] if lang == "en" else ""
+        it["original_title"] = title if lang != "ko" else ""
         picked.append(it)
         _mark_seen(it, seen)
     return picked
+
+
+def _today_kst() -> str:
+    return datetime.now(KST).strftime("%Y-%m-%d")
+
+
+def rank_items(items: list, kind: str, country: dict = None) -> list:
+    """배지(경쟁사·당사·제조업·거점 인근·주요 매체)와 중요도 점수를 붙이고 점수 → 최신순으로 정렬."""
+    r = NR.rules()
+    today = _today_kst()
+    iso3 = (country or {}).get("iso3", "")
+    code = (country or {}).get("code", "")
+    for it in items:
+        if not isinstance(it, dict) or it.get("is_fallback"):
+            continue
+        r.annotate(it, kind, iso3)
+        it["score"] = r.score(it, kind, today, code)
+    return sorted(items, key=lambda i: (-(i.get("score") or 0), _neg_date(i.get("published"))))
+
+
+def _neg_date(d) -> str:
+    """최신순 정렬 키 (YYYY-MM-DD 를 뒤집어 비교)."""
+    return "".join(chr(255 - ord(ch)) for ch in str(d or "0000-00-00"))
 
 
 # ---------------------------------------------------------------------------
@@ -736,7 +778,7 @@ def _fallback_trend_item(spec: dict, country: dict) -> dict:
 
 
 def _to_trend_item(p: dict) -> dict:
-    return {
+    out = {
         "title": p.get("title", ""),
         "desc": p.get("summary", ""),
         "source": p.get("source", "Google News"),
@@ -746,6 +788,33 @@ def _to_trend_item(p: dict) -> dict:
         "original_title": p.get("original_title", ""),
         "published": p.get("published", ""),
     }
+    if p.get("also"):
+        out["also"] = p["also"]
+    return out
+
+
+def _hr_spec(spec: dict) -> dict:
+    """HR & LABOR 검색어는 config/news_rules.json 의 hr 값을 우선 사용."""
+    if spec.get("category") != "HR & LABOR":
+        return spec
+    hr = NR.rules().hr
+    out = dict(spec)
+    for k_cfg, k_spec in (("en_keywords", "en_keywords"), ("ko_keywords", "kr_keywords"), ("home_query", "home_query")):
+        if hr.get(k_cfg):
+            out[k_spec] = hr[k_cfg]
+    return out
+
+
+def _local_hr_pick(country: dict, limit: int, seen: set, picked: list) -> list:
+    """현지어 HR 뉴스 (config/news_rules.json → hr.local[ISO3])."""
+    spec = (NR.rules().hr.get("local") or {}).get(country.get("iso3", ""))
+    if not isinstance(spec, dict) or not spec.get("q") or not spec.get("hl"):
+        return picked
+    need = re.compile(spec["require_name"], re.I) if spec.get("require_name") else None
+    check = (lambda t, _l: bool(need.search(t or ""))) if need else None
+    lang = spec["hl"].split("-")[0].lower()
+    url = _google_news_url_local(f'{spec["q"]} when:14d', spec)
+    return _pick(_fetch_feed(url, 40), lang, limit, seen, check, picked)
 
 
 def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
@@ -762,6 +831,8 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
 
     trends = []
     for spec in INDUSTRY_TOPICS:
+        spec = _hr_spec(spec)
+        is_hr = spec["category"] == "HR & LABOR"
         limit = spec.get("max_items", 4)
         picked = []
         try:
@@ -769,8 +840,11 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
                 picked = _pick(_fetch_feed(_google_news_url_ko(f"{spec['home_query']} when:14d"), 30),
                                "ko", limit, seen)
             else:
-                q_ko = f'"{name_kr}" {spec["kr_keywords"]} when:14d'
-                picked = _pick(_fetch_feed(_google_news_url_ko(q_ko), 30), "ko", limit, seen, check)
+                if is_hr:   # 현지어 HR 뉴스가 가장 정확하므로 먼저
+                    picked = _local_hr_pick(country, limit, seen, picked)
+                if len(picked) < limit:
+                    q_ko = f'"{name_kr}" {spec["kr_keywords"]} when:14d'
+                    picked = _pick(_fetch_feed(_google_news_url_ko(q_ko), 30), "ko", limit, seen, check, picked)
                 if len(picked) < limit:
                     q_en = f'"{name_en}" {spec["en_keywords"]}{ex} when:14d'
                     picked = _pick(_fetch_feed(_google_news_url_en(q_en), 40), "en", limit, seen, check, picked)
@@ -780,6 +854,10 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
         items = [_to_trend_item(p) for p in picked]
         if not items:
             items = cached_by_cat.get(spec["category"]) or [_fallback_trend_item(spec, country)]
+        if is_hr:
+            for it in items:
+                it["law"] = (not it.get("is_fallback")) and is_law_item(it)
+        items = rank_items(items, "hr" if is_hr else "auto", country)
 
         trends.append({
             "category": spec["category"],
@@ -888,7 +966,7 @@ def get_local_news(country: dict, cached: dict, seen: set) -> dict:
         for it in picked:
             if cid == "safe":
                 it["safety_tag"] = safety_tag(it.get("original_title") or it.get("title", ""))
-        out[cid] = picked
+        out[cid] = rank_items(picked, cid, country)
     return out
 
 
@@ -907,6 +985,8 @@ INDUSTRY_TAG_RULES = [
 
 
 def industry_tag(title: str) -> str:
+    if NR.rules().competitor_of(title):
+        return "경쟁사"
     for tag, rx in INDUSTRY_TAG_RULES:
         if rx.search(title or ""):
             return tag
@@ -927,7 +1007,7 @@ def get_global_industry(previous: list) -> list:
         items = _cached_list(previous)
     for it in items:
         it["tag"] = industry_tag(it.get("original_title") or it.get("title", ""))
-    return items[:10]
+    return rank_items(items, "ind")[:10]
 
 
 def load_translation_cache() -> dict:
@@ -990,8 +1070,11 @@ def _translate_google_alt(text: str) -> str:
     return data if isinstance(data, str) else ""
 
 
+_TEXT_LANG: dict = {}   # 원문 → 언어 코드 (MyMemory 는 원문 언어를 알려줘야 한다)
+
+
 def _translate_mymemory(text: str) -> str:
-    params = {"q": text[:480], "langpair": "en|ko"}
+    params = {"q": text[:480], "langpair": f"{_TEXT_LANG.get(text, 'en')}|ko"}
     if MYMEMORY_EMAIL:
         params["de"] = MYMEMORY_EMAIL
     data = _json_with_retry("GET", MYMEMORY_URL, params=params)
@@ -1119,17 +1202,18 @@ def _iter_news_items(countries: list):
 
 
 def apply_translations(countries: list) -> None:
-    """lang=en 이면서 아직 번역되지 않은 기사 제목을 일괄 번역해 반영.
+    """한국어가 아니면서 아직 번역되지 않은 기사 제목(영어·현지어)을 일괄 번역해 반영.
     - 화면에는 제목만 나오므로 본문 요약은 번역하지 않는다(요청량 절반 감소).
     - 글로벌 동향 → 최신 기사 순으로 번역해, 시간이 모자라도 브리핑에 나오는 기사부터 번역되게 한다."""
     cache = load_translation_cache()
     targets = []
     for item, _body_key in _iter_news_items(countries):
-        if item.get("lang") != "en" or item.get("translated"):
+        if item.get("lang", "ko") == "ko" or item.get("translated"):
             continue
         src_title = item.get("original_title") or item.get("title") or ""
         item["original_title"] = src_title
         targets.append((item, src_title))
+        _TEXT_LANG[src_title] = item.get("lang") or "en"
 
     if not targets:
         save_translation_cache(cache)
@@ -1266,10 +1350,6 @@ def collect_country(country: dict, cache_by_code: dict, fx_series: dict) -> dict
              "items": [_fallback_trend_item(s, country)]}
             for s in INDUSTRY_TOPICS
         ]
-    for t in result.get("hr_trends", []):
-        if t.get("category") == "HR & LABOR":
-            for it in t.get("items", []):
-                it["law"] = (not it.get("is_fallback")) and is_law_item(it)
     return result
 
 
@@ -1332,11 +1412,17 @@ def main() -> dict:
         log.error(f"일괄 번역 단계 실패(원문 유지): {e}")
 
     now_kst = datetime.now(KST)
+    try:
+        top_briefing = build_top_briefing(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"))
+    except Exception as e:
+        log.error(f"오늘 핵심 브리핑 구성 실패(빈 목록): {e}")
+        top_briefing = []
     data = {
         "generated_at": now_kst.isoformat(),
         "generated_at_display": now_kst.strftime("%Y-%m-%d %H:%M KST"),
         "as_of_display": f"{now_kst.strftime('%Y-%m-%d %H:%M')} KST 수집",
         "regions": REGIONS,
+        "top_briefing": top_briefing,
         "countries": countries_result,
         "global_industry": global_industry,
     }
@@ -1349,9 +1435,99 @@ def main() -> dict:
     except Exception as e:
         log.error(f"아카이브 저장 실패(사이트 생성은 계속): {e}")
 
-    _log_quality_report(countries_result)
+    _log_quality_report(countries_result, data)
     log.info(f"전체 {len(countries_result)}개국 수집 완료 ({time.time() - started:.0f}초)")
     return data
+
+
+# ---------------------------------------------------------------------------
+# 10. 오늘 핵심 브리핑 — 전체 기사 중 중요도 상위 N건 (같은 사건은 나라·매체를 합쳐 1건)
+# ---------------------------------------------------------------------------
+TOP_FIELDS = ("title", "original_title", "translated", "lang", "link", "source", "published",
+              "safety_tag", "law", "own", "competitor", "mfg", "near_site", "trusted")
+
+
+def _top_candidates(countries: list, global_industry: list):
+    for c in countries:
+        news = c.get("news") or {}
+        for kind in ("safe", "pol", "soc"):
+            for it in news.get(kind) or []:
+                yield kind, c.get("code", ""), it
+        for t in c.get("hr_trends") or []:
+            kind = "hr" if t.get("category") == "HR & LABOR" else "auto"
+            for it in t.get("items") or []:
+                yield kind, c.get("code", ""), it
+    for it in global_industry or []:
+        yield "ind", "", it
+
+
+def build_top_briefing(countries: list, global_industry: list, today: str) -> list:
+    r = NR.rules()
+    cands = []
+    for kind, code, it in _top_candidates(countries, global_industry):
+        if not isinstance(it, dict) or it.get("is_fallback") or not it.get("title"):
+            continue
+        n = NR.days_between(it.get("published"), today)
+        if n is None or n > r.top_max_days:
+            continue
+        cands.append((it.get("score") or 0, kind, code, it))
+    cands.sort(key=lambda x: -x[0])
+
+    checkers = {c["code"]: make_relevance_checker(c) for c in COUNTRIES}
+
+    def mentions(code: str, item: dict) -> bool:
+        """item 제목에 code 나라 이름이 나오는지 (다른 나라 기사끼리 잘못 묶이는 것 방지)."""
+        chk = checkers.get(code)
+        lang = item.get("lang", "ko")
+        return bool(chk) and lang in ("ko", "en") and chk(key_title(item), lang)
+
+    def same_event(g: dict, kind: str, code: str, it: dict) -> bool:
+        rep = g["item"]
+        # 같은 나라·같은 안전 분류의 그날 보도는 표현이 달라도 같은 사건으로 본다 (예: 이스탄불 지진 보도 여러 건)
+        if kind == "safe" and g["kind"] == "safe" and code and g["countries"] == [code] \
+                and it.get("safety_tag") and it.get("safety_tag") == rep.get("safety_tag"):
+            return True
+        if not similar(key_title(rep), key_title(it)):
+            return False
+        if not code or not g["countries"] or code in g["countries"]:
+            return True
+        # 다른 나라 기사는 서로의 나라 이름이 제목에 함께 나올 때만 같은 사건 (예: 'Russia strikes Ukraine')
+        return mentions(code, rep) or any(mentions(gc, it) for gc in g["countries"])
+
+    groups = []   # 같은 사건 묶음
+    for score, kind, code, it in cands:
+        g = next((g for g in groups if same_event(g, kind, code, it)), None)
+        if g is None:
+            groups.append({"item": it, "kind": kind, "score": score, "countries": [code] if code else [],
+                           "sources": {it.get("source", "")} | {a.get("source", "") for a in it.get("also") or []}})
+            continue
+        if code and code not in g["countries"]:
+            g["countries"].append(code)
+        g["sources"].add(it.get("source", ""))
+        g["sources"].update(a.get("source", "") for a in it.get("also") or [])
+
+    for g in groups:
+        g["final"] = g["score"] + min(len(g["countries"]) - 1, 3) * 6 + min(len(g["sources"]) - 1, 4) * 3
+    groups.sort(key=lambda g: -g["final"])
+
+    out, per_kind, per_country = [], {}, {}
+    for g in groups:
+        if len(out) >= r.top_count:
+            break
+        if per_kind.get(g["kind"], 0) >= r.top_per_kind:
+            continue
+        main = g["countries"][0] if g["countries"] else ""
+        if main and per_country.get(main, 0) >= 2:
+            continue
+        per_kind[g["kind"]] = per_kind.get(g["kind"], 0) + 1
+        if main:
+            per_country[main] = per_country.get(main, 0) + 1
+        it = g["item"]
+        entry = {k: it[k] for k in TOP_FIELDS if it.get(k) not in (None, "", False)}
+        entry.update({"kind": g["kind"], "countries": g["countries"], "score": g["final"],
+                      "source_count": len([x for x in g["sources"] if x])})
+        out.append(entry)
+    return out
 
 
 def _load_previous_global_industry() -> list:
@@ -1362,18 +1538,42 @@ def _load_previous_global_industry() -> list:
         return []
 
 
-def _log_quality_report(countries: list) -> None:
-    """실행 로그에 품질 요약을 남겨 GitHub Actions에서 바로 확인할 수 있게 한다."""
+QUALITY_PATH = os.path.join(BASE_DIR, "collector_quality.json")
+
+
+def _log_quality_report(countries: list, data: dict = None) -> dict:
+    """실행 로그에 품질 요약을 남기고, 알림 판단용 collector_quality.json 을 쓴다(커밋하지 않음)."""
     fx_fail = [c["code"] for c in countries if not c["exchange_rate"].get("is_base")
                and (c["exchange_rate"].get("stale") or not c["exchange_rate"].get("history_values"))]
     fallback_news = [c["code"] for c in countries if not any((c.get("news") or {}).values())]
-    en_items = [i for i, _ in _iter_news_items(countries) if i.get("lang") == "en"]
-    untranslated = sum(1 for i in en_items if not i.get("translated"))
+    foreign = [i for i, _ in _iter_news_items(countries) if i.get("lang", "ko") != "ko"]
+    untranslated = sum(1 for i in foreign if not i.get("translated"))
     log.info(f"[품질] 환율 최신값 미확보: {len(fx_fail)}개국 {fx_fail}")
     log.info(f"[품질] 현지 뉴스 0건: {len(fallback_news)}개국 {fallback_news}")
     safe = [(c["code"], i.get("safety_tag")) for c in countries for i in (c.get("news") or {}).get("safe", [])]
     log.info(f"[품질] 안전·재난 보도 {len(safe)}건 {safe}")
-    log.info(f"[품질] 영문 기사 {len(en_items)}건 중 미번역 {untranslated}건")
+    log.info(f"[품질] 외국어 기사 {len(foreign)}건 중 미번역 {untranslated}건")
+    log.info(f"[품질] 규칙으로 제외한 기사: {REJECT_STATS or '없음'}")
+    top = (data or {}).get("top_briefing") or []
+    log.info(f"[품질] 오늘 핵심 브리핑 {len(top)}건")
+    report = {
+        "generated_at": (data or {}).get("generated_at", ""),
+        "news_stopped": _NEWS_STOPPED,
+        "zero_news_countries": fallback_news,
+        "fx_failed_countries": fx_fail,
+        "foreign_items": len(foreign),
+        "untranslated": untranslated,
+        "translation_rate": round(1 - untranslated / len(foreign), 3) if foreign else 1.0,
+        "safety_items": len(safe),
+        "top_briefing": len(top),
+        "rejected": REJECT_STATS,
+    }
+    try:
+        with open(QUALITY_PATH, "w", encoding="utf-8") as f:
+            json.dump(report, f, ensure_ascii=False, indent=1)
+    except Exception as e:  # noqa: BLE001
+        log.warning(f"품질 보고서 저장 실패(무시): {e}")
+    return report
 
 
 if __name__ == "__main__":

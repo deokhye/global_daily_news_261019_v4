@@ -31,6 +31,7 @@ DATA_PATH = os.path.join(BASE_DIR, "data", "countries_data.json")
 ARCHIVE_INDEX_PATH = os.path.join(BASE_DIR, "docs", "archive", "index.json")
 TEMPLATE_DIR = os.path.join(BASE_DIR, "template")
 OUTPUT_PATH = os.path.join(BASE_DIR, "docs", "index.html")
+LATEST_PATH = os.path.join(BASE_DIR, "docs", "latest.json")   # 매일 같은 주소의 최신 데이터 (HR Insight 연동용)
 KST = timezone(timedelta(hours=9))
 
 FALLBACK_HTML = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
@@ -92,13 +93,21 @@ def build() -> None:
 
     today = str(data.get("generated_at", ""))[:10] or datetime.now(KST).strftime("%Y-%m-%d")
     archive_min, archive_max = archive_range(today)
-    payload = json.dumps({
+    dashboard = {
         "as_of_display": data.get("as_of_display", ""),
         "generated_at": data.get("generated_at", ""),
         "regions": data.get("regions") or REGIONS,
+        "top_briefing": data.get("top_briefing", []),
         "countries": data.get("countries", []),
         "global_industry": data.get("global_industry", []),
-    }, ensure_ascii=False, separators=(",", ":"), default=str).replace("</", "<\\/")
+    }
+    raw = json.dumps(dashboard, ensure_ascii=False, separators=(",", ":"), default=str)
+    payload = raw.replace("</", "<\\/")
+    try:
+        with open(LATEST_PATH, "w", encoding="utf-8") as f:
+            f.write(raw)
+    except Exception as e:  # noqa: BLE001
+        log.warning(f"latest.json 저장 실패(화면 생성은 계속): {e}")
 
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=select_autoescape(["html"]))
     page = env.get_template("template.html").render(
