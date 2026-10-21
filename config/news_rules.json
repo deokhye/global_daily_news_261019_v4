@@ -50,7 +50,8 @@
     "title_patterns": [
       "\\[(포토|화보|영상|카드뉴스|그래픽|여행|르포|기획|매거진)\\]", "\\bin pictures\\b", "^photos?\\s*[:|]", "\\bphoto (essay|gallery)\\b",
       "^(watch|video)\\s*[:|]", "\\bgallery\\b", "\\btravel guide\\b", "\\bthings to do\\b", "\\bbest places\\b",
-      "\\bbucket list\\b", "\\bweekend getaway\\b", "\\bwhere to (eat|stay|go)\\b", "가볼 만한 곳", "여행지", "맛집"
+      "\\bbucket list\\b", "\\bweekend getaway\\b", "\\bwhere to (eat|stay|go)\\b", "가볼 만한 곳", "여행지", "맛집",
+      "\\d[\\d,.]*\\s*(comments|replies|upvotes)\\b", "\\d[\\d,.]*\\s*개의\\s*(댓글|답글)", "^r/", "\\bAMA\\b", "\\bthread\\b"
     ]
   },
 
@@ -60,7 +61,8 @@
       "PR Newswire", "GlobeNewswire", "Business Wire", "EIN Presswire", "Newswire", "openPR", "PRWeb", "Accesswire",
       "IndexBox", "MarketsandMarkets", "Research and Markets", "Mordor Intelligence", "Fortune Business Insights",
       "Coherent Market Insights", "Persistence Market Research", "Allied Market Research", "Market.us", "Precedence Research",
-      "Digital Journal", "Medium", "Blogspot", "Substack", "Benzinga", "Zacks", "Motley Fool", "Seeking Alpha", "Yahoo 뉴스 블로그"
+      "Digital Journal", "Medium", "Blogspot", "Substack",
+      "Reddit", "Pantip", "Quora", "YouTube", "Facebook", "Instagram", "TikTok", "LinkedIn", "X (formerly Twitter)", "Threads", "Naver Blog", "네이버 블로그", "티스토리", "디시인사이드", "더쿠", "에펨코리아", "Benzinga", "Zacks", "Motley Fool", "Seeking Alpha", "Yahoo 뉴스 블로그"
     ],
     "trusted": [
       "Reuters", "AP News", "Associated Press", "AFP", "Bloomberg", "Financial Times", "The Wall Street Journal", "WSJ",
@@ -106,24 +108,84 @@
     "en_keywords": "(\"minimum wage\" OR \"labor law\" OR \"labour law\" OR \"labor reform\" OR \"labour reform\" OR \"employment law\" OR \"labor code\" OR \"labour code\" OR union OR unions OR strike OR walkout OR \"collective bargaining\" OR \"wage talks\" OR \"wage deal\" OR layoffs OR \"job cuts\" OR redundancies OR \"working hours\" OR \"work week\" OR \"workers\")",
     "ko_keywords": "(노동법 OR 최저임금 OR 노조 OR 파업 OR 임금협상 OR 근로시간 OR 고용 OR 구조조정 OR 해고 OR 노동 개혁)",
     "home_query": "(노동법 OR 최저임금 OR 노조 OR 파업 OR 고용노동부 OR 임금협상 OR 근로시간 OR 중대재해 OR 노란봉투법 OR 정년연장)",
+    "require_patterns": [
+      "_설명: HR·노동 기사는 제목(원문 제목 포함)에 아래 노동 관련 표현이 하나는 있어야 채택",
+      "\\bminimum wage", "\\bwages?\\b", "\\bsalar", "\\bpay (rise|raise|deal|talks|dispute|gap|cut)", "\\blabou?r\\b", "\\btrade unions?\\b", "\\bunions?\\b",
+      "\\bstrikes?\\b", "\\bstriking\\b", "\\bwalkouts?\\b", "\\bworkers?\\b", "\\bworkforce", "\\bemploy", "\\bjobs?\\b", "\\bjob cuts", "\\blayoffs?\\b", "\\blaid off",
+      "\\bredundanc", "\\bhiring\\b", "\\bpension", "\\bretirement age", "\\bovertime", "\\bworking (hours|week|time)", "\\bwork ?week", "\\bcollective (agreement|bargaining)",
+      "\\bpayroll", "\\bunemploy", "\\bstaff cuts", "\\bheadcount",
+      "노동", "임금", "노조", "파업", "고용", "해고", "근로", "최저임금", "일자리", "채용", "연금", "구조조정", "노사", "인력 감축", "희망퇴직", "실업",
+      "Mindestlohn", "Lohn", "Streik", "Gewerkschaft", "Tarif", "Stellen", "Arbeit", "Beschäftig", "Kündigung",
+      "sztrájk", "bér", "szakszervezet", "munka", "leépítés", "elbocsát",
+      "工资", "罢工", "工会", "裁员", "劳动", "就业", "社保", "薪",
+      "upah", "UMP", "UMK", "mogok", "buruh", "pekerja", "PHK", "ketenagakerjaan", "karyawan",
+      "salario", "huelga", "sindicat", "laboral", "despid", "empleo", "trabajador", "jornada",
+      "salário", "greve", "trabalh", "demiss", "emprego", "CLT",
+      "lương", "đình công", "công đoàn", "lao động", "việc làm",
+      "賃金", "賃上げ", "労働", "ストライキ", "組合", "雇用", "春闘", "人員削減",
+      "SMIC", "grève", "syndicat", "travail", "licenci", "salaire", "emploi", "retraite",
+      "sciopero", "sindacat", "lavor", "licenzi", "contratto",
+      "płac", "strajk", "związk", "pracown", "zwolnie", "kodeks pracy",
+      "mzd", "stávk", "odbor", "zaměstnan", "propouš",
+      "salari", "grevă", "muncă", "concedi", "angajaț", "angajat",
+      "ücret", "grev", "sendika", "işçi", "işten", "istihdam",
+      "ค่าแรง", "นัดหยุดงาน", "สหภาพ", "แรงงาน", "เลิกจ้าง", "ลูกจ้าง"
+    ],
+    "exclude_patterns": [
+      "_설명: 노동 표현이 있어도 아래 문맥이면 HR·노동 기사가 아님 (공습·군사·외교·스포츠 등)",
+      "\\b(air|drone|missile|military|precision|retaliatory|pre-?emptive|naval|rocket|artillery)[- ]?strikes?\\b", "\\bairstrikes?\\b", "\\blaunch(es|ed|ing)? (\\w+ )?strikes?\\b", "\\bretaliat", "\\bstrikes? (kill|hit|target)",
+      "\\bstruck\\b", "\\bfighter jets?\\b", "\\bjets?\\b", "\\btroops\\b", "\\bmilitary\\b", "\\barmy\\b", "\\bnavy\\b", "\\bwarships?\\b", "\\bdeploy",
+      "\\b(european|soviet|african|postal|customs|banking|energy|eurasian|economic) union\\b", "\\bunion (budget|cabinet|minister|territory|government|home)\\b", "\\bEU\\b(?!.*\\b(workers?|wages?|labou?r|strike)\\b)",
+      "\\bstrike(r|s)? (a|the)? ?(deal|balance|tone|chord|gold|out)\\b", "\\bstrikers?\\b", "\\bfootball|\\bsoccer|\\bcricket|\\bbaseball|\\bstrikeout",
+      "\\bjobs report\\b(?!.*\\b(cut|layoff|strike)\\b)",
+      "공습", "미사일", "전투기", "파병", "군사 ", "전투"
+    ],
     "local": {
-      "DEU": {"hl": "de", "gl": "DE", "ceid": "DE:de", "q": "(Mindestlohn OR Streik OR Warnstreik OR Gewerkschaft OR \"IG Metall\" OR Tarifverhandlungen OR Stellenabbau OR Arbeitsrecht)"},
+      "DEU": {"hl": "de", "gl": "DE", "ceid": "DE:de", "q": "(Mindestlohn OR Streik OR Warnstreik OR Gewerkschaft OR \"IG Metall\" OR Tarifverhandlungen OR Stellenabbau OR Arbeitsrecht)", "exclude_names": "Österreich|Schweiz|Wien|Zürich"},
       "HUN": {"hl": "hu", "gl": "HU", "ceid": "HU:hu", "q": "(minimálbér OR sztrájk OR szakszervezet OR \"munka törvénykönyve\" OR leépítés OR bértárgyalás)"},
       "CHN": {"hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans", "q": "(最低工资 OR 劳动法 OR 罢工 OR 工会 OR 裁员 OR 社保 OR 劳动合同)"},
       "IDN": {"hl": "id", "gl": "ID", "ceid": "ID:id", "q": "(\"upah minimum\" OR UMP OR UMK OR mogok OR \"serikat pekerja\" OR PHK OR \"UU Cipta Kerja\" OR ketenagakerjaan)"},
       "MEX": {"hl": "es-419", "gl": "MX", "ceid": "MX:es-419", "q": "(\"salario mínimo\" OR huelga OR sindicato OR \"reforma laboral\" OR despidos OR \"jornada laboral\")", "require_name": "México|mexican"},
-      "BRA": {"hl": "pt-BR", "gl": "BR", "ceid": "BR:pt-419", "q": "(\"salário mínimo\" OR greve OR sindicato OR \"reforma trabalhista\" OR demissões OR CLT)"},
+      "BRA": {"hl": "pt-BR", "gl": "BR", "ceid": "BR:pt-419", "q": "(\"salário mínimo\" OR greve OR sindicato OR \"reforma trabalhista\" OR demissões OR CLT)", "exclude_names": "Portugal|Angola|Moçambique"},
       "VNM": {"hl": "vi", "gl": "VN", "ceid": "VN:vi", "q": "(\"lương tối thiểu\" OR \"đình công\" OR \"công đoàn\" OR \"Bộ luật Lao động\" OR \"cắt giảm lao động\")"},
       "JPN": {"hl": "ja", "gl": "JP", "ceid": "JP:ja", "q": "(最低賃金 OR 労働基準法 OR ストライキ OR 労働組合 OR 春闘 OR 賃上げ OR 人員削減)"},
-      "FRA": {"hl": "fr", "gl": "FR", "ceid": "FR:fr", "q": "(SMIC OR grève OR syndicat OR \"code du travail\" OR licenciements OR \"réforme des retraites\")"},
-      "ITA": {"hl": "it", "gl": "IT", "ceid": "IT:it", "q": "(\"salario minimo\" OR sciopero OR sindacato OR licenziamenti OR \"contratto nazionale\")"},
-      "ESP": {"hl": "es", "gl": "ES", "ceid": "ES:es", "q": "(\"salario mínimo\" OR huelga OR sindicatos OR \"reforma laboral\" OR ERE OR despidos)"},
+      "FRA": {"hl": "fr", "gl": "FR", "ceid": "FR:fr", "q": "(SMIC OR grève OR syndicat OR \"code du travail\" OR licenciements OR \"réforme des retraites\")", "exclude_names": "Québec|Belgique|Suisse|Maroc|Algérie|Tunisie|Sénégal|Côte d'Ivoire|Canada"},
+      "ITA": {"hl": "it", "gl": "IT", "ceid": "IT:it", "q": "(\"salario minimo\" OR sciopero OR sindacato OR licenziamenti OR \"contratto nazionale\")", "exclude_names": "Svizzera|Ticino|San Marino"},
+      "ESP": {"hl": "es", "gl": "ES", "ceid": "ES:es", "q": "(\"salario mínimo\" OR huelga OR sindicatos OR \"reforma laboral\" OR ERE OR despidos)", "exclude_names": "México|mexican|Argentin|Colombia|Chile|Perú|Venezuel|Ecuador|Bolivia|Uruguay|Paraguay|Cuba|Panamá"},
       "POL": {"hl": "pl", "gl": "PL", "ceid": "PL:pl", "q": "(\"płaca minimalna\" OR strajk OR \"związki zawodowe\" OR \"kodeks pracy\" OR zwolnienia)"},
       "CZE": {"hl": "cs", "gl": "CZ", "ceid": "CZ:cs", "q": "(\"minimální mzda\" OR stávka OR odbory OR \"zákoník práce\" OR propouštění)"},
       "ROU": {"hl": "ro", "gl": "RO", "ceid": "RO:ro", "q": "(\"salariul minim\" OR grevă OR sindicat OR \"codul muncii\" OR concedieri)"},
       "TUR": {"hl": "tr", "gl": "TR", "ceid": "TR:tr", "q": "(\"asgari ücret\" OR grev OR sendika OR \"iş kanunu\" OR işten çıkarma)"},
       "THA": {"hl": "th", "gl": "TH", "ceid": "TH:th", "q": "(ค่าแรงขั้นต่ำ OR นัดหยุดงาน OR สหภาพแรงงาน OR กฎหมายแรงงาน OR เลิกจ้าง)"}
     }
+  },
+
+  "safety": {
+    "_설명": "현지 안전 동향은 '실제로 일어난 사건' 위주. incident(피해·발생 표현)가 있으면 우선, statement(발언·외교·배치·전망)만 있는 기사는 제외. 무력충돌·사회불안은 incident 가 꼭 있어야 채택.",
+    "incident_patterns": [
+      "\\bkill(s|ed|ing)?\\b", "\\bdead\\b", "\\bdeaths?\\b", "\\bdie[sd]?\\b", "\\bdeath toll", "\\binjur", "\\bwounded", "\\bcasualt", "\\bmissing\\b",
+      "\\bevacuat", "\\bdisplaced", "\\bdamag", "\\bdestroy", "\\bdevastat", "\\bhit(s)?\\b", "\\bstruck\\b", "\\bslams?\\b", "\\bbatter", "\\bravag", "\\bshak(es|en|ing)\\b", "\\bjolts?\\b",
+      "\\bflooded\\b", "\\bsubmerg", "\\bstranded", "\\btrapped", "\\brescu", "\\bcollapse[sd]?\\b", "\\bexplod", "\\bexplosion", "\\bblast\\b", "\\bburn(s|ed|ing)?\\b", "\\bablaze",
+      "\\bderail", "\\bcrash(es|ed)?\\b", "\\berupt", "\\blandfall", "\\bhalt(s|ed)?\\b", "\\bshut(s)? down\\b", "\\bsuspend(s|ed)? (operations|production|flights)", "\\bmagnitude\\b", "\\bpower outage|\\bblackout", "\\battack(s|ed)? (on|in|at|near|kills?)\\b", "\\bshot dead|\\bshooting\\b", "\\bstrikes? (on|hits?)\\b", "\\bintercept", "\\bthwart", "\\bshell(ed|ing)\\b", "\\bbomb(ed|ing|s)?\\b",
+      "\\bclash(es|ed)?\\b", "\\barrest", "\\bteargas|\\btear gas", "\\bcurfew", "\\blockdown", "\\boutbreak", "\\bcases rise|\\bcases surge",
+      "사망", "숨져", "숨진", "부상", "다쳐", "실종", "대피", "이재민", "피해", "파손", "강타", "덮쳐", "휩쓸", "침수", "매몰", "고립", "붕괴", "무너", "폭발", "화재", "불길", "탈선", "추락", "충돌",
+      "규모 \\d", "공격", "피격", "상륙", "가동 중단", "운항 중단", "정전", "사상자", "체포", "통행금지", "확산", "발생"
+    ],
+    "statement_patterns": [
+      "\\bsays?\\b", "\\bsaid\\b", "\\bwarns?\\b", "\\bvows?\\b", "\\burges?\\b", "\\bcalls? (for|on)\\b", "\\bcall with\\b", "\\btalks?\\b", "\\bmeeting\\b", "\\bsummit\\b",
+      "\\bagree", "\\bpledge", "\\bplans?\\b", "\\bto (send|deploy|defend|resume|restore|boost|buy)\\b", "\\bdeploy", "\\bsends?\\b", "\\bsanction", "\\bresum", "\\brestor",
+      "\\bearly warning", "\\balert system", "\\bdrills?\\b", "\\bexercise", "\\bforecast", "\\boutlook", "\\bcould\\b", "\\bmay\\b", "\\brisk of\\b", "\\bprepar",
+      "\\binsurance\\b", "\\bclaims?\\b", "\\blessons?\\b", "\\bbill\\b", "\\blaw\\b", "\\bapprov",
+      "말했", "밝혔", "발표", "경고", "촉구", "회담", "통화", "합의", "계획", "파견", "배치", "재개", "복구 지원", "전망", "가능성", "대비", "훈련", "보험", "법안", "승인"
+    ],
+    "forecast_patterns": [
+      "_설명: 아직 일어나지 않은 예보·우려 기사 — 실제 사건보다 뒤로",
+      "\\bcould\\b", "\\bmay\\b", "\\bmight\\b", "\\bexpected to\\b", "\\bset to\\b", "\\blikely\\b", "\\bforecast", "\\bwarns?\\b", "\\bwarning\\b",
+      "\\bapproach", "\\bheads? (for|to|toward)", "\\bbrac(es|ing) for\\b", "\\bthreat(en)?s?\\b", "\\bon alert\\b",
+      "예상", "예보", "전망", "우려", "가능성", "북상", "접근", "경보", "주의보", "대비"
+    ],
+    "front_max": 10,
+    "hr_front_max": 10
   },
 
   "city_aliases": {
