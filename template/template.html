@@ -41,7 +41,6 @@
   #stale { background: #FEF3C7; color: #92400E; border-bottom: 1px solid #FDE68A; font-size: 13px; font-weight: 600; text-align: center; padding: 9px 16px; }
   .b-orig { border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; font-size: 11px; color: var(--muted); }
   .notice { font-size: 12px; color: var(--muted); text-align: center; margin: 6px 0 0; }
-  .more-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
   nav.tabs { display: flex; gap: 4px; }
   nav.tabs a { padding: 12px 18px; font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 3px solid transparent; }
   nav.tabs a:hover { text-decoration: none; color: var(--text); }
@@ -141,6 +140,10 @@
   .kpi .v { font-size: 28px; font-weight: 900; margin-top: 4px; line-height: 1.2; word-break: keep-all; }
   .kpi .v small { font-size: 15px; font-weight: 700; }
   .kpi .v.long { font-size: 20px; }
+  .kpi .v.txt { line-height: 1.25; }          /* '법정 최저임금 없음' 같은 글자 값도 숫자와 같은 크기 */
+  .kpi .v .unit { font-size: 15px; font-weight: 700; color: var(--sub); white-space: nowrap; }
+  .kpi .v .approx { font-size: 15px; font-weight: 700; color: var(--muted); margin-right: 3px; }
+  .kpi .krw { font-size: 13px; font-weight: 700; color: var(--accent-dark); margin-top: 2px; }
   .kpi .d { font-size: 13px; font-weight: 700; color: var(--sub); margin-top: 2px; }
   .kpi .s { font-size: 12px; color: var(--sub); margin-top: 8px; }
   .kpi svg { display: block; margin-top: 6px; }
@@ -606,7 +609,6 @@
     var safetyFull = safetyGroups(scope, {});          // 건수는 주요 브리핑에 올라간 기사까지 모두 셈 (카드 ⚠ 숫자와 같은 기준)
     var safetyAll = safetyGroups(scope, excluded);     // 목록은 주요 브리핑과 겹치는 기사를 빼고 표시
     var safety = safetyAll.slice(0, FRONT_MAX);
-    var safetyInTop = safetyFull.filter(function (g) { return excluded[g.item.link]; }).length;
     var hrFullRows = [];
     scope.forEach(function (c) {
       var r = freshItems(trend(c, 'HR & LABOR'))[0];
@@ -638,21 +640,14 @@
         '<span class="l"><span>' + o.count + '개국</span>' + (o.alerts ? '<span class="badge b-red" title="현지 안전 보도 ' + o.alerts + '건">⚠ ' + o.alerts + '</span>' : '') + '</span></button>';
     }).join('') + '</section>';
 
-    // '전체': 왼쪽 = 안전 / 오른쪽 = HR + 그 아래 글로벌 동향
-    // 조직 선택: 안전·HR 2열 + 글로벌 동향 하단(전체 폭)
-    var wide = state.org === 'ALL';
-    var cardCls = wide ? 'card' : 'card half';
+    var cardCls = 'card half';    // 안전(왼쪽)·HR(오른쪽) 2열 + 글로벌 동향은 항상 하단 전체 폭
     var sec = '';
     sec += '<section class="' + cardCls + '" aria-labelledby="safety-h"><div class="card-head"><h2 id="safety-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B91C1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 16.5H2.5z"></path><path d="M12 10v4M12 17.5v.01"></path></svg>' +
       '현지 안전 동향 <span class="count" style="color:#fff;background:#B91C1C">' + safetyFull.length + '</span></h2>' +
-      '<span class="note">실제 발생한 사건 · 여러 매체 보도 우선</span></div>';
+      '<span class="note">국가별 주요 안전 보도</span></div>';
     sec += safety.length ? safety.map(function (g) { return feedRow(g, safetyBadge(g.item.safety_tag), 'safe'); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' 주요 안전 보도가 없습니다.</p>';
-    var sNotes = [];
-    if (safetyInTop) sNotes.push('오늘 주요 브리핑에 나온 ' + safetyInTop + '건은 위에 있습니다');
-    if (safetyAll.length > safety.length) sNotes.push('외 ' + (safetyAll.length - safety.length) + '건은 국가 상세 › 안전·재난 탭에서 볼 수 있습니다');
-    if (sNotes.length) sec += '<p class="more-note">' + sNotes.join(' · ') + '.</p>';
     sec += '</section>';
     var safetyHtml = sec; sec = '';
     sec += '<section class="' + cardCls + '" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
@@ -660,26 +655,19 @@
       'HR·노동 주요 소식 <span class="count b-law">' + hrCount + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
     sec += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' HR·노동 소식이 없습니다.</p>';
-    var hNotes = [];
-    var hrInTop = groupByLink(hrFullRows).filter(function (g) { return excluded[g.item.link]; }).length;
-    if (hrInTop) hNotes.push('오늘 주요 브리핑에 나온 ' + hrInTop + '건은 위에 있습니다');
-    if (hrAll.length > hr.length) hNotes.push('외 ' + (hrAll.length - hr.length) + '건은 국가 상세 › HR·노동에서 볼 수 있습니다');
-    if (hNotes.length) sec += '<p class="more-note">' + hNotes.join(' · ') + '.</p>';
     sec += '</section>';
     var hrHtml = sec; sec = '';
 
     var gi = freshItems(realItems(DASHBOARD.global_industry, 'ind')).filter(function (i) { return !excluded[i.link]; });
     sec += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
-    sec += gi.length ? '<div class="' + (wide ? 'gi-list' : 'grid-2') + '">' + gi.map(function (i) {
+    sec += gi.length ? '<div class="grid-2">' + gi.map(function (i) {
       // 경쟁사 기사는 '경쟁사' 배지 하나만 (분류 배지와 경쟁사 배지가 겹치지 않게)
       // 분류 배지 하나만 (경쟁사 / 타이어 / EV / 시장전망 / 완성차)
       var tagBadge = (i.competitor || i.tag === '경쟁사') ? '<span class="badge b-comp">경쟁사</span>' : '<span class="badge b-ind">' + esc(i.tag || '완성차') + '</span>';
       return articleLink(i, metaLine(i, tagBadge, true) + '<span class="ttl sm">' + esc(i.title) + '</span>');
     }).join('') + '</div>' : '<p class="empty">' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' 보도된 글로벌 동향이 없습니다.</p>';
     sec += '</section>';
-    h += wide
-      ? '<div class="row-2"><div class="col-half">' + safetyHtml + '</div><div class="col-half">' + hrHtml + sec + '</div></div>'
-      : '<div class="row-2">' + safetyHtml + hrHtml + '</div>' + sec;
+    h += '<div class="row-2">' + safetyHtml + hrHtml + '</div>' + sec;
     document.getElementById('main').innerHTML = h;
   }
 
@@ -720,6 +708,47 @@
     }
     var r = splitRef(String(mw || '').trim() || '-');
     return { v: r.v, note: r.ref };
+  }
+  // 최저임금 표기 통일: "[약] 금액 통화코드 / 단위" + 원화 환산
+  //  예) '₺164.94 / 시간' → 164.94 TRY / 시간,  '약 290,800포린트 / 월' → 약 290,800 HUF / 월,  '1일 400바트' → 400 THB / 일
+  //  금액이 없는 값('법정 최저임금 없음', '업종별 상이')은 같은 크기의 글자로 표시
+  var WAGE_UNIT = [[/시간|hour|hr\b|hourly/i, '시간'], [/월|month/i, '월'], [/주|week/i, '주'], [/일|day|daily/i, '일'], [/연|year|annual/i, '년']];
+  function parseWage(text, c) {
+    var t = String(text || '').trim();
+    var lead = /^(\d+)\s*(일|시간|월|주)\s+/.exec(t);          // '1일 400바트' 형식
+    var unit = lead ? lead[2] : '';
+    var body = lead ? t.slice(lead[0].length) : t;
+    var m = /(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?/.exec(body);
+    if (!m) return null;
+    if (!unit) {
+      var after = body.slice(m.index + m[0].length);
+      var slash = /\/\s*([^\s,()]+)/.exec(after) || /\/\s*([^\s,()]+)/.exec(body);
+      var src = slash ? slash[1] : after;
+      for (var k = 0; k < WAGE_UNIT.length; k++) { if (WAGE_UNIT[k][0].test(src)) { unit = WAGE_UNIT[k][1]; break; } }
+    }
+    var eur = /€|\bEUR\b|유로/.test(t);
+    return { approx: /약|approx|~|≈/.test(t), amount: m[0], value: Number(m[0].replace(/,/g, '')),
+             cur: eur ? 'EUR' : (c.currency || ''), unit: unit };
+  }
+  function wageKrw(w) {
+    var code = w.cur === 'EUR' ? 'DE' : null, o = null;
+    if (w.cur === 'KRW') return null;
+    if (code) o = byCode(code);
+    else o = COUNTRIES.find(function (x) { return x.currency === w.cur; });
+    var fx = (o && o.exchange_rate) || {};
+    if (!fx.current_rate || !isFinite(w.value)) return null;
+    var won = w.value * fx.current_rate / (fx.unit_base || 1);
+    var r = won >= 100000 ? Math.round(won / 1000) * 1000 : won >= 10000 ? Math.round(won / 100) * 100 : Math.round(won / 10) * 10;
+    return r.toLocaleString('ko-KR');
+  }
+  function wageHtml(text, c) {
+    var w = parseWage(text, c);
+    if (!w) return '<div class="v txt">' + esc(text || '-') + '</div>';
+    var curLabel = w.cur === 'KRW' ? '원' : w.cur;
+    var krw = wageKrw(w);
+    return '<div class="v">' + (w.approx ? '<span class="approx">약</span>' : '') + esc(w.amount) +
+      '<span class="unit"> ' + esc(curLabel) + (w.unit ? ' / ' + w.unit : '') + '</span></div>' +
+      (krw ? '<div class="krw">≈ ' + krw + '원' + (w.unit ? ' / ' + w.unit : '') + '</div>' : '');
   }
   function sparkline(values) {
     var v = (values || []).filter(function (x) { return typeof x === 'number' && isFinite(x); }).slice(-6);
@@ -808,7 +837,7 @@
     h += '<section class="kpis" aria-label="핵심 지표">' + fxCard(c) +
       statCard('물가상승률 (CPI YoY)', p.inflation, src.inflation) +
       statCard('실업률', p.unemployment, src.unemployment) +
-      '<div class="kpi"><div class="k">최저임금</div><div class="v' + (mw.v.length > 14 ? ' long' : '') + '">' + esc(mw.v) + '</div>' +
+      '<div class="kpi"><div class="k">최저임금</div>' + wageHtml(mw.v, c) +
       (mw.note ? '<div class="d" style="font-weight:500">' + esc(mw.note) + '</div>' : '') +
       '<div class="s">출처: ' + esc(minWageSource(mw.v, src.min_wage)) + '</div></div></section>';
 
