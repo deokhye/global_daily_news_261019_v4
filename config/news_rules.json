@@ -1,0 +1,121 @@
+{
+  "_설명": "뉴스 수집·분류 규칙. 코드 수정 없이 이 파일만 고치면 다음 수집부터 반영됩니다. 정규식(regex)은 대소문자를 구분하지 않습니다. 고친 뒤 main에 올리면 화면만 다시 만들어지고, 수집 규칙은 다음 날 새벽 수집부터 적용됩니다.",
+
+  "opinion": {
+    "_설명": "사설·칼럼·기고·인터뷰 등 의견 기사 제외. 제목에 아래 표현이 있으면 수집하지 않습니다.",
+    "title_patterns": [
+      "\\[(사설|칼럼|기고|시론|논평|오피니언|기자수첩|데스크칼럼|특별기고|인터뷰|사내칼럼|만물상|여적|횡설수설)",
+      "(사설|칼럼|기고|시론)\\s*[\\]|:]",
+      "^opinion\\b", "\\bopinion\\s*[|:]", "[|:-]\\s*opinion$", "\\bop-?ed\\b", "\\beditorial\\b",
+      "\\bcommentary\\s*[|:]", "^(column|letters?)\\s*[|:]", "\\bletter to the editor\\b",
+      "\\bQ&A\\b", "\\binterview\\s*[|:]", "\\bin conversation with\\b"
+    ],
+    "sources": ["Project Syndicate", "The Conversation"]
+  },
+
+  "past_event": {
+    "_설명": "지금 모니터링할 필요가 없는 과거 시점·기념일 기사 제외.",
+    "title_patterns": [
+      "\\d+\\s*주년", "\\d+\\s*년\\s*전\\s*(오늘|그날)", "회고", "추모식", "추도식", "기념식", "기념일", "그날을 기억",
+      "\\banniversary\\b", "\\byears? ago today\\b", "\\bremember(s|ing)?\\b", "\\bcommemorat",
+      "\\bmemorial (service|day|ceremony)", "\\blooking back\\b", "\\bon this day\\b", "\\bin retrospect\\b"
+    ]
+  },
+
+  "noise": {
+    "_설명": "연예·스포츠·가십 제외. (연예 기본 목록은 코드에 있고, 여기는 추가분입니다)",
+    "title_patterns": [
+      "축구", "야구", "농구", "배구", "올림픽", "월드컵", "프로야구", "K리그", "프리미어리그", "메이저리그", "골프 대회", "e스포츠",
+      "\\bfootball\\b", "\\bsoccer\\b", "\\bpremier league\\b", "\\bchampions league\\b", "\\bla liga\\b", "\\bbundesliga\\b",
+      "\\bolympics?\\b", "\\bworld cup\\b", "\\bfifa\\b", "\\buefa\\b", "\\bnba\\b", "\\bnfl\\b", "\\bmlb\\b", "\\bnhl\\b",
+      "\\btennis\\b", "\\bwimbledon\\b", "\\bgolf (tournament|open|championship)", "\\bpga\\b", "\\bformula (1|one)\\b", "\\bf1\\b",
+      "\\bgrand prix\\b", "\\bmotogp\\b", "\\bnascar\\b", "\\bcricket\\b", "\\brugby\\b", "\\bmarathon\\b", "\\bfixtures?\\b",
+      "\\bhoroscope", "\\blottery\\b", "\\brecipe", "\\bcelebrity\\b"
+    ]
+  },
+
+  "sources": {
+    "_설명": "blocked: 보도자료 배포·시장조사 광고·콘텐츠 농장(수집 안 함). trusted: 주요 통신사·일간지(우선 노출). 매체 이름 일부만 맞아도 적용됩니다.",
+    "blocked": [
+      "PR Newswire", "GlobeNewswire", "Business Wire", "EIN Presswire", "Newswire", "openPR", "PRWeb", "Accesswire",
+      "IndexBox", "MarketsandMarkets", "Research and Markets", "Mordor Intelligence", "Fortune Business Insights",
+      "Coherent Market Insights", "Persistence Market Research", "Allied Market Research", "Market.us", "Precedence Research",
+      "Digital Journal", "Medium", "Blogspot", "Substack", "Benzinga", "Zacks", "Motley Fool", "Seeking Alpha", "Yahoo 뉴스 블로그"
+    ],
+    "trusted": [
+      "Reuters", "AP News", "Associated Press", "AFP", "Bloomberg", "Financial Times", "The Wall Street Journal", "WSJ",
+      "BBC", "The Guardian", "The New York Times", "The Economist", "CNBC", "Nikkei", "Nikkei Asia", "DW", "Al Jazeera",
+      "Automotive News", "Tire Business", "Tyrepress", "European Rubber Journal", "Just Auto",
+      "연합뉴스", "뉴시스", "뉴스1", "KBS", "MBC", "SBS", "YTN", "한국경제", "매일경제", "서울경제", "조선일보", "중앙일보", "동아일보", "한겨레", "경향신문"
+    ]
+  },
+
+  "company": {
+    "_설명": "own: 당사 언급(최우선). competitors: 경쟁사 감시 목록 — 이름(배지 표시용)과 제목 정규식.",
+    "own": "Hankook Tire|Hankook|한국타이어|한국앤컴퍼니",
+    "competitors": {
+      "Michelin": "Michelin|미쉐린",
+      "Bridgestone": "Bridgestone|Firestone|브리지스톤",
+      "Continental": "Continental (AG|tires?|tyres?)|Conti(nental)? tyre|콘티넨탈",
+      "Goodyear": "Goodyear|굿이어",
+      "Pirelli": "Pirelli|피렐리",
+      "Sumitomo": "Sumitomo Rubber|Dunlop|Falken|스미토모|던롭",
+      "Yokohama": "Yokohama Rubber|Yokohama Tire|요코하마",
+      "Toyo": "Toyo Tire|토요타이어",
+      "Kumho": "Kumho|금호타이어",
+      "Nexen": "Nexen|넥센타이어",
+      "Linglong": "Linglong|링롱",
+      "Giti": "Giti Tire|지티타이어"
+    }
+  },
+
+  "manufacturing": {
+    "_설명": "제조업(완성차·타이어·부품) 관련 기사는 같은 분류 안에서 먼저 보여 줍니다.",
+    "title_patterns": [
+      "\\bautomotive\\b", "\\bautomakers?\\b", "\\bcarmakers?\\b", "\\bauto (industry|sector|parts|workers|plant|exports?|sales)",
+      "\\b(car|vehicle|EV) (sales|plant|factory|production|exports?|makers?)", "\\belectric vehicles?\\b", "\\bEVs?\\b",
+      "\\btires?\\b", "\\btyres?\\b", "\\brubber\\b", "\\bfactor(y|ies)\\b", "\\bmanufactur", "\\bassembly (line|plant)",
+      "\\bsuppliers?\\b", "\\bauto parts\\b", "\\bsteel\\b", "\\bindustrial (output|production)",
+      "\\b(Toyota|Volkswagen|VW|Hyundai|Kia|GM|General Motors|Ford|Stellantis|BMW|Mercedes|Tesla|BYD|Renault|Nissan|Honda|Audi|Porsche|Volvo)\\b",
+      "완성차", "자동차", "타이어", "전기차", "공장", "제조", "부품", "생산라인", "현대차", "기아", "수출"
+    ]
+  },
+
+  "hr": {
+    "_설명": "HR·노동 뉴스 검색어. en/ko 는 모든 국가 공통, local 은 국가별 현지어 검색(Google 뉴스 현지판). require_name 이 있으면 제목에 그 이름이 있어야 채택.",
+    "en_keywords": "(\"minimum wage\" OR \"labor law\" OR \"labour law\" OR \"labor reform\" OR \"labour reform\" OR \"employment law\" OR \"labor code\" OR \"labour code\" OR union OR unions OR strike OR walkout OR \"collective bargaining\" OR \"wage talks\" OR \"wage deal\" OR layoffs OR \"job cuts\" OR redundancies OR \"working hours\" OR \"work week\" OR \"workers\")",
+    "ko_keywords": "(노동법 OR 최저임금 OR 노조 OR 파업 OR 임금협상 OR 근로시간 OR 고용 OR 구조조정 OR 해고 OR 노동 개혁)",
+    "home_query": "(노동법 OR 최저임금 OR 노조 OR 파업 OR 고용노동부 OR 임금협상 OR 근로시간 OR 중대재해 OR 노란봉투법 OR 정년연장)",
+    "local": {
+      "DEU": {"hl": "de", "gl": "DE", "ceid": "DE:de", "q": "(Mindestlohn OR Streik OR Warnstreik OR Gewerkschaft OR \"IG Metall\" OR Tarifverhandlungen OR Stellenabbau OR Arbeitsrecht)"},
+      "HUN": {"hl": "hu", "gl": "HU", "ceid": "HU:hu", "q": "(minimálbér OR sztrájk OR szakszervezet OR \"munka törvénykönyve\" OR leépítés OR bértárgyalás)"},
+      "CHN": {"hl": "zh-CN", "gl": "CN", "ceid": "CN:zh-Hans", "q": "(最低工资 OR 劳动法 OR 罢工 OR 工会 OR 裁员 OR 社保 OR 劳动合同)"},
+      "IDN": {"hl": "id", "gl": "ID", "ceid": "ID:id", "q": "(\"upah minimum\" OR UMP OR UMK OR mogok OR \"serikat pekerja\" OR PHK OR \"UU Cipta Kerja\" OR ketenagakerjaan)"},
+      "MEX": {"hl": "es-419", "gl": "MX", "ceid": "MX:es-419", "q": "(\"salario mínimo\" OR huelga OR sindicato OR \"reforma laboral\" OR despidos OR \"jornada laboral\")", "require_name": "México|mexican"},
+      "BRA": {"hl": "pt-BR", "gl": "BR", "ceid": "BR:pt-419", "q": "(\"salário mínimo\" OR greve OR sindicato OR \"reforma trabalhista\" OR demissões OR CLT)"},
+      "VNM": {"hl": "vi", "gl": "VN", "ceid": "VN:vi", "q": "(\"lương tối thiểu\" OR \"đình công\" OR \"công đoàn\" OR \"Bộ luật Lao động\" OR \"cắt giảm lao động\")"},
+      "JPN": {"hl": "ja", "gl": "JP", "ceid": "JP:ja", "q": "(最低賃金 OR 労働基準法 OR ストライキ OR 労働組合 OR 春闘 OR 賃上げ OR 人員削減)"},
+      "FRA": {"hl": "fr", "gl": "FR", "ceid": "FR:fr", "q": "(SMIC OR grève OR syndicat OR \"code du travail\" OR licenciements OR \"réforme des retraites\")"},
+      "ITA": {"hl": "it", "gl": "IT", "ceid": "IT:it", "q": "(\"salario minimo\" OR sciopero OR sindacato OR licenziamenti OR \"contratto nazionale\")"},
+      "ESP": {"hl": "es", "gl": "ES", "ceid": "ES:es", "q": "(\"salario mínimo\" OR huelga OR sindicatos OR \"reforma laboral\" OR ERE OR despidos)"},
+      "POL": {"hl": "pl", "gl": "PL", "ceid": "PL:pl", "q": "(\"płaca minimalna\" OR strajk OR \"związki zawodowe\" OR \"kodeks pracy\" OR zwolnienia)"},
+      "CZE": {"hl": "cs", "gl": "CZ", "ceid": "CZ:cs", "q": "(\"minimální mzda\" OR stávka OR odbory OR \"zákoník práce\" OR propouštění)"},
+      "ROU": {"hl": "ro", "gl": "RO", "ceid": "RO:ro", "q": "(\"salariul minim\" OR grevă OR sindicat OR \"codul muncii\" OR concedieri)"},
+      "TUR": {"hl": "tr", "gl": "TR", "ceid": "TR:tr", "q": "(\"asgari ücret\" OR grev OR sendika OR \"iş kanunu\" OR işten çıkarma)"},
+      "THA": {"hl": "th", "gl": "TH", "ceid": "TH:th", "q": "(ค่าแรงขั้นต่ำ OR นัดหยุดงาน OR สหภาพแรงงาน OR กฎหมายแรงงาน OR เลิกจ้าง)"}
+    }
+  },
+
+  "city_aliases": {
+    "_설명": "거점 도시의 다른 표기 (sites.csv 의 city 와 함께 제목에서 찾습니다).",
+    "Seongnam": ["성남", "판교"], "Daejeon": ["대전"], "Geumsan": ["금산"], "Taean": ["태안"],
+    "Clarksville": ["Tennessee"], "Rácalmás": ["Racalmas", "Dunaújváros"], "Cikarang": ["Bekasi"]
+  },
+
+  "top_briefing": {
+    "_설명": "오늘 핵심 브리핑: 최근 max_days 일 기사 중 점수 상위 count 건. 같은 분류는 최대 per_kind 건.",
+    "count": 5,
+    "max_days": 1,
+    "per_kind": 2
+  }
+}
