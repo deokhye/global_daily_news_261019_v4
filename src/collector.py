@@ -72,7 +72,7 @@ REQUEST_TIMEOUT = 12
 RUN_STARTED = time.monotonic()
 FX_BUDGET_SEC = int(os.environ.get("FX_BUDGET_SEC", "180"))
 NEWS_BUDGET_SEC = int(os.environ.get("NEWS_BUDGET_SEC", "480"))
-TRANSLATION_BUDGET_SEC = int(os.environ.get("TRANSLATION_BUDGET_SEC", "240"))
+TRANSLATION_BUDGET_SEC = int(os.environ.get("TRANSLATION_BUDGET_SEC", "360"))
 NEWS_MAX_CONSECUTIVE_ERRORS = 12   # Google News 오류가 이만큼 연속되면 차단으로 보고 뉴스 수집 중단
 NEWS_WORKERS = 4          # Google News 동시 요청 수 (너무 높으면 503/429 차단)
 HTTP_USER_AGENT = (
@@ -752,7 +752,7 @@ def rank_items(items: list, kind: str, country: dict = None) -> list:
             if r.too_old(it, kind, today):          # 분류별 최대 기사 나이 초과 (config: max_age_days)
                 REJECT_STATS["오래된 기사"] = REJECT_STATS.get("오래된 기사", 0) + 1
                 continue
-            r.annotate(it, kind, iso3)
+            r.annotate(it, kind, iso3, today)
             it["score"] = r.score(it, kind, today, code)
         it.pop("_cached", None)
         kept.append(it)
@@ -813,13 +813,20 @@ def _hr_spec(spec: dict) -> dict:
     return out
 
 
+def _hr_check(check=None):
+    """HR·노동 기사 판정: 국가 관련성(check) + 노동 관련 표현 필수 + 공습·군사·외교·스포츠 문맥 제외."""
+    r = NR.rules()
+    return lambda t, l: (check is None or check(t, l)) and r.hr_ok(t)
+
+
 def _local_hr_pick(country: dict, limit: int, seen: set, picked: list) -> list:
     """현지어 HR 뉴스 (config/news_rules.json → hr.local[ISO3])."""
     spec = (NR.rules().hr.get("local") or {}).get(country.get("iso3", ""))
     if not isinstance(spec, dict) or not spec.get("q") or not spec.get("hl"):
         return picked
     need = re.compile(spec["require_name"], re.I) if spec.get("require_name") else None
-    check = (lambda t, _l: bool(need.search(t or ""))) if need else None
+    other = re.compile(spec["exclude_names"], re.I) if spec.get("exclude_names") else None   # 같은 언어 다른 나라 기사
+    check = _hr_check(lambda t, _l: (not need or bool(need.search(t or ""))) and not (other and other.search(t or "")))
     lang = spec["hl"].split("-")[0].lower()
     url = _google_news_url_local(f'{spec["q"]} when:14d', spec)
     return _pick(_fetch_feed(url, 40), lang, limit, seen, check, picked)
@@ -844,24 +851,28 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
         limit = spec.get("max_items", 4)
         picked = []
         try:
+            chk = _hr_check(check) if is_hr else check
             if code == "KR":
                 picked = _pick(_fetch_feed(_google_news_url_ko(f"{spec['home_query']} when:14d"), 30),
-                               "ko", limit, seen)
+                               "ko", limit, seen, _hr_check() if is_hr else None)
             else:
                 if is_hr:   # 현지어 HR 뉴스가 가장 정확하므로 먼저
                     picked = _local_hr_pick(country, limit, seen, picked)
                 if len(picked) < limit:
                     q_ko = f'"{name_kr}" {spec["kr_keywords"]} when:14d'
-                    picked = _pick(_fetch_feed(_google_news_url_ko(q_ko), 30), "ko", limit, seen, check, picked)
+                    picked = _pick(_fetch_feed(_google_news_url_ko(q_ko), 30), "ko", limit, seen, chk, picked)
                 if len(picked) < limit:
                     q_en = f'"{name_en}" {spec["en_keywords"]}{ex} when:14d'
-                    picked = _pick(_fetch_feed(_google_news_url_en(q_en), 40), "en", limit, seen, check, picked)
+                    picked = _pick(_fetch_feed(_google_news_url_en(q_en), 40), "en", limit, seen, chk, picked)
         except Exception as e:
             log.warning(f"[{code}] '{spec['category']}' 수집 예외: {e}")
 
         items = [_to_trend_item(p) for p in picked]
         if not items:
-            items = cached_by_cat.get(spec["category"]) or [_fallback_trend_item(spec, country)]
+            prev = cached_by_cat.get(spec["category"]) or []
+            if is_hr:      # 이전 수집분에도 새 HR 기준 적용
+                prev = [p for p in prev if NR.rules().hr_ok(p.get("original_title") or p.get("title", ""))]
+            items = prev or [_fallback_trend_item(spec, country)]
         if is_hr:
             for it in items:
                 it["law"] = (not it.get("is_fallback")) and is_law_item(it)
@@ -928,12 +939,23 @@ LAW_RE = re.compile(r"(?i)\blaws?\b|\bbill\b|\bact\b|\bamend|\bregulation|\bdecr
 
 
 def safety_tag(title: str) -> str:
+    """안전 분류. '실제로 일어난 사건'만: 발언·외교·배치·전망 기사는 제외하고,
+    무력충돌·테러 / 사회불안은 피해·발생 표현(사망·공격·충돌 등)이 있어야 채택 (config: safety)."""
     if not title or SAFETY_EXCLUDE.search(title):
         return ""
-    for tag, rx in SAFETY_TAGS:
-        if rx.search(title):
-            return tag
-    return ""
+    tag = next((t for t, rx in SAFETY_TAGS if rx.search(title)), "")
+    if not tag:
+        return ""
+    cls = NR.rules().safety_class(title)
+    if cls == "statement":
+        return ""
+    if tag in ("무력충돌·테러", "사회불안") and cls != "incident":
+        return ""
+    return tag
+
+
+def is_incident(title: str) -> bool:
+    return NR.rules().safety_class(title) == "incident"
 
 
 def is_law_item(item: dict) -> bool:
@@ -977,7 +999,9 @@ def get_local_news(country: dict, cached: dict, seen: set) -> dict:
             picked = prev[:limit]
         for it in picked:
             if cid == "safe":
-                it["safety_tag"] = safety_tag(it.get("original_title") or it.get("title", ""))
+                t = it.get("original_title") or it.get("title", "")
+                it["safety_tag"] = safety_tag(t)
+                it["incident"] = is_incident(t)
         out[cid] = rank_items(picked, cid, country)
     return out
 
@@ -1158,6 +1182,26 @@ def _translate_one(text: str) -> str:
     return ""
 
 
+_SPLIT_RE = re.compile(r"(\s[-–—|:]\s|:\s|,\s|;\s|\s/\s)")
+
+
+def _translate_split(text: str) -> str:
+    """통째로는 번역이 안 되는 긴 제목을 구두점 단위로 나눠 각각 번역해 다시 잇는다 (마지막 시도)."""
+    parts = _SPLIT_RE.split(text)
+    if len(parts) < 3:
+        return ""
+    out = []
+    for part in parts:
+        if _SPLIT_RE.fullmatch(part) or not re.search(r"[^\W\d_]{2,}", part):
+            out.append(part)
+            continue
+        _TEXT_LANG.setdefault(part, _TEXT_LANG.get(text, "auto"))
+        ko = _translate_one(part)
+        out.append(ko if ko else part)
+    joined = "".join(out).strip()
+    return joined if is_good_translation(text, joined) else ""
+
+
 def _translate_batch(texts: list, lang: str = "auto"):
     """같은 언어 문장 여러 개를 줄바꿈으로 묶어 한 번에 번역. 줄 수가 어긋나거나 실패하면 None."""
     st = TRANSLATE_STATS.setdefault("batch", {"ok": 0, "fail": 0, "streak": 0})
@@ -1230,7 +1274,7 @@ def translate_texts(texts: list, cache: dict) -> dict:
                 continue
             if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
                 break
-            translated[i] = _translate_one(t)
+            translated[i] = _translate_one(t) or _translate_split(t)
             time.sleep(0.3)
         for src, ko in zip(ch, translated):
             if is_good_translation(src, ko):
@@ -1245,6 +1289,15 @@ def translate_texts(texts: list, cache: dict) -> dict:
     done = len([t for t in pending if t in result])
     stats = ", ".join(f"{k} 성공 {v['ok']}·실패 {v['fail']}" for k, v in TRANSLATE_STATS.items())
     log.info(f"번역 완료: {done}/{len(pending)}건 성공 ({time.monotonic() - started:.0f}초) [{stats}]")
+    failed = {}
+    for t in pending:
+        if t not in result:
+            lg = _TEXT_LANG.get(t, "auto")
+            failed[lg] = failed.get(lg, 0) + 1
+    if failed:
+        log.info("번역 실패 언어별: " + ", ".join(f"{k} {v}건" for k, v in sorted(failed.items(), key=lambda kv: -kv[1])))
+        for t in [t for t in pending if t not in result][:5]:
+            log.info(f"  번역 실패 예: [{_TEXT_LANG.get(t, 'auto')}] {t[:90]}")
     if stop_reason:
         log.warning(f"번역 중단: {stop_reason} — 나머지는 원문 유지, 다음 실행 때 재시도")
     return result
@@ -1509,7 +1562,7 @@ def main() -> dict:
 # 10. 오늘 핵심 브리핑 — 전체 기사 중 중요도 상위 N건 (같은 사건은 나라·매체를 합쳐 1건)
 # ---------------------------------------------------------------------------
 TOP_FIELDS = ("title", "original_title", "translated", "lang", "link", "source", "published",
-              "safety_tag", "law", "own", "competitor", "mfg", "near_site", "trusted")
+              "safety_tag", "incident", "law", "own", "competitor", "mfg", "near_site", "trusted")
 
 
 def _top_candidates(countries: list, global_industry: list):
@@ -1533,8 +1586,10 @@ def build_top_briefing(countries: list, global_industry: list, today: str) -> li
         if not isinstance(it, dict) or it.get("is_fallback") or not it.get("title"):
             continue
         n = NR.days_between(it.get("published"), today)
-        if n is None or n > r.top_max_days:
-            continue
+        if n is None or n > r.top_max_days or it.get("past_ref"):
+            continue                     # 날짜 없음·오래됨·제목에 지난 연도만 있는 기사 제외
+        if it.get("lang", "ko") != "ko" and not it.get("translated"):
+            continue                     # 번역되지 않은 기사는 주요 브리핑에서 제외
         cands.append((it.get("score") or 0, kind, code, it))
     cands.sort(key=lambda x: -x[0])
 

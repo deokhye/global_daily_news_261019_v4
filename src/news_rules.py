@@ -43,7 +43,7 @@ _STOP = {"the", "a", "an", "of", "in", "on", "to", "for", "and", "or", "at", "by
 
 
 def _compile(patterns) -> re.Pattern | None:
-    pats = [p for p in (patterns or []) if isinstance(p, str) and p.strip()]
+    pats = [p for p in (patterns or []) if isinstance(p, str) and p.strip() and not p.startswith("_설명")]
     if not pats:
         return None
     ok = []
@@ -116,6 +116,14 @@ class NewsRules:
                             if not name.startswith("_") and _compile([pat])]
         self.mfg_re = _compile((raw.get("manufacturing") or {}).get("title_patterns"))
         self.hr = raw.get("hr") or {}
+        self.hr_require_re = _compile(self.hr.get("require_patterns"))
+        self.hr_exclude_re = _compile(self.hr.get("exclude_patterns"))
+        sf = raw.get("safety") or {}
+        self.incident_re = _compile(sf.get("incident_patterns"))
+        self.statement_re = _compile(sf.get("statement_patterns"))
+        self.forecast_re = _compile(sf.get("forecast_patterns"))
+        self.safety_front_max = int(sf.get("front_max", 10))
+        self.hr_front_max = int(sf.get("hr_front_max", 10))
         aliases = {k: v for k, v in (raw.get("city_aliases") or {}).items() if not k.startswith("_") and isinstance(v, list)}
         self.site_city_re = {iso3: _name_list_regex(names) for iso3, names in _load_site_cities(aliases).items()}
         ages = raw.get("max_age_days") or {}
@@ -156,6 +164,36 @@ class NewsRules:
             return "연예·스포츠"
         return ""
 
+    # ------------------------------------------------------------------ HR·안전 판정
+    def hr_ok(self, title: str) -> bool:
+        """HR·노동 기사: 노동 관련 표현이 있고, 공습·군사·외교·스포츠 문맥이 아닐 것."""
+        t = title or ""
+        if self.hr_require_re and not self.hr_require_re.search(t):
+            return False
+        return not (self.hr_exclude_re and self.hr_exclude_re.search(t))
+
+    def safety_class(self, title: str) -> str:
+        """'incident'(피해·발생 표현) / 'statement'(발언·외교·배치만) / 'event'(예보·그 밖)."""
+        t = title or ""
+        if self.forecast_re and self.forecast_re.search(t):
+            return "event"                   # 예보·우려 (아직 일어나지 않음) — 채택은 하되 실제 사건보다 뒤로
+        if self.incident_re and self.incident_re.search(t):
+            return "incident"
+        if self.statement_re and self.statement_re.search(t):
+            return "statement"
+        return "event"
+
+    def past_reference(self, title: str, today: str) -> bool:
+        """제목에 올해·내년이 없이 지난 연도만 나오면 과거 기사일 가능성이 높다 (예: '2019년 홍수', 'March 2023')."""
+        t = title or ""
+        years = [int(y) for y in re.findall(r"(?<!\d)(19[5-9]\d|20[0-4]\d)(?!\d)", t)]
+        if not years:
+            return False
+        if re.search(r"(?i)\bsince\b|\bthan\b|\bcompared|\bfirst time\b|\bhighest\b|\blowest\b|이후|이래|부터|보다|만에|최고|최저", t):
+            return False                    # '2019년 이후 처음' 같은 비교 표현은 최신 기사
+        cur = int((today or datetime.now().strftime("%Y"))[:4])
+        return max(years) < cur - 0 and not any(y >= cur for y in years)
+
     def too_old(self, item: dict, kind: str, today: str) -> bool:
         """분류별 최대 기사 나이를 넘었는지. 날짜를 모르는 기사는 이전 수집분(_cached)일 때만 오래된 것으로 본다."""
         limit = self.max_age.get(kind)
@@ -173,7 +211,7 @@ class NewsRules:
                 return name
         return ""
 
-    def annotate(self, item: dict, kind: str, iso3: str = "") -> dict:
+    def annotate(self, item: dict, kind: str, iso3: str = "", today: str = "") -> dict:
         """item 에 own / competitor / mfg / near_site / trusted 를 채운다 (원문 제목 기준)."""
         titles = " / ".join(x for x in (item.get("original_title"), item.get("title")) if x)
         item["own"] = bool(self.own_re and self.own_re.search(titles))
@@ -185,7 +223,8 @@ class NewsRules:
             near = m.group(0) if m else ""
         item["near_site"] = near
         item["trusted"] = bool(self.trusted_re and self.trusted_re.search(item.get("source") or ""))
-        for k in ("own", "mfg", "trusted"):          # 데이터 크기를 줄이려고 False 는 저장하지 않는다
+        item["past_ref"] = self.past_reference(item.get("original_title") or item.get("title") or "", today)
+        for k in ("own", "mfg", "trusted", "past_ref"):          # 데이터 크기를 줄이려고 False 는 저장하지 않는다
             if not item[k]:
                 item.pop(k)
         for k in ("competitor", "near_site"):
@@ -198,6 +237,10 @@ class NewsRules:
         s = KIND_BASE.get(kind, 10)
         if kind == "safe":
             s += 20 if item.get("safety_tag") in SAFETY_SEVERE else 5
+            if item.get("incident"):
+                s += 10                     # 실제 피해·발생이 확인되는 보도
+        if item.get("past_ref"):
+            s -= 30                         # 제목에 지난 연도만 있는 기사
         if item.get("law"):
             s += 15
         if item.get("own"):
