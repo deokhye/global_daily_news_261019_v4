@@ -158,7 +158,7 @@ def pick_competitors(groups: list, limit: int) -> list:
 def gemini_summary(groups: list, names: dict, start: str, end: str, settings: dict) -> dict | None:
     key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not key:
-        log.info("GEMINI_API_KEY 가 없어 AI 요약 없이 보냅니다")
+        log.info("GEMINI_API_KEY 가 없어 AI 요약 칸 없이 보냅니다 (정상)")
         return None
     model = os.environ.get("GEMINI_MODEL", "").strip() or settings.get("gemini_model") or "gemini-2.5-flash"
     lines = []
@@ -167,8 +167,8 @@ def gemini_summary(groups: list, names: dict, start: str, end: str, settings: di
         lines.append(f"- [{names.get(g['code'], '글로벌') if g['code'] else '글로벌'}] [{KIND_LABEL.get(g['kind'], '')}] "
                      f"{it.get('title', '')} ({it.get('source', '')}, {str(it.get('published') or '')[:10]})")
     prompt = (
-        f"다음은 지난주({start}~{end}) 한 주 동안 한국타이어 해외 39개국 관련 공개 뉴스 중 중요도가 높은 기사 제목 목록입니다.\n"
-        "한국타이어 Global HR팀이 월요일 아침에 1분 안에 읽을 '지난주 주요 이슈' 요약을 한국어로 써 주세요.\n"
+        f"다음은 {start}~{end} 한 주 동안 한국타이어 해외 39개국 관련 공개 뉴스 중 중요도가 높은 기사 제목 목록입니다.\n"
+        "한국타이어 Global HR팀이 1분 안에 읽을 주간 주요 이슈 요약을 한국어로 써 주세요.\n"
         "규칙: 목록에 있는 내용만 쓰고 추측하거나 숫자를 지어내지 마세요. 나라 이름을 꼭 밝히세요. 문장은 짧게.\n"
         "아래 JSON 형식으로만 답하세요:\n"
         '{"headline": "이번 주를 한 문장으로", '
@@ -210,7 +210,7 @@ def _badge(kind: str, text: str = "") -> str:
 
 
 def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str, end: str,
-           site_url: str = "") -> tuple:
+           site_url: str = "", label: str = "지난주") -> tuple:
     names = week_info["names"]
     counts = week_info["counts"]
     safe_total = sum(r["safe"] for r in counts.values())
@@ -229,8 +229,8 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             for s in (ai.get("sections") or [])[:5])
         watch = "".join(f"<li style='margin:3px 0'>{_e(w)}</li>" for w in (ai.get("watch") or [])[:2])
         ai_html = (
-            "<tr><td style='padding:0 28px 8px'><table width='100%' cellpadding='0' cellspacing='0' "
-            "style='background:#FFF7ED;border:1px solid #FED7AA;border-radius:14px'><tr><td style='padding:18px 20px'>"
+            "<tr><td style='padding:8px 24px'><table width='100%' cellpadding='0' cellspacing='0' "
+            "style='background:#FFF7ED;border:1px solid #FED7AA;border-radius:20px'><tr><td style='padding:18px 20px'>"
             "<div style='font-size:11px;font-weight:700;color:#9A3412;letter-spacing:.02em'>AI 요약 · 원문 확인 필요</div>"
             f"<div style='font-size:17px;font-weight:900;color:#1E293B;margin-top:6px;line-height:1.45'>{_e(ai.get('headline'))}</div>"
             f"<table width='100%' cellpadding='0' cellspacing='0'>{secs}</table>"
@@ -238,84 +238,104 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
                f"<ul style='margin:4px 0 0;padding-left:18px;font-size:14px;color:#334155;line-height:1.6'>{watch}</ul>" if watch else "")
             + "</td></tr></table></td></tr>")
     else:
-        ai_html = ("<tr><td style='padding:0 28px 8px;font-size:13px;color:#64748B'>이번 주는 AI 요약 없이 "
-                   "중요 기사 목록만 보내드립니다.</td></tr>")
+        ai_html = ""          # Gemini 를 쓰지 않으면 요약 칸 없이 바로 지표·Top 10 으로 시작
 
-    kpi = lambda label, num, sub: (  # noqa: E731
-        f"<td width='33%' style='padding:4px'><table width='100%' cellpadding='0' cellspacing='0' "
-        f"style='border:1px solid #E2E8F0;border-radius:12px'><tr><td style='padding:12px 14px'>"
-        f"<div style='font-size:12px;color:#64748B;font-weight:700'>{label}</div>"
-        f"<div style='font-size:24px;font-weight:900;color:#1E293B;margin-top:2px'>{num}</div>"
-        f"<div style='font-size:12px;color:#64748B'>{sub}</div></td></tr></table></td>")
-    kpis = ("<tr><td style='padding:8px 24px'><table width='100%' cellpadding='0' cellspacing='0'><tr>"
-            + kpi("안전·재난 보도", f"{safe_total}건", f"{safe_cty}개국")
-            + kpi("HR·노동 이슈", f"{hr_total}건", f"{sum(1 for r in counts.values() if r['hr'])}개국")
-            + kpi("경쟁사 동향", f"{len(comps)}건", "글로벌")
-            + "</tr></table></td></tr>")
+    # ---- 사이트의 '오늘 핵심 브리핑' 카드와 같은 모양 (색·배지·번호 동그라미)
+    def badge(text, fg, bg, extra=""):
+        return (f"<span style='display:inline-block;font-size:12px;font-weight:700;color:{fg};background:{bg};"
+                f"border-radius:6px;padding:1px 8px;margin:0 6px 4px 0;{extra}'>{_e(text)}</span>")
+
+    def kind_badge(g):
+        it = g["item"]
+        if g["kind"] == "safe" and it.get("safety_tag"):
+            red = it["safety_tag"] in NR.SAFETY_SEVERE
+            return badge(it["safety_tag"], "#B91C1C" if red else "#92400E", "#FEE2E2" if red else "#FEF3C7")
+        fg, bg = KIND_COLOR.get(g["kind"], ("#475569", "#F1F5F9"))
+        return badge(KIND_LABEL.get(g["kind"], ""), fg, bg)
+
+    def extra_badges(it):
+        out = ""
+        if it.get("law"):
+            out += badge("법·제도", "#3730A3", "#E0E7FF")
+        if it.get("own"):
+            out += badge("한국타이어", "#FFFFFF", "#C2410C")
+        if it.get("competitor"):
+            out += badge(f"경쟁사 · {it['competitor']}", "#7C2D12", "#FED7AA")
+        if it.get("near_site"):
+            out += badge("거점 인근", "#1E40AF", "#DBEAFE")
+        return out
+
+    def meta(it, n_src=1, days=1):
+        tr = ("<span style='display:inline-block;border:1px solid #E2E8F0;border-radius:4px;padding:0 6px;"
+              "font-size:11px;color:#64748B;margin-left:6px'>자동번역</span>") if it.get("translated") else ""
+        return (f"<div style='font-size:12px;color:#64748B;margin-top:3px'><b style='color:#475569'>{_e(it.get('source'))}</b>"
+                + (f"&nbsp; 외 {n_src - 1}개 매체" if n_src > 1 else "")
+                + f"&nbsp; {_e(str(it.get('published') or '')[5:10].replace('-', '.'))}"
+                + (f"&nbsp;·&nbsp;{days}일 연속 보도" if days > 1 else "") + tr + "</div>")
+
+    def card(title_html, note, body):
+        return ("<tr><td style='padding:8px 24px'><table width='100%' cellpadding='0' cellspacing='0' "
+                "style='background:#FFFFFF;border:1px solid #FED7AA;border-radius:20px'><tr><td style='padding:22px 24px 10px'>"
+                "<table width='100%' cellpadding='0' cellspacing='0'><tr>"
+                f"<td style='font-size:18px;font-weight:900;color:#1E293B'>{title_html}</td>"
+                f"<td align='right' style='font-size:12px;color:#64748B'>{note}</td></tr></table>"
+                f"{body}</td></tr></table></td></tr>")
 
     rows = []
     for i, g in enumerate(top, 1):
         it = g["item"]
         n_src = len([s for s in g["sources"] if s])
-        extra = []
-        if it.get("own"):
-            extra.append(_badge("ind", "한국타이어"))
-        if it.get("competitor"):
-            extra.append(_badge("ind", f"경쟁사 · {it['competitor']}"))
-        if it.get("near_site"):
-            extra.append("<span style='display:inline-block;font-size:11px;font-weight:700;color:#1E40AF;"
-                         "background:#DBEAFE;border-radius:5px;padding:1px 7px'>거점 인근</span>")
-        label = it.get("safety_tag") if g["kind"] == "safe" and it.get("safety_tag") else ""
+        first = i == 1
+        last = i == len(top)
+        border = "" if last else "border-bottom:1px solid #F1F5F9;"
         rows.append(
-            "<tr><td style='padding:12px 0;border-bottom:1px solid #F1F5F9;vertical-align:top;width:30px'>"
-            f"<div style='width:24px;height:24px;border-radius:12px;background:{'#C2410C' if i == 1 else '#FFF7ED'};"
-            f"color:{'#fff' if i == 1 else '#9A3412'};font-weight:900;font-size:12px;text-align:center;line-height:24px'>{i}</div></td>"
-            "<td style='padding:12px 0 12px 8px;border-bottom:1px solid #F1F5F9'>"
-            f"<div style='font-size:12px;color:#334155'>{_badge(g['kind'], label)} "
-            f"<b>{_e(ctry(g['code']))}</b> {' '.join(extra)}</div>"
-            f"<a href='{_e(it.get('link'))}' style='display:block;font-size:15px;font-weight:700;color:#1E293B;"
-            f"text-decoration:none;line-height:1.5;margin-top:4px'>{_e(it.get('title'))}</a>"
-            f"<div style='font-size:12px;color:#64748B;margin-top:2px'>{_e(it.get('source'))}"
-            + (f" 외 {n_src - 1}개 매체" if n_src > 1 else "")
-            + f" · {_e(str(it.get('published') or '')[5:10].replace('-', '.'))}"
-            + (f" · {len(g['days'])}일 연속 보도" if len(g["days"]) > 1 else "")
-            + "</div></td></tr>")
-    top_html = ("<tr><td style='padding:16px 28px 0'><div style='font-size:16px;font-weight:900;color:#1E293B'>"
-                f"지난주 주요 이슈 Top {len(top)}</div>"
-                "<div style='font-size:12px;color:#64748B;margin-top:2px;line-height:1.5'>선정 기준: 안전·재난 심각도, 법·제도 변화, "
-                "당사·경쟁사 언급, 거점 인근, 제조업 관련, 여러 매체·여러 날 보도 순 · 같은 분류는 최대 4건</div>"
-                f"<table width='100%' cellpadding='0' cellspacing='0'>{''.join(rows)}</table></td></tr>")
+            f"<tr><td style='padding:14px 0;{border}vertical-align:top;width:40px'>"
+            f"<div style='width:28px;height:28px;border-radius:14px;background:{'#C2410C' if first else '#FFF7ED'};"
+            f"color:{'#FFFFFF' if first else '#9A3412'};font-weight:900;font-size:14px;text-align:center;line-height:28px'>{i}</div></td>"
+            f"<td style='padding:14px 0;{border}'>"
+            f"<div style='font-size:14px;color:#1E293B'>{kind_badge(g)}{extra_badges(it)}"
+            f"<b style='font-size:14px'>{_e(ctry(g['code']) if g['code'] else '글로벌')}</b></div>"
+            f"<a href='{_e(it.get('link'))}' style='display:block;font-size:16px;font-weight:700;color:#1E293B;"
+            f"text-decoration:none;line-height:1.5;margin-top:2px'>{_e(it.get('title'))}</a>"
+            + meta(it, n_src, len(g["days"])) + "</td></tr>")
+    top_html = card(
+        "<span style='color:#C2410C'>&#9733;</span>&nbsp;" + label + " 핵심 브리핑",
+        "중요도 순 · 같은 사건은 1건으로 묶음",
+        f"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:4px'>{''.join(rows)}</table>"
+        "<div style='font-size:11px;color:#94A3B8;line-height:1.5;padding:4px 0 8px'>선정 기준: 안전·재난 심각도, 법·제도 변화, "
+        "당사·경쟁사 언급, 거점 인근, 제조업 관련, 여러 매체·여러 날 보도 · 같은 분류는 최대 4건</div>")
 
-    comp_html = "".join(
-        f"<li style='margin:6px 0;font-size:14px;line-height:1.5'>"
-        f"<a href='{_e(g['item'].get('link'))}' style='color:#1E293B;text-decoration:none;font-weight:700'>{_e(g['item'].get('title'))}</a>"
-        f"<span style='color:#64748B;font-size:12px'> — {_e(g['item'].get('source'))}, "
-        f"{_e(str(g['item'].get('published') or '')[5:10].replace('-', '.'))}</span></li>" for g in comps)
-    comp_block = ("<tr><td style='padding:22px 28px 0'><div style='font-size:16px;font-weight:900;color:#1E293B'>경쟁사 동향</div>"
-                  f"<ul style='margin:6px 0 0;padding-left:18px'>{comp_html}</ul></td></tr>") if comps else ""
+    comp_rows = "".join(
+        f"<tr><td style='padding:12px 0;{'' if k == len(comps) - 1 else 'border-bottom:1px solid #F1F5F9;'}'>"
+        f"<div>{badge('경쟁사 · ' + (g['item'].get('competitor') or NR.rules().competitor_of(key_title(g['item'])) or ''), '#7C2D12', '#FED7AA')}</div>"
+        f"<a href='{_e(g['item'].get('link'))}' style='display:block;font-size:15px;font-weight:700;color:#1E293B;"
+        f"text-decoration:none;line-height:1.5'>{_e(g['item'].get('title'))}</a>"
+        + meta(g["item"]) + "</td></tr>" for k, g in enumerate(comps))
+    comp_block = card("경쟁사 동향", "업계 전반 뉴스 · 경쟁사 동향",
+                      f"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:4px'>{comp_rows}</table>") if comps else ""
 
-    button = (f"<tr><td align='center' style='padding:26px 28px 6px'><a href='{_e(site_url)}' "
+    button = (f"<tr><td align='center' style='padding:22px 28px 6px'><a href='{_e(site_url)}' "
               "style='display:inline-block;background:#C2410C;color:#fff;font-weight:700;font-size:14px;"
               "text-decoration:none;border-radius:10px;padding:11px 22px'>사이트에서 자세히 보기</a></td></tr>") if site_url else ""
 
     page = (
         "<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'>"
-        "<title>Global Daily News 지난주 주요 이슈</title></head>"
+        f"<title>Global Daily News {label} 주요 이슈</title></head>"
         "<body style='margin:0;padding:0;background:#F4F5F7;font-family:-apple-system,\"Malgun Gothic\",\"Apple SD Gothic Neo\",sans-serif'>"
         "<table width='100%' cellpadding='0' cellspacing='0' style='background:#F4F5F7'><tr><td align='center' style='padding:24px 12px'>"
-        "<table width='100%' cellpadding='0' cellspacing='0' style='max-width:680px;background:#fff;border:1px solid #E2E8F0;border-radius:18px'>"
-        "<tr><td style='padding:26px 28px 14px'>"
+        "<table width='100%' cellpadding='0' cellspacing='0' style='max-width:720px;background:#F4F5F7'>"
+        "<tr><td style='padding:10px 28px 10px'>"
         "<div style='font-size:12px;font-weight:700;color:#C2410C'>GLOBAL DAILY NEWS · 주간 요약</div>"
-        "<div style='font-size:22px;font-weight:900;color:#1E293B;margin-top:4px'>지난주 주요 이슈</div>"
+        f"<div style='font-size:24px;font-weight:900;color:#1E293B;margin-top:4px;letter-spacing:-0.02em'>{label} 주요 이슈</div>"
         f"<div style='font-size:13px;color:#64748B;margin-top:2px'>{_e(start.replace('-', '.'))} ~ {_e(end.replace('-', '.'))} · 39개국</div>"
         "</td></tr>"
-        + ai_html + kpis + top_html + comp_block + button +
+        + ai_html + top_html + comp_block + button +
         "<tr><td style='padding:18px 28px 24px;font-size:11px;color:#94A3B8;line-height:1.6'>"
-        "공개 뉴스를 자동 수집·분류한 결과이며, AI 요약은 사실과 다를 수 있으니 원문을 확인해 주세요.<br>"
+        "공개 뉴스를 자동 수집·분류한 결과입니다. 자세한 내용은 원문을 확인해 주세요.<br>"
         "매주 월요일 아침 자동 발송됩니다. 받는 사람 변경은 담당자에게 요청해 주세요.</td></tr>"
         "</table></td></tr></table></body></html>")
 
-    text = [f"Global Daily News 지난주 주요 이슈 ({start} ~ {end})", ""]
+    text = [f"Global Daily News {label} 주요 이슈 ({start} ~ {end})", ""]
     if ai:
         text += [f"[AI 요약 · 원문 확인 필요] {ai.get('headline', '')}"]
         for s in ai.get("sections") or []:
@@ -337,22 +357,35 @@ def last_week(today: date) -> tuple:
     return end - timedelta(days=6), end
 
 
-def build(end: date, use_ai: bool = True, ai_override: dict | None = None) -> tuple:
-    """end = 지난주 일요일. 월요일 새벽 아카이브에도 일요일 기사가 있어 end+1 일치까지 읽고 기사 날짜로 거른다."""
+def build(end: date, use_ai: bool = True, ai_override: dict | None = None, today: date | None = None) -> tuple:
+    """end = 지난주 일요일. 월요일 새벽 아카이브에도 일요일 기사가 있어 end+1 일치까지 읽고 기사 날짜로 거른다.
+    지난주 기록이 아직 없으면(수집을 시작한 지 얼마 안 된 경우 등) 오늘까지 '최근 7일'로 대신 만든다."""
     st = load_settings()
     days = int(st.get("days", 7))
+    label = "지난주"
     start_d = end - timedelta(days=days - 1)
     week = load_week(end + timedelta(days=1), days + 1)
     start, end_s = start_d.isoformat(), end.isoformat()
-    if not week:
-        raise RuntimeError(f"{start}~{end_s} 아카이브가 하나도 없습니다 (docs/archive/ 확인)")
-    info = collect_week(week, start, end_s)
+    info = collect_week(week, start, end_s) if week else {"groups": []}
+    if not info["groups"]:
+        today = today or datetime.now(KST).date()
+        log.warning(f"지난주({start}~{end_s}) 기사가 없어 최근 7일(~{today.isoformat()})로 대신 만듭니다")
+        end, label = today, "최근 7일"
+        start_d = end - timedelta(days=days - 1)
+        week = load_week(end, days)
+        start, end_s = start_d.isoformat(), end.isoformat()
+        if not week:
+            raise RuntimeError(f"최근 7일({start}~{end_s}) 아카이브도 없습니다. 매일 수집(Daily Global Brief Update)이 "
+                               "한 번 이상 돌아 docs/archive/ 에 파일이 생긴 뒤 다시 실행해 주세요.")
+        info = collect_week(week, start, end_s)
     top = pick_top(info["groups"], int(st.get("top_n", 10)), int(st.get("per_kind_max", 4)))
-    comps = pick_competitors(info["groups"], int(st.get("competitor_max", 6)))
+    top_ids = {id(g) for g in top}
+    comps = [g for g in pick_competitors(info["groups"], int(st.get("competitor_max", 6)) + len(top))
+             if id(g) not in top_ids][: int(st.get("competitor_max", 6))]     # Top 10 에 이미 나온 기사는 빼고
     ai = ai_override if ai_override is not None else (gemini_summary(info["groups"], info["names"], start, end_s, st) if use_ai else None)
     site = os.environ.get("SITE_URL", "").strip()
-    page, text = render(info, top, comps, ai, start, end_s, site)
-    subject = (st.get("subject") or "[Global Daily News] 지난주 주요 이슈 ({start} ~ {end})").format(
+    page, text = render(info, top, comps, ai, start, end_s, site, label)
+    subject = (st.get("subject") or "[Global Daily News] 지난주 주요 이슈 ({start} ~ {end})").replace("지난주", label).format(
         start=start.replace("-", "."), end=end_s.replace("-", "."))
     log.info(f"주간 요약: 아카이브 {len(week)}일, 이슈 {len(info['groups'])}건 → Top {len(top)}, 경쟁사 {len(comps)}건, "
              f"AI 요약 {'있음' if ai else '없음'}")
