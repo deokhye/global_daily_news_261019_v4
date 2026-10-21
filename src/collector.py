@@ -1053,9 +1053,19 @@ def _json_with_retry(method: str, url: str, **kw):
         return r.json()
 
 
-def _translate_google(text: str) -> str:
-    """Google 번역 공개 엔드포인트(client=gtx). 줄바꿈으로 묶은 여러 문장도 한 번에 번역된다."""
-    data = _json_with_retry("POST", GTX_URL, params={"client": "gtx", "sl": "auto", "tl": "ko", "dt": "t"},
+# 기사 언어 코드 → 번역기 언어 코드
+LANG_CODE = {"zh": "zh-CN", "pt": "pt", "es": "es", "he": "iw"}
+
+
+def _sl(lang: str) -> str:
+    lang = (lang or "").lower()
+    return LANG_CODE.get(lang, lang) if lang and lang != "auto" else "auto"
+
+
+def _translate_google(text: str, sl: str = "auto") -> str:
+    """Google 번역 공개 엔드포인트(client=gtx). 줄바꿈으로 묶은 여러 문장도 한 번에 번역된다.
+    여러 언어가 섞인 묶음은 한 언어로만 인식돼 나머지가 번역되지 않으므로, 묶음은 언어별로 보낸다(sl)."""
+    data = _json_with_retry("POST", GTX_URL, params={"client": "gtx", "sl": sl, "tl": "ko", "dt": "t"},
                             data={"q": text})
     return "".join(seg[0] for seg in (data[0] or []) if seg and seg[0])
 
@@ -1074,7 +1084,7 @@ _TEXT_LANG: dict = {}   # 원문 → 언어 코드 (MyMemory 는 원문 언어�
 
 
 def _translate_mymemory(text: str) -> str:
-    params = {"q": text[:480], "langpair": f"{_TEXT_LANG.get(text, 'en')}|ko"}
+    params = {"q": text[:480], "langpair": f"{_sl(_TEXT_LANG.get(text, 'en')).replace('auto', 'en')}|ko"}
     if MYMEMORY_EMAIL:
         params["de"] = MYMEMORY_EMAIL
     data = _json_with_retry("GET", MYMEMORY_URL, params=params)
@@ -1093,12 +1103,11 @@ def _translate_one(text: str) -> str:
             continue
         try:
             out = fn(text)
+            st["streak"] = 0          # 응답이 왔으면 서비스는 살아 있음 (연속 장애로 세지 않음)
             if out and HANGUL_RE.search(out):
                 st["ok"] += 1
-                st["streak"] = 0
                 return out.strip()
-            st["fail"] += 1
-            st["streak"] += 1
+            st["fail"] += 1           # 고유명사만 있는 제목 등 — 다음 번역기로 넘어감
         except Exception as e:
             st["fail"] += 1
             st["streak"] += 1
@@ -1106,14 +1115,14 @@ def _translate_one(text: str) -> str:
     return ""
 
 
-def _translate_batch(texts: list):
-    """여러 문장을 줄바꿈으로 묶어 한 번에 번역. 줄 수가 어긋나거나 실패하면 None."""
+def _translate_batch(texts: list, lang: str = "auto"):
+    """같은 언어 문장 여러 개를 줄바꿈으로 묶어 한 번에 번역. 줄 수가 어긋나거나 실패하면 None."""
     st = TRANSLATE_STATS.setdefault("batch", {"ok": 0, "fail": 0, "streak": 0})
     if st["streak"] >= 2:                     # 묶음 번역이 연달아 막히면 단건 번역으로만 진행
         return None
     joined = "\n".join(t.replace("\n", " ") for t in texts)
     try:
-        out = _translate_google(joined)
+        out = _translate_google(joined, _sl(lang))
         lines = [ln.strip() for ln in (out or "").split("\n") if ln.strip()]
         if len(lines) == len(texts):
             st["ok"] += 1
@@ -1147,31 +1156,39 @@ def translate_texts(texts: list, cache: dict) -> dict:
         return result
 
     log.info(f"번역 대상 {len(pending)}건 (캐시 적중 {len(result)}건)")
-    chunks, chunk, size = [], [], 0
+    # 언어별로 나눠 묶는다 (언어 순서는 우선순위가 가장 높은 문장이 속한 언어부터)
+    by_lang: dict = {}
     for t in pending:
-        if chunk and (size + len(t) > 1500 or len(chunk) >= 20):
-            chunks.append(chunk)
-            chunk, size = [], 0
-        chunk.append(t)
-        size += len(t) + 1
-    if chunk:
-        chunks.append(chunk)
+        by_lang.setdefault(_TEXT_LANG.get(t, "auto"), []).append(t)
+    chunks = []
+    for lang, texts_l in by_lang.items():
+        chunk, size = [], 0
+        for t in texts_l:
+            if chunk and (size + len(t) > 1500 or len(chunk) >= 20):
+                chunks.append((lang, chunk))
+                chunk, size = [], 0
+            chunk.append(t)
+            size += len(t) + 1
+        if chunk:
+            chunks.append((lang, chunk))
+    if len(by_lang) > 1:
+        log.info("번역 언어별 건수: " + ", ".join(f"{k} {len(v)}" for k, v in by_lang.items()))
 
     started = time.monotonic()
     stop_reason = ""
-    for ch in chunks:
+    for lang, ch in chunks:
         if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
             stop_reason = f"시간 예산({TRANSLATION_BUDGET_SEC}초) 초과"
             break
-        translated = _translate_batch(ch)
-        if translated is None:
-            translated = []
-            for t in ch:
-                if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
-                    translated.append("")
-                    continue
-                translated.append(_translate_one(t))
-                time.sleep(0.3)
+        translated = _translate_batch(ch, lang) or [""] * len(ch)
+        # 묶음 번역에서 한글이 안 나온 줄(번역 실패·원문 그대로)은 한 건씩 다시 시도
+        for i, t in enumerate(ch):
+            if translated[i] and HANGUL_RE.search(translated[i]):
+                continue
+            if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
+                break
+            translated[i] = _translate_one(t)
+            time.sleep(0.3)
         for src, ko in zip(ch, translated):
             if ko and HANGUL_RE.search(ko):
                 result[src] = ko

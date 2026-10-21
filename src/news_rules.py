@@ -1,7 +1,7 @@
 """
 news_rules.py
 -------------
-뉴스 수집·분류 규칙 (config/news_rules.json) — collector.py 가 사용한다.
+뉴스 수집·분류 규칙 (config/news_rules.json) — collector.py 와 weekly_mail.py 가 함께 쓴다.
 
   reject_reason(title, source)  → 의견·과거 시점·연예/스포츠·차단 매체면 이유 문자열, 아니면 ""
   annotate(item, kind, country) → 경쟁사·당사·제조업·거점 인근·매체 등급 표시를 붙인다
@@ -103,6 +103,10 @@ class NewsRules:
         self.past_re = _compile((raw.get("past_event") or {}).get("title_patterns"))
         self.gossip_re = re.compile(GOSSIP_PATTERN)
         self.noise_re = _compile((raw.get("noise") or {}).get("title_patterns"))
+        nn = raw.get("non_news") or {}
+        self.non_news_src_re = _compile(nn.get("source_patterns"))
+        self.non_news_name_re = _name_list_regex(nn.get("sources"))
+        self.non_news_title_re = _compile(nn.get("title_patterns"))
         src = raw.get("sources") or {}
         self.blocked_re = _name_list_regex(src.get("blocked"))
         self.trusted_re = _name_list_regex(src.get("trusted"))
@@ -124,6 +128,16 @@ class NewsRules:
         t = title or ""
         return bool(self.gossip_re.search(t) or (self.noise_re and self.noise_re.search(t)))
 
+    def is_non_news(self, title: str, source: str = "") -> bool:
+        """매거진·화보·여행/라이프스타일 등 뉴스가 아닌 콘텐츠."""
+        if self.non_news_title_re and self.non_news_title_re.search(title or ""):
+            return True                       # 화보·영상·여행 콘텐츠는 매체와 상관없이 제외
+        s = source or ""
+        if not s or (self.trusted_re and self.trusted_re.search(s)):
+            return False                      # 주요 매체·업계 전문지 이름은 매거진 판정에서 예외
+        return bool((self.non_news_src_re and self.non_news_src_re.search(s))
+                    or (self.non_news_name_re and re.search(rf"^(?:{self.non_news_name_re.pattern})\b", s, re.I)))
+
     def reject_reason(self, title: str, source: str = "") -> str:
         t = title or ""
         if self.blocked_re and source and self.blocked_re.search(source):
@@ -132,6 +146,8 @@ class NewsRules:
             return "의견 기사"
         if self.opinion_src_re and source and self.opinion_src_re.search(source):
             return "의견 매체"
+        if self.is_non_news(t, source):
+            return "매거진·비뉴스"
         if self.past_re and self.past_re.search(t):
             return "과거 시점"
         if self.is_gossip(t):
