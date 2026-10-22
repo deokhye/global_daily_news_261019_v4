@@ -24,7 +24,10 @@
 
   header.top { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
   .top-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 14px 24px; }
-  .brand { display: flex; align-items: center; gap: 12px; flex: 1 1 320px; }
+  .brand { display: flex; align-items: center; gap: 12px; flex: 1 1 320px; color: var(--text); text-decoration: none; }
+  .brand:hover { text-decoration: none; color: var(--text); }
+  .brand:hover h1 { color: var(--accent); }
+  .b-new { color: #fff; background: #16A34A; font-size: 11px; letter-spacing: .02em; }
   .brand-mark { width: 40px; height: 40px; border-radius: 12px; background: #FFF0E6; display: flex; align-items: center; justify-content: center; }
   .brand h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
   .brand p { margin: 0; font-size: 12px; color: var(--muted); }
@@ -202,7 +205,7 @@
 
 <header class="top">
   <div class="top-row" style="max-width:1360px;margin:0 auto">
-    <div class="brand">
+    <a class="brand" href="#/briefing" id="brand-home" title="오늘의 브리핑으로">
       <div class="brand-mark">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
       </div>
@@ -210,7 +213,7 @@
         <h1>Global Daily News</h1>
         <p>한국타이어 39개국 HR·현지 정세 데일리 브리핑</p>
       </div>
-    </div>
+    </a>
     <form class="search-box" id="search-form" role="search" onsubmit="return false">
       <input type="search" id="search-input" placeholder="기사 검색 (예: 파업, minimum wage)" aria-label="기사 검색" enterkeyhint="search">
     </form>
@@ -301,14 +304,8 @@
     var b = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(currentDate || '')); if (!b) return null;
     return Math.round((Date.UTC(+b[1], +b[2] - 1, +b[3]) - a) / 86400000);
   }
-  function relDate(d) {
-    var n = daysAgo(d);
-    if (n === null) return '';
-    if (n <= 0) return '오늘';
-    if (n === 1) return '어제';
-    if (n < 7) return n + '일 전';
-    return fmtDate(d);
-  }
+  // 기사 날짜는 '어제·3일 전' 대신 실제 날짜(월.일)로 표시
+  function relDate(d) { return fmtDate(d); }
   function byNewest(a, b) { return String(b.published || '').localeCompare(String(a.published || '')); }
   function isOld(i) { var n = daysAgo(i.published); return n !== null && n >= 7; }
   function autoDec(n) { var a = Math.abs(n); return a >= 100 ? 1 : (a >= 10 ? 2 : 3); }
@@ -385,6 +382,11 @@
   // 중요도 점수 → 최신순 (점수가 없는 옛 데이터는 최신순)
   function byScore(a, b) { return (Number(b.score) || 0) - (Number(a.score) || 0) || byNewest(a, b); }
   // '자동번역' 배지는 쓰지 않고(하단 안내 한 줄로 대체), 번역이 안 돼 원문을 보여 줄 때만 '원문' 표시
+  // 이전 수집에 없던 기사 (수집 단계에서 first_seen = 그날 날짜)
+  function newBadge(i) {
+    var d = String(DASHBOARD.generated_at || '').slice(0, 10);
+    return i && i.first_seen && d && i.first_seen === d ? '<span class="badge b-new" title="어제 수집에는 없던 새 기사">NEW</span>' : '';
+  }
   function trBadge(i) { return i._orig ? '<span class="b-orig" title="번역되지 않아 원문 제목을 표시합니다">원문</span>' : ''; }
   function origTitleAttr(i) { return i.translated && i.original_title ? ' title="원문: ' + esc(i.original_title) + '"' : ''; }
   function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
@@ -392,7 +394,7 @@
     return '<a class="item' + (isOld(i) ? ' old' : '') + '" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + inner + '</a>';
   }
   function metaLine(i, extra, onlyExtra) {
-    return '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + (extra || '') + (onlyExtra ? '' : extraBadges(i)) + trBadge(i) + '</div>';
+    return '<div class="meta">' + newBadge(i) + '<span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + (extra || '') + (onlyExtra ? '' : extraBadges(i)) + trBadge(i) + '</div>';
   }
 
   // ------------------------------------------------------------- state & routing
@@ -490,7 +492,7 @@
     h += hits.length ? hits.map(function (g) {
       var i = g.item;
       var kindBadge = g.kind === 'safe' && i.safety_tag ? safetyBadge(i.safety_tag) : '<span class="badge b-gray">' + SEARCH_KIND[g.kind] + '</span>';
-      return '<div class="item"><div class="meta">' + kindBadge + (i.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(i) +
+      return '<div class="item"><div class="meta">' + newBadge(i) + kindBadge + (i.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(i) +
         (g.countries.length ? countryButtons(g.countries, g.kind === 'safe' || g.kind === 'pol' || g.kind === 'soc' ? g.kind : '') : '<b>글로벌</b>') + '</div>' +
         '<a class="ttl" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + esc(i.title) + '</a>' +
         '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
@@ -520,7 +522,7 @@
   }
   function feedRow(g, badges, tab) {
     var i = g.item;
-    return '<div class="item"><div class="meta">' + countryButtons(g.countries, tab) + badges + extraBadges(i) + '</div>' +
+    return '<div class="item"><div class="meta">' + newBadge(i) + countryButtons(g.countries, tab) + badges + extraBadges(i) + '</div>' +
       '<a class="ttl sm" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + esc(i.title) + '</a>' +
       '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
   }
@@ -553,7 +555,7 @@
       var kindBadge = t.kind === 'safe' && t.safety_tag ? safetyBadge(t.safety_tag) : '<span class="badge ' + k.cls + '">' + k.label + '</span>';
       var ctry = (t.countries || []).map(byCode).filter(Boolean);
       return '<li><span class="rk">' + (idx + 1) + '</span><div class="body">' +
-        '<div class="meta">' + kindBadge + (ctry.length ? countryButtons(ctry, k.tab) : '') + '</div>' +
+        '<div class="meta">' + newBadge(t) + kindBadge + (ctry.length ? countryButtons(ctry, k.tab) : '') + '</div>' +
         '<a class="ttl" href="' + esc(safeUrl(t.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(t) + '>' + esc(t.title) + '</a>' +
         '<div class="meta"><span class="src">' + esc(t.source || '') + '</span>' + alsoNote(t) + '<span>' + relDate(t.published) + '</span>' + trBadge(t) + '</div>' +
         '</div></li>';
@@ -707,13 +709,21 @@
     var m = /^(.*?)\s*\(([^()]*)\)\s*$/.exec(String(s || ''));
     return m ? { v: m[1], ref: m[2] } : { v: String(s || '-'), ref: '' };
   }
+  // 값 끝의 괄호 설명은 본문에서 떼어 작은 글씨로 (괄호 안에 괄호가 있어도 처리)
+  //  예) '법정 최저임금 없음 (업종별 점진임금모델(PWM) 적용)' → 값 '법정 최저임금 없음' + 설명 '업종별 점진임금모델(PWM) 적용'
+  function splitTail(t) {
+    var m = /^(.*?)\s+\((.*)\)\s*$/.exec(String(t || '').trim());
+    return m && m[1] ? { v: m[1], ref: m[2] } : { v: String(t || '').trim(), ref: '' };
+  }
   function minWageText(mw) {
     if (mw && typeof mw === 'object') {
-      var d = String(mw.display || '').trim();
-      return { v: d || '-', note: String(mw.note || '').trim() };
+      var d = splitTail(mw.display || '');
+      var note = String(mw.note || '').trim();
+      if (note === '-') note = '';
+      return { v: d.v || '-', note: [d.ref, note].filter(Boolean).join(' · ') };
     }
-    var r = splitRef(String(mw || '').trim() || '-');
-    return { v: r.v, note: r.ref };
+    var r = splitTail(String(mw || '').trim() || '-');
+    return { v: r.v || '-', note: r.ref };
   }
   // 최저임금 표기 통일: "[약] 금액 통화코드 / 단위" + 원화 환산
   //  예) '₺164.94 / 시간' → 164.94 TRY / 시간,  '약 290,800포린트 / 월' → 약 290,800 HUF / 월,  '1일 400바트' → 400 THB / 일
@@ -913,6 +923,18 @@
     }
     if (el.hasAttribute('data-code')) { state.pickRegion = null; go(el.getAttribute('data-code')); return; }
     if (el.hasAttribute('data-newstab')) { state.tab = el.getAttribute('data-newstab'); renderCountry(); }
+  });
+  // 사이트 이름(Global Daily News)을 누르면 항상 '오늘의 브리핑' 첫 화면으로 (최신 날짜·전체 조직·맨 위)
+  document.getElementById('brand-home').addEventListener('click', function (e) {
+    e.preventDefault();
+    state.org = 'ALL'; state.expand = {};
+    document.getElementById('search-input').value = '';
+    if (currentDate !== INITIAL_DATE) {
+      document.getElementById('briefDatePicker').value = INITIAL_DATE;
+      applyDataset(INITIAL_DASHBOARD, INITIAL_DATE);
+    }
+    if (location.hash !== '#/briefing') { location.hash = '#/briefing'; }
+    else { readHash(); render(); window.scrollTo(0, 0); }
   });
   document.getElementById('search-form').addEventListener('submit', function (e) {
     e.preventDefault();
