@@ -1,0 +1,92 @@
+name: Backfill Archive (과거 날짜 다시 수집)
+
+# 지정한 날짜마다 '그날 새벽 수집'처럼 기간을 맞춰 다시 수집하고 docs/archive/날짜.json 만 바꾼다.
+#   - 현재 화면 데이터(data/countries_data.json)는 건드리지 않는다
+#   - 날짜 하나에 10~15분. 여러 날짜는 순서대로 처리
+#   - 끝나면 사이트를 다시 만들어 배포 (날짜 선택에서 바로 확인 가능)
+on:
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: "다시 수집할 날짜 (쉼표로 구분, 예: 2026-10-19,2026-10-20,2026-10-21)"
+        required: true
+        default: "2026-10-19,2026-10-20,2026-10-21"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages            # 매일 수집과 동시에 돌지 않게 같은 그룹 사용
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Collect each date
+        env:
+          DATES: ${{ inputs.dates }}
+        run: |
+          set -u
+          ok=0; fail=0
+          for d in $(echo "$DATES" | tr ',' ' '); do
+            if ! echo "$d" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+              echo "::warning::날짜 형식이 아님(건너뜀): $d"; continue
+            fi
+            echo "════════ $d 다시 수집 ════════"
+            if BACKFILL_DATE="$d" timeout 25m python src/collector.py; then ok=$((ok+1)); else fail=$((fail+1)); echo "::warning::$d 수집 실패"; fi
+          done
+          echo "완료: 성공 $ok · 실패 $fail"
+          [ "$ok" -gt 0 ]
+
+      - name: Build Site
+        if: ${{ !cancelled() }}
+        run: python src/build_site.py
+
+      - name: Commit archives
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/archive/ data/translation_cache.json
+          if git diff --staged --quiet; then echo "변경 없음"; exit 0; fi
+          git commit -q -m "chore: backfill archives [${{ inputs.dates }}]"
+          for i in 1 2 3; do
+            if git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "push 완료"; exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          echo "::warning::push 실패"
+
+      - name: Upload Pages artifact
+        if: ${{ !cancelled() && hashFiles('docs/index.html') != '' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+  deploy:
+    needs: backfill
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
