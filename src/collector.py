@@ -436,16 +436,20 @@ def _q(s: str) -> str:
 
 
 def _time_window(query: str) -> str:
-    """평소에는 'when:3d'(최근 3일). 과거 날짜 수집이면 같은 길이의 기간을 그날 기준으로 바꾼다:
-    when:3d → after:(그날-3일) before:(그날)  — 그날 새벽 수집 때 볼 수 있었던 기사 범위."""
+    """평소에는 'when:3d'(최근 3일) 그대로.
+    과거 날짜 수집이면 Google 뉴스 RSS가 after:/before: 기간 검색을 제대로 처리하지 않아(결과 0건)
+    'when:'을 그날까지 닿도록 넓히고(when:3d → when:(3+경과일)d), 그날 이후 기사는 _fetch_feed 에서 버린다."""
     if not BACKFILL_DATE:
         return query
     end = datetime.strptime(BACKFILL_DATE, "%Y-%m-%d").date()
+    lag = max(0, (datetime.now(KST).date() - end).days) + 1
+    return re.sub(r"when:(\d+)d", lambda m: f"when:{int(m.group(1)) + lag}d", query)
 
-    def sub(m):
-        n = int(m.group(1))
-        return f"after:{(end - timedelta(days=n)).isoformat()} before:{end.isoformat()}"
-    return re.sub(r"when:(\d+)d", sub, query)
+
+def _after_backfill_date(item: dict) -> bool:
+    """과거 날짜 수집에서 그날 이후에 나온 기사인지 (그날 새벽에는 볼 수 없었던 기사)."""
+    pub = (item.get("published") or "")[:10]
+    return bool(BACKFILL_DATE and pub and pub > BACKFILL_DATE)
 
 
 def _google_news_url_ko(query: str) -> str:
@@ -597,9 +601,12 @@ def _fetch_feed(url: str, limit: int) -> list:
     items = []
     for entry in entries:
         try:
-            items.append(_parse_entry(entry))
+            it = _parse_entry(entry)
         except Exception:
             continue
+        if _after_backfill_date(it):
+            continue
+        items.append(it)
         if len(items) >= limit:
             break
     return items
@@ -1506,6 +1513,21 @@ def _build_country_fallback(code: str) -> dict:
     }
 
 
+BACKFILL_MIN_ARTICLES = int(os.environ.get("BACKFILL_MIN_ARTICLES", "30"))
+
+
+def _count_articles(countries: list) -> int:
+    """국가별 뉴스(정치·사회·안전) + HR/산업 동향 실제 기사 수 (안내용 대체 항목 제외)."""
+    n = 0
+    for c in countries or []:
+        lists = list(((c or {}).get("news") or {}).values())
+        lists += [t.get("items") for t in (c or {}).get("hr_trends") or [] if isinstance(t, dict)]
+        for lst in lists:
+            if isinstance(lst, list):
+                n += sum(1 for i in lst if isinstance(i, dict) and i.get("title") and not i.get("is_fallback"))
+    return n
+
+
 def main() -> dict:
     started = time.time()
     cache_by_code = {} if BACKFILL_DATE else load_cache()     # 과거 날짜 수집은 지금 데이터를 섞지 않는다
@@ -1574,6 +1596,12 @@ def main() -> dict:
     }
 
     if BACKFILL_DATE:
+        n_news = _count_articles(countries_result) + len(global_industry or [])
+        log.info(f"{BACKFILL_DATE} 수집 기사 수: {n_news}건")
+        if n_news < BACKFILL_MIN_ARTICLES:
+            # 빈 결과로 기존 아카이브를 덮어쓰지 않는다
+            raise SystemExit(f"{BACKFILL_DATE}: 기사 {n_news}건뿐이라 저장하지 않음(기존 아카이브 유지). "
+                             "RSS 경고 로그를 확인하세요.")
         save_archive(data)
         log.info(f"docs/archive/{BACKFILL_DATE}.json 저장 완료 (현재 데이터는 그대로)")
         _log_quality_report(countries_result, data)
