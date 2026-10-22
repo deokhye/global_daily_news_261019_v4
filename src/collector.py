@@ -1531,6 +1531,10 @@ def main() -> dict:
 
     now_kst = datetime.now(KST)
     try:
+        mark_first_seen(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"))
+    except Exception as e:
+        log.warning(f"새 기사 표시(first_seen) 실패(무시): {e}")
+    try:
         top_briefing = build_top_briefing(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"))
     except Exception as e:
         log.error(f"오늘 핵심 브리핑 구성 실패(빈 목록): {e}")
@@ -1562,7 +1566,7 @@ def main() -> dict:
 # 10. 오늘 핵심 브리핑 — 전체 기사 중 중요도 상위 N건 (같은 사건은 나라·매체를 합쳐 1건)
 # ---------------------------------------------------------------------------
 TOP_FIELDS = ("title", "original_title", "translated", "lang", "link", "source", "published",
-              "safety_tag", "incident", "law", "own", "competitor", "mfg", "near_site", "trusted")
+              "safety_tag", "incident", "law", "own", "competitor", "mfg", "near_site", "trusted", "first_seen")
 
 
 def _top_candidates(countries: list, global_industry: list):
@@ -1590,7 +1594,8 @@ def build_top_briefing(countries: list, global_industry: list, today: str) -> li
             continue                     # 날짜 없음·오래됨·제목에 지난 연도만 있는 기사 제외
         if it.get("lang", "ko") != "ko" and not it.get("translated"):
             continue                     # 번역되지 않은 기사는 주요 브리핑에서 제외
-        cands.append((it.get("score") or 0, kind, code, it))
+        carried = it.get("first_seen") and it["first_seen"] < today      # 어제 이미 나온 기사는 조금 뒤로
+        cands.append(((it.get("score") or 0) - (8 if carried else 0), kind, code, it))
     cands.sort(key=lambda x: -x[0])
 
     checkers = {c["code"]: make_relevance_checker(c) for c in COUNTRIES}
@@ -1648,6 +1653,50 @@ def build_top_briefing(countries: list, global_industry: list, today: str) -> li
                       "source_count": len([x for x in g["sources"] if x])})
         out.append(entry)
     return out
+
+
+# ---------------------------------------------------------------------------
+# 11. 새 기사 표시 — 이전 수집에 없던 기사에 first_seen=오늘 (화면의 'NEW' 배지)
+# ---------------------------------------------------------------------------
+def _all_items(countries: list, global_industry: list):
+    for it, _ in _iter_news_items(countries):
+        yield it
+    for it in global_industry or []:
+        if isinstance(it, dict):
+            yield it
+
+
+def mark_first_seen(countries: list, global_industry: list, today: str) -> None:
+    """이전 수집 데이터(data/countries_data.json)와 비교해 처음 나온 기사는 first_seen=오늘,
+    이미 있던 기사는 처음 나온 날짜를 이어받는다. 같은 날 다시 수집해도 NEW 표시가 유지된다."""
+    try:
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            prev = json.load(f)
+    except Exception:  # noqa: BLE001 — 첫 수집이면 모두 새 기사로 보지 않음(비교 대상 없음)
+        prev = None
+    if not prev:
+        for it in _all_items(countries, global_industry):
+            it.setdefault("first_seen", "")
+        return
+    prev_day = str(prev.get("generated_at", ""))[:10] or today
+    by_link, by_title = {}, {}
+    # 처음 나온 날짜가 없는 이전 기사(이 기능 이전 데이터): 이전 수집이 오늘이면 '날짜 미상(오래됨)'으로 보고 NEW 를 붙이지 않는다
+    unknown = prev_day if prev_day < today else "0000-00-00"
+    for it in _all_items(prev.get("countries") or [], prev.get("global_industry") or []):
+        fs = it.get("first_seen") or unknown
+        if it.get("link"):
+            by_link[it["link"]] = min(fs, by_link.get(it["link"], fs))
+        nt = _norm_title(key_title(it))
+        if nt:
+            by_title[nt] = min(fs, by_title.get(nt, fs))
+    n_new = 0
+    for it in _all_items(countries, global_industry):
+        if it.get("is_fallback"):
+            continue
+        fs = by_link.get(it.get("link")) or by_title.get(_norm_title(key_title(it)))
+        it["first_seen"] = fs or today
+        n_new += 0 if fs else 1
+    log.info(f"[품질] 이전 수집({prev_day}) 대비 새 기사 {n_new}건")
 
 
 def _load_previous_global_industry() -> list:
