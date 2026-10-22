@@ -64,6 +64,9 @@ ARCHIVE_RETENTION_DAYS = 180
 TRANSLATION_CACHE_TTL_DAYS = 45
 
 OFFLINE = os.environ.get("OFFLINE", "").strip() in {"1", "true", "yes"}
+# 과거 날짜 다시 수집: BACKFILL_DATE=2026-10-19 → 그날 새벽 수집처럼 기간을 맞춰 docs/archive/2026-10-19.json 만 저장
+#   (현재 화면 데이터 data/countries_data.json 은 건드리지 않는다)
+BACKFILL_DATE = os.environ.get("BACKFILL_DATE", "").strip()
 DISABLE_TRANSLATION = OFFLINE or os.environ.get("DISABLE_TRANSLATION", "").strip() in {"1", "true", "yes"}
 
 REQUEST_TIMEOUT = 12
@@ -432,17 +435,30 @@ def _q(s: str) -> str:
     return requests.utils.quote(s, safe="")
 
 
+def _time_window(query: str) -> str:
+    """평소에는 'when:3d'(최근 3일). 과거 날짜 수집이면 같은 길이의 기간을 그날 기준으로 바꾼다:
+    when:3d → after:(그날-3일) before:(그날)  — 그날 새벽 수집 때 볼 수 있었던 기사 범위."""
+    if not BACKFILL_DATE:
+        return query
+    end = datetime.strptime(BACKFILL_DATE, "%Y-%m-%d").date()
+
+    def sub(m):
+        n = int(m.group(1))
+        return f"after:{(end - timedelta(days=n)).isoformat()} before:{end.isoformat()}"
+    return re.sub(r"when:(\d+)d", sub, query)
+
+
 def _google_news_url_ko(query: str) -> str:
-    return f"https://news.google.com/rss/search?q={_q(query)}&hl=ko&gl=KR&ceid=KR:ko"
+    return f"https://news.google.com/rss/search?q={_q(_time_window(query))}&hl=ko&gl=KR&ceid=KR:ko"
 
 
 def _google_news_url_en(query: str) -> str:
-    return f"https://news.google.com/rss/search?q={_q(query)}&hl=en-US&gl=US&ceid=US:en"
+    return f"https://news.google.com/rss/search?q={_q(_time_window(query))}&hl=en-US&gl=US&ceid=US:en"
 
 
 def _google_news_url_local(query: str, spec: dict) -> str:
     """현지어 Google 뉴스(예: hl=de&gl=DE&ceid=DE:de)."""
-    return (f"https://news.google.com/rss/search?q={_q(query)}"
+    return (f"https://news.google.com/rss/search?q={_q(_time_window(query))}"
             f"&hl={_q(spec['hl'])}&gl={_q(spec['gl'])}&ceid={_q(spec['ceid'])}")
 
 
@@ -735,7 +751,7 @@ def _pick(candidates: list, lang: str, limit: int, seen: set, check=None, alread
 
 
 def _today_kst() -> str:
-    return datetime.now(KST).strftime("%Y-%m-%d")
+    return BACKFILL_DATE or datetime.now(KST).strftime("%Y-%m-%d")
 
 
 def rank_items(items: list, kind: str, country: dict = None) -> list:
@@ -1492,11 +1508,16 @@ def _build_country_fallback(code: str) -> dict:
 
 def main() -> dict:
     started = time.time()
-    cache_by_code = load_cache()
+    cache_by_code = {} if BACKFILL_DATE else load_cache()     # 과거 날짜 수집은 지금 데이터를 섞지 않는다
+    if BACKFILL_DATE:
+        log.info(f"과거 날짜 다시 수집 모드: {BACKFILL_DATE} (아카이브만 저장)")
 
     log.info("환율 일괄 수집 시작")
     try:
         fx_series = prefetch_fx_series(COUNTRIES)
+        if BACKFILL_DATE:          # 그날 새벽 기준 = 전날까지의 종가
+            cut = pd.Timestamp(BACKFILL_DATE)
+            fx_series = {t: s_[s_.index < cut] for t, s_ in fx_series.items()}
     except Exception as e:
         log.error(f"환율 일괄 수집 실패: {e}")
         fx_series = {}
@@ -1519,10 +1540,10 @@ def main() -> dict:
     countries_result = [collected.get(c["code"]) or _build_country_fallback(c["code"]) for c in COUNTRIES]
 
     try:
-        global_industry = get_global_industry(_load_previous_global_industry())
+        global_industry = get_global_industry([] if BACKFILL_DATE else _load_previous_global_industry())
     except Exception as e:
         log.error(f"글로벌 산업 동향 실패: {e}")
-        global_industry = _load_previous_global_industry()
+        global_industry = [] if BACKFILL_DATE else _load_previous_global_industry()
 
     try:
         apply_translations(countries_result + [{"news": {"global": global_industry}}])
@@ -1530,6 +1551,9 @@ def main() -> dict:
         log.error(f"일괄 번역 단계 실패(원문 유지): {e}")
 
     now_kst = datetime.now(KST)
+    if BACKFILL_DATE:
+        dt = datetime.strptime(BACKFILL_DATE + " 05:30", "%Y-%m-%d %H:%M")
+        now_kst = KST.localize(dt) if hasattr(KST, "localize") else dt.replace(tzinfo=KST)
     try:
         mark_first_seen(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"))
     except Exception as e:
@@ -1549,6 +1573,11 @@ def main() -> dict:
         "global_industry": global_industry,
     }
 
+    if BACKFILL_DATE:
+        save_archive(data)
+        log.info(f"docs/archive/{BACKFILL_DATE}.json 저장 완료 (현재 데이터는 그대로)")
+        _log_quality_report(countries_result, data)
+        return data
     save_cache(data)  # 실패 시 예외 → 워크플로 실패로 즉시 드러나게 함
     log.info(f"data/countries_data.json 저장 완료 ({len(countries_result)}개국)")
 
@@ -1669,8 +1698,12 @@ def _all_items(countries: list, global_industry: list):
 def mark_first_seen(countries: list, global_industry: list, today: str) -> None:
     """이전 수집 데이터(data/countries_data.json)와 비교해 처음 나온 기사는 first_seen=오늘,
     이미 있던 기사는 처음 나온 날짜를 이어받는다. 같은 날 다시 수집해도 NEW 표시가 유지된다."""
+    path = CACHE_PATH
+    if BACKFILL_DATE:      # 과거 날짜 수집이면 전날 아카이브와 비교
+        prev_date = (datetime.strptime(BACKFILL_DATE, "%Y-%m-%d").date() - timedelta(days=1)).isoformat()
+        path = os.path.join(ARCHIVE_DIR, f"{prev_date}.json")
     try:
-        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             prev = json.load(f)
     except Exception:  # noqa: BLE001 — 첫 수집이면 모두 새 기사로 보지 않음(비교 대상 없음)
         prev = None
