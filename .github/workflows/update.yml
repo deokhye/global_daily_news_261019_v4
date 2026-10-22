@@ -4,6 +4,10 @@ name: Daily Global Brief Update
 #   collect : 뉴스·환율 수집 → 화면 생성 → 데이터 커밋 → 배포   (매일 예약 실행, 수동 실행 기본값)
 #   build   : 화면만 다시 생성 → 배포 (수집 없음)              (main 에 코드·설정 push, 국가 프로필 갱신 후)
 #   skip    : 아무것도 안 함                                    (백업 예약인데 오늘 데이터가 이미 있을 때)
+#
+# 주간 메일 (지난주 월~일 주요 이슈): 월요일 새벽 예약 수집이 끝나면 같은 실행 안에서 발송한다.
+#   수동 실행에서는 '주간 메일' 항목으로 preview(미리보기만) / send(실제 발송)를 고를 수 있다.
+#   같은 날 두 번 보내지 않도록 data/weekly_mail_sent.txt 에 보낸 날짜를 남긴다.
 on:
   schedule:
     # 목표: KST 06:30 전 갱신 완료. 정각을 피해 지연을 줄인다.
@@ -19,6 +23,11 @@ on:
         type: choice
         options: [collect, build]
         default: collect
+      weekly_mail:
+        description: "주간 메일: none = 안 함 / preview = 미리보기만(Artifacts) / send = 실제 발송"
+        type: choice
+        options: [none, preview, send]
+        default: none
 
 permissions:
   contents: write
@@ -48,9 +57,18 @@ jobs:
           if [ "${{ github.event.schedule }}" = "50 20 * * *" ] && [ -f "docs/archive/$TODAY.json" ]; then
             echo "백업 실행: 오늘($TODAY) 데이터가 이미 있어 건너뜁니다."; MODE=skip
           fi
+          # 주간 메일: 월요일(KST) 예약 수집 때 자동 발송, 수동 실행은 선택값
+          WEEKLY=none
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(TZ=Asia/Seoul date +%u)" = "1" ] && [ "$MODE" = "collect" ]; then WEEKLY=send; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then WEEKLY="${{ inputs.weekly_mail }}"; fi
+          if [ "$WEEKLY" = "send" ] && [ "${{ github.event_name }}" = "schedule" ] && grep -qx "$TODAY" data/weekly_mail_sent.txt 2>/dev/null; then
+            echo "주간 메일: 오늘($TODAY) 이미 보냈습니다 — 건너뜀"; WEEKLY=none
+          fi
+          if [ "$MODE" = "skip" ]; then WEEKLY=none; fi
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
           echo "today=$TODAY" >> "$GITHUB_OUTPUT"
-          echo "실행 모드: $MODE"
+          echo "weekly=$WEEKLY" >> "$GITHUB_OUTPUT"
+          echo "실행 모드: $MODE · 주간 메일: $WEEKLY"
 
       - uses: actions/setup-python@v5
         if: steps.decide.outputs.mode != 'skip'
@@ -66,8 +84,11 @@ jobs:
           pip freeze | grep -iE "yfinance|pandas|requests|feedparser|jinja2|beautifulsoup4|openpyxl"
 
       - name: Run Collector
+        id: collect
         if: steps.decide.outputs.mode == 'collect'
         timeout-minutes: 20
+        env:
+          MYMEMORY_EMAIL: ${{ secrets.MYMEMORY_EMAIL }}   # 선택: 보조 번역기 일일 한도 확대
         run: python src/collector.py
 
       # 수집이 실패·시간 초과해도 직전 데이터로 화면은 반드시 만든다.
@@ -75,6 +96,37 @@ jobs:
       - name: Build Site
         if: steps.decide.outputs.mode != 'skip' && !cancelled()
         run: python src/build_site.py
+
+      # 주간 메일 — 실패해도 사이트 배포는 계속 (continue-on-error)
+      - name: Weekly summary mail
+        id: weekly
+        if: steps.decide.outputs.weekly != 'none' && !cancelled() && hashFiles('src/weekly_mail.py') != ''
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_SMTP_HOST: ${{ secrets.MAIL_SMTP_HOST }}
+          MAIL_SMTP_PORT: ${{ secrets.MAIL_SMTP_PORT }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: |
+          if [ "${{ steps.decide.outputs.weekly }}" = "preview" ]; then
+            python src/weekly_mail.py --dry-run
+          else
+            python src/weekly_mail.py
+            echo "${{ steps.decide.outputs.today }}" >> data/weekly_mail_sent.txt
+          fi
+
+      - name: Upload weekly mail preview
+        if: steps.decide.outputs.weekly != 'none' && !cancelled() && hashFiles('weekly_mail_preview.html') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-mail-preview
+          path: weekly_mail_preview.html
+          retention-days: 14
 
       - name: Commit data
         if: steps.decide.outputs.mode == 'collect'
@@ -94,6 +146,17 @@ jobs:
           done
           git status --short | head -20
           echo "::warning::데이터 커밋 push 실패 — 사이트 배포는 계속 진행합니다."
+
+      # 수집 실패·뉴스 0건 국가 다수·번역 성공률 저조 → ALERT_TO 로 알림 (메일 설정이 없으면 로그만)
+      - name: Quality alert
+        if: always() && steps.decide.outputs.mode == 'collect' && hashFiles('src/notify.py') != ''
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_SMTP_HOST: ${{ secrets.MAIL_SMTP_HOST }}
+          MAIL_SMTP_PORT: ${{ secrets.MAIL_SMTP_PORT }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+        run: python src/notify.py --collector-status "${{ steps.collect.outcome }}" --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Check page
         if: steps.decide.outputs.mode != 'skip' && !cancelled()
