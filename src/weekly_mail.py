@@ -44,6 +44,7 @@ GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:ge
 
 KIND_LABEL = {"safe": "안전·재난", "hr": "HR·노동", "ind": "업계 동향", "auto": "완성차·타이어",
               "pol": "정치·경제", "soc": "사회·문화"}
+LINK_HINT = "기사 제목을 누르면 원문으로 이동합니다"
 KIND_COLOR = {"safe": ("#B91C1C", "#FEE2E2"), "hr": ("#3730A3", "#E0E7FF"), "ind": ("#9A3412", "#FFEDD5"),
               "auto": ("#9A3412", "#FFEDD5"), "pol": ("#475569", "#F1F5F9"), "soc": ("#475569", "#F1F5F9")}
 
@@ -138,7 +139,7 @@ def pick_top(groups: list, top_n: int, per_kind_max: int) -> list:
     for g in sorted(groups, key=lambda g: (g["weekly"], str(g["item"].get("published") or "")), reverse=True):
         if len(out) >= top_n:
             break
-        if g["kind"] == "auto":
+        if is_industry(g):          # 업계 동향·경쟁사는 하단 '업계·경쟁사 동향'으로
             continue
         if per_kind.get(g["kind"], 0) >= per_kind_max:
             continue
@@ -147,10 +148,20 @@ def pick_top(groups: list, top_n: int, per_kind_max: int) -> list:
     return out
 
 
+def is_competitor(g: dict) -> bool:
+    it = g["item"]
+    return bool(it.get("competitor") or it.get("tag") == "경쟁사" or NR.rules().competitor_of(key_title(it)))
+
+
+def is_industry(g: dict) -> bool:
+    """업계 동향(글로벌 산업·완성차·타이어) 또는 경쟁사 기사."""
+    return g["kind"] in ("ind", "auto") or is_competitor(g)
+
+
 def pick_competitors(groups: list, limit: int) -> list:
-    comp = [g for g in groups if g["item"].get("competitor") or g["item"].get("tag") == "경쟁사"
-            or NR.rules().competitor_of(key_title(g["item"]))]
-    comp.sort(key=lambda g: str(g["item"].get("published") or ""), reverse=True)
+    """하단 '업계·경쟁사 동향': 경쟁사·업계 기사를 중요도 순으로 (같은 사건은 이미 1건으로 묶여 있음)."""
+    comp = [g for g in groups if is_industry(g)]
+    comp.sort(key=lambda g: (g["weekly"], str(g["item"].get("published") or "")), reverse=True)
     return comp[:limit]
 
 
@@ -265,6 +276,12 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             out += badge("거점 인근", "#1E40AF", "#DBEAFE")
         return out
 
+    def one_badge(g):
+        """사이트와 같이 구분 배지는 1개만: 경쟁사 기사면 '경쟁사', 아니면 분류(안전 유형·HR 등)."""
+        if g["item"].get("competitor"):
+            return badge("경쟁사", "#7C2D12", "#FED7AA")
+        return kind_badge(g)
+
     def meta(it, n_src=1, days=1):
         tr = ("<span style='display:inline-block;border:1px solid #E2E8F0;border-radius:4px;padding:0 6px;"
               "font-size:11px;color:#64748B;margin-left:6px'>자동번역</span>") if it.get("translated") else ""
@@ -290,28 +307,26 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         border = "" if last else "border-bottom:1px solid #F1F5F9;"
         rows.append(
             f"<tr><td style='padding:14px 0;{border}vertical-align:top;width:40px'>"
-            f"<div style='width:28px;height:28px;border-radius:14px;background:{'#C2410C' if first else '#FFF7ED'};"
-            f"color:{'#FFFFFF' if first else '#9A3412'};font-weight:900;font-size:14px;text-align:center;line-height:28px'>{i}</div></td>"
+            f"<div style='width:28px;height:28px;border-radius:14px;background:#FFF7ED;"
+            f"color:#9A3412;font-weight:900;font-size:14px;text-align:center;line-height:28px'>{i}</div></td>"
             f"<td style='padding:14px 0;{border}'>"
-            f"<div style='font-size:14px;color:#1E293B'>{kind_badge(g)}{extra_badges(it)}"
+            f"<div style='font-size:14px;color:#1E293B'>{one_badge(g)}"
             f"<b style='font-size:14px'>{_e(ctry(g['code']) if g['code'] else '글로벌')}</b></div>"
             f"<a href='{_e(it.get('link'))}' style='display:block;font-size:16px;font-weight:700;color:#1E293B;"
             f"text-decoration:none;line-height:1.5;margin-top:2px'>{_e(it.get('title'))}</a>"
             + meta(it, n_src, len(g["days"])) + "</td></tr>")
     top_html = card(
         "<span style='color:#C2410C'>&#9733;</span>&nbsp;" + label + " 핵심 브리핑",
-        "중요도 순 · 같은 사건은 1건으로 묶음",
-        f"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:4px'>{''.join(rows)}</table>"
-        "<div style='font-size:11px;color:#94A3B8;line-height:1.5;padding:4px 0 8px'>선정 기준: 안전·재난 심각도, 법·제도 변화, "
-        "당사·경쟁사 언급, 거점 인근, 제조업 관련, 여러 매체·여러 날 보도 · 같은 분류는 최대 4건</div>")
+        LINK_HINT,
+        f"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:4px'>{''.join(rows)}</table>")
 
     comp_rows = "".join(
         f"<tr><td style='padding:12px 0;{'' if k == len(comps) - 1 else 'border-bottom:1px solid #F1F5F9;'}'>"
-        f"<div>{badge('경쟁사 · ' + (g['item'].get('competitor') or NR.rules().competitor_of(key_title(g['item'])) or ''), '#7C2D12', '#FED7AA')}</div>"
+        f"<div>{badge('경쟁사', '#7C2D12', '#FED7AA') if is_competitor(g) else badge('업계 동향', *KIND_COLOR['ind'])}</div>"
         f"<a href='{_e(g['item'].get('link'))}' style='display:block;font-size:15px;font-weight:700;color:#1E293B;"
         f"text-decoration:none;line-height:1.5'>{_e(g['item'].get('title'))}</a>"
         + meta(g["item"]) + "</td></tr>" for k, g in enumerate(comps))
-    comp_block = card("경쟁사 동향", "업계 전반 뉴스 · 경쟁사 동향",
+    comp_block = card("업계·경쟁사 동향", LINK_HINT,
                       f"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:4px'>{comp_rows}</table>") if comps else ""
 
     button = (f"<tr><td align='center' style='padding:22px 28px 6px'><a href='{_e(site_url)}' "
@@ -333,6 +348,8 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         "<tr><td style='padding:18px 28px 24px;font-size:11px;color:#94A3B8;line-height:1.6'>"
         "공개 뉴스를 자동 수집·분류한 결과입니다. 자세한 내용은 원문을 확인해 주세요.<br>"
         "매주 월요일 아침 자동 발송됩니다. 받는 사람 변경은 담당자에게 요청해 주세요.</td></tr>"
+        "<tr><td align='center' style='padding:6px 28px 28px;border-top:1px solid #E2E8F0;font-size:13px;"
+        "font-weight:700;color:#475569'>Hankook Tire &amp; Technology Global HR팀</td></tr>"
         "</table></td></tr></table></body></html>")
 
     text = [f"Global Daily News {label} 주요 이슈 ({start} ~ {end})", ""]
@@ -341,12 +358,17 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         for s in ai.get("sections") or []:
             text += [f"■ {s.get('title', '')}"] + [f"  - {p}" for p in s.get("points") or []]
         text.append("")
-    text.append(f"안전·재난 {safe_total}건 · HR·노동 {hr_total}건 · 경쟁사 {len(comps)}건")
+    text.append("※ 기사 제목(링크)을 누르면 원문 기사로 이동합니다.")
     text.append("")
     for i, g in enumerate(top, 1):
         text.append(f"{i}. [{ctry(g['code'])}·{KIND_LABEL.get(g['kind'], '')}] {g['item'].get('title', '')}\n   {g['item'].get('link', '')}")
+    if comps:
+        text += ["", "■ 업계·경쟁사 동향"]
+        text += [f"- [{'경쟁사' if is_competitor(g) else '업계 동향'}] {g['item'].get('title', '')}\n   {g['item'].get('link', '')}"
+                 for g in comps]
     if site_url:
         text += ["", f"사이트: {site_url}"]
+    text += ["", "Hankook Tire & Technology Global HR팀"]
     return page, "\n".join(text)
 
 
@@ -380,8 +402,8 @@ def build(end: date, use_ai: bool = True, ai_override: dict | None = None, today
         info = collect_week(week, start, end_s)
     top = pick_top(info["groups"], int(st.get("top_n", 10)), int(st.get("per_kind_max", 4)))
     top_ids = {id(g) for g in top}
-    comps = [g for g in pick_competitors(info["groups"], int(st.get("competitor_max", 6)) + len(top))
-             if id(g) not in top_ids][: int(st.get("competitor_max", 6))]     # Top 10 에 이미 나온 기사는 빼고
+    comps = [g for g in pick_competitors(info["groups"], int(st.get("competitor_max", 8)) + len(top))
+             if id(g) not in top_ids][: int(st.get("competitor_max", 8))]
     ai = ai_override if ai_override is not None else (gemini_summary(info["groups"], info["names"], start, end_s, st) if use_ai else None)
     site = os.environ.get("SITE_URL", "").strip()
     page, text = render(info, top, comps, ai, start, end_s, site, label)
@@ -392,6 +414,37 @@ def build(end: date, use_ai: bool = True, ai_override: dict | None = None, today
     return subject, page, text
 
 
+def _hint(err: Exception) -> str:
+    """발송 오류를 사람이 바로 이해할 수 있는 안내로 바꾼다."""
+    m = str(err)
+    if "SmtpClientAuthentication is disabled" in m:
+        return "회사 메일 계정에 SMTP 인증(SMTP AUTH)이 꺼져 있습니다 → IT에 해당 계정의 SMTP AUTH 허용을 요청하세요."
+    if "security defaults" in m or "5.7.139" in m:
+        return "회사 보안 정책(MFA·보안 기본값)으로 로그인이 막혔습니다 → 앱 암호 또는 MFA 없는 발송 전용 계정이 필요합니다."
+    if "5.7.3" in m and "outlook" in m.lower():
+        return ("Outlook 로그인 거부(5.7.3): ① 비밀번호 오류 ② 계정에 MFA(추가 인증)/SSO 적용 "
+                "③ 회사가 SMTP 인증(SMTP AUTH)을 막음 중 하나입니다 → 비밀번호가 맞다면 IT에 SMTP AUTH 허용·앱 암호를 요청하세요.")
+    if "535" in m or "Authentication" in m or "5.7.3" in m or "5.7.8" in m:
+        return "로그인 실패: MAIL_USER(메일 주소 전체)와 MAIL_PASSWORD 값을 확인하세요. Gmail이면 앱 비밀번호 16자리를 넣어야 합니다."
+    if "5.7.57" in m or "5.7.60" in m:
+        return "로그인한 계정으로 보낼 권한이 없습니다 → MAIL_USER와 실제 로그인 계정이 같은지 확인하세요."
+    if "설정되지 않았습니다" in m or "받는 사람이 없습니다" in m:
+        return "Settings → Secrets and variables → Actions → Repository secrets 에 MAIL_USER, MAIL_PASSWORD, MAIL_TO 가 있는지 확인하세요."
+    if "timed out" in m or "Connection" in m or "getaddrinfo" in m:
+        return "메일 서버 연결 실패: MAIL_SMTP_HOST / MAIL_SMTP_PORT 값을 확인하세요 (Outlook: smtp.office365.com / 587)."
+    return "아래 오류 원문을 확인하세요."
+
+
+def _report(title: str, lines: list) -> None:
+    """실행 요약 화면(Summary)과 오류 표시(Annotations)에 결과를 남긴다."""
+    text = " / ".join(x for x in lines if x)
+    print(f"::{'notice' if title.startswith('✅') else 'error'} title={title}::{text}")
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if path:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(f"### {title}\n\n" + "\n".join(f"- {x}" for x in lines if x) + "\n\n")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="발송하지 않고 미리보기 파일만 생성")
@@ -400,14 +453,32 @@ def main() -> int:
     args = ap.parse_args()
     end = date.fromisoformat(args.end) if args.end else last_week(datetime.now(KST).date())[1]
 
-    subject, page, text = build(end, use_ai=not args.no_ai)
+    try:
+        subject, page, text = build(end, use_ai=not args.no_ai)
+    except Exception as e:
+        log.exception("주간 메일 내용 만들기 실패")
+        _report("❌ 주간 메일 내용 만들기 실패", [f"오류: {type(e).__name__}: {e}"])
+        return 1
     with open(PREVIEW_PATH, "w", encoding="utf-8") as f:
         f.write(page)
     log.info(f"미리보기 저장: {PREVIEW_PATH}")
     if args.dry_run:
+        _report("✅ 주간 메일 미리보기 생성", [f"제목: {subject}", "실행 화면 맨 아래 Artifacts → weekly-mail-preview 에서 내려받으세요."])
         return 0
     recipients = parse_recipients(os.environ.get("MAIL_TO", ""))
-    send_mail(subject, page, text, recipients)
+    user = os.environ.get("MAIL_USER", "").strip()
+    host = os.environ.get("MAIL_SMTP_HOST", "").strip() or "smtp.gmail.com"
+    port = os.environ.get("MAIL_SMTP_PORT", "").strip() or "465"
+    log.info(f"발송 설정: 서버 {host}:{port}, 보내는 계정 {user[:3] + '***' + user[user.find('@'):] if '@' in user else '(없음)'}, "
+             f"받는 사람 {len(recipients)}명")
+    try:
+        send_mail(subject, page, text, recipients)
+    except Exception as e:
+        log.error(f"주간 메일 발송 실패: {type(e).__name__}: {e}")
+        _report("❌ 주간 메일 발송 실패", [_hint(e), f"서버: {host}:{port} · 받는 사람 {len(recipients)}명",
+                                          f"오류 원문: {type(e).__name__}: {e}"])
+        return 1
+    _report("✅ 주간 메일 발송 완료", [f"제목: {subject}", f"받는 사람 {len(recipients)}명 (숨은 참조) + 보내는 계정 보낸편지함"])
     return 0
 
 
