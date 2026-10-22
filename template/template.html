@@ -382,11 +382,8 @@
   // 중요도 점수 → 최신순 (점수가 없는 옛 데이터는 최신순)
   function byScore(a, b) { return (Number(b.score) || 0) - (Number(a.score) || 0) || byNewest(a, b); }
   // '자동번역' 배지는 쓰지 않고(하단 안내 한 줄로 대체), 번역이 안 돼 원문을 보여 줄 때만 '원문' 표시
-  // 이전 수집에 없던 기사 (수집 단계에서 first_seen = 그날 날짜)
-  function newBadge(i) {
-    var d = String(DASHBOARD.generated_at || '').slice(0, 10);
-    return i && i.first_seen && d && i.first_seen === d ? '<span class="badge b-new" title="어제 수집에는 없던 새 기사">NEW</span>' : '';
-  }
+  // NEW 배지는 표시하지 않음 (first_seen 은 수집 단계에서 주요 브리핑 순서에만 사용)
+  function newBadge() { return ''; }
   function trBadge(i) { return i._orig ? '<span class="b-orig" title="번역되지 않아 원문 제목을 표시합니다">원문</span>' : ''; }
   function origTitleAttr(i) { return i.translated && i.original_title ? ' title="원문: ' + esc(i.original_title) + '"' : ''; }
   function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
