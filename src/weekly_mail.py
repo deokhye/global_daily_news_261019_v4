@@ -331,7 +331,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
 
     button = (f"<tr><td align='center' style='padding:22px 28px 6px'><a href='{_e(site_url)}' "
               "style='display:inline-block;background:#C2410C;color:#fff;font-weight:700;font-size:14px;"
-              "text-decoration:none;border-radius:10px;padding:11px 22px'>사이트에서 자세히 보기</a></td></tr>") if site_url else ""
+              "text-decoration:none;border-radius:10px;padding:11px 22px'>Global Daily News 바로가기</a></td></tr>") if site_url else ""
 
     page = (
         "<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'>"
