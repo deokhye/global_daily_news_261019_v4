@@ -1,27 +1,34 @@
 name: Daily Global Brief Update
 
 # 실행 모드
-#   collect : 뉴스·환율 수집 → 화면 생성 → 데이터 커밋 → 배포   (매일 예약 실행, 수동 실행 기본값)
+#   collect : 뉴스·환율 수집 → 화면 생성 → 데이터 커밋 → 배포   (수동 실행 기본값)
+#   auto    : 오늘 데이터가 없을 때만 collect, 있으면 skip      (예약 실행 · 외부 알람(cron-job.org) 용)
 #   build   : 화면만 다시 생성 → 배포 (수집 없음)              (main 에 코드·설정 push, 국가 프로필 갱신 후)
-#   skip    : 아무것도 안 함                                    (백업 예약인데 오늘 데이터가 이미 있을 때)
+#   mail    : 주간 메일만 발송 (수집·배포 없음, 2~3분)          (월요일 05:00 외부 알람(cron-job.org) 용)
+#   skip    : 아무것도 안 함                                    (오늘 데이터가 이미 있을 때)
 #
-# 주간 메일 (지난주 월~일 주요 이슈): 월요일 새벽 예약 수집이 끝나면 같은 실행 안에서 발송한다.
+# 주간 메일 (지난주 월~일 주요 이슈): 월요일 05:00 이후 첫 실행에서 한 번만 발송한다.
+#   - 정확히 05:00 에 받으려면 cron-job.org 에서 월 05:00 에 mode=mail 로 실행 요청
+#   - 그게 없으면 월요일 05:05 예약(대체)이나 05:00 이후 시작된 자동 수집에서 발송 (GitHub 지연만큼 늦어짐)
 #   수동 실행에서는 '주간 메일' 항목으로 preview(미리보기만) / send(실제 발송)를 고를 수 있다.
 #   같은 날 두 번 보내지 않도록 data/weekly_mail_sent.txt 에 보낸 날짜를 남긴다.
 on:
   schedule:
-    # 목표: KST 06:30 전 갱신 완료. 정각을 피해 지연을 줄인다.
-    - cron: "20 20 * * *"   # 주 실행: KST 05:20
-    - cron: "50 20 * * *"   # 백업 실행: KST 05:50 (오늘 아카이브가 없을 때만 수집)
+    # GitHub 예약은 바쁜 시간대에 2~3시간 늦게 시작되는 일이 잦다 → 일찍, 여러 번 요청.
+    # 먼저 시작된 실행이 수집하고, 뒤 실행은 오늘 데이터가 있으면 바로 끝난다(skip).
+    - cron: "40 17 * * *"   # KST 02:40
+    - cron: "40 18 * * *"   # KST 03:40
+    - cron: "40 19 * * *"   # KST 04:40
+    - cron: "5 20 * * 0"    # 월요일 KST 05:05 — 주간 메일 대체 발송(이미 보냈으면 아무것도 안 함)
   push:
     branches: [main]
     paths: ["src/**", "template/**", "config/**"]
   workflow_dispatch:
     inputs:
       mode:
-        description: "collect = 뉴스·환율 수집 후 배포 / build = 화면만 다시 생성"
+        description: "collect = 뉴스·환율 수집 후 배포 / build = 화면만 다시 생성 / auto = 오늘 데이터 없을 때만 수집 / mail = 주간 메일만"
         type: choice
-        options: [collect, build]
+        options: [collect, build, auto, mail]
         default: collect
       weekly_mail:
         description: "주간 메일: none = 안 함 / preview = 미리보기만(Artifacts) / send = 실제 발송"
@@ -52,19 +59,25 @@ jobs:
         run: |
           TODAY=$(TZ=Asia/Seoul date +%F)
           MODE=collect
-          if [ "${{ github.event_name }}" = "push" ]; then MODE=build; fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then MODE="${{ inputs.mode }}"; fi
-          if [ "${{ github.event.schedule }}" = "50 20 * * *" ] && [ -f "docs/archive/$TODAY.json" ]; then
-            echo "백업 실행: 오늘($TODAY) 데이터가 이미 있어 건너뜁니다."; MODE=skip
+          EVENT="${{ github.event_name }}"
+          if [ "$EVENT" = "push" ]; then MODE=build; fi
+          if [ "$EVENT" = "workflow_dispatch" ]; then MODE="${{ inputs.mode }}"; fi
+          AUTO=no
+          if [ "$EVENT" = "schedule" ] || [ "$MODE" = "auto" ]; then AUTO=yes; MODE=collect; fi
+          if [ "$AUTO" = "yes" ] && [ -f "docs/archive/$TODAY.json" ]; then
+            echo "자동 실행: 오늘($TODAY) 데이터가 이미 있어 건너뜁니다."; MODE=skip
           fi
-          # 주간 메일: 월요일(KST) 예약 수집 때 자동 발송, 수동 실행은 선택값
+          # 주간 메일: 월요일(KST) 05:00 이후 첫 실행에서 한 번만 발송
           WEEKLY=none
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(TZ=Asia/Seoul date +%u)" = "1" ] && [ "$MODE" = "collect" ]; then WEEKLY=send; fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then WEEKLY="${{ inputs.weekly_mail }}"; fi
-          if [ "$WEEKLY" = "send" ] && [ "${{ github.event_name }}" = "schedule" ] && grep -qx "$TODAY" data/weekly_mail_sent.txt 2>/dev/null; then
+          if [ "$EVENT" = "workflow_dispatch" ]; then WEEKLY="${{ inputs.weekly_mail }}"; fi
+          if [ "$MODE" = "mail" ] && [ "$WEEKLY" = "none" ]; then WEEKLY=send; fi
+          HOUR=$((10#$(TZ=Asia/Seoul date +%H)))
+          if [ "$AUTO" = "yes" ] && [ "$WEEKLY" = "none" ] && [ "$(TZ=Asia/Seoul date +%u)" = "1" ] && [ "$HOUR" -ge 5 ]; then WEEKLY=send; fi
+          if [ "$WEEKLY" = "send" ] && { [ "$AUTO" = "yes" ] || [ "$MODE" = "mail" ]; } && grep -qx "$TODAY" data/weekly_mail_sent.txt 2>/dev/null; then
             echo "주간 메일: 오늘($TODAY) 이미 보냈습니다 — 건너뜀"; WEEKLY=none
           fi
-          if [ "$MODE" = "skip" ]; then WEEKLY=none; fi
+          if [ "$MODE" = "skip" ] && [ "$WEEKLY" != "none" ]; then MODE=mail; fi
+          if [ "$MODE" = "mail" ] && [ "$WEEKLY" = "none" ]; then MODE=skip; fi
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
           echo "today=$TODAY" >> "$GITHUB_OUTPUT"
           echo "weekly=$WEEKLY" >> "$GITHUB_OUTPUT"
@@ -94,7 +107,7 @@ jobs:
       # 수집이 실패·시간 초과해도 직전 데이터로 화면은 반드시 만든다.
       # (이 단계가 건너뛰어지면 index.html 없이 배포되어 사이트가 404 가 된다)
       - name: Build Site
-        if: steps.decide.outputs.mode != 'skip' && !cancelled()
+        if: steps.decide.outputs.mode != 'skip' && steps.decide.outputs.mode != 'mail' && !cancelled()
         run: python src/build_site.py
 
       # 주간 메일 — 실패해도 사이트 배포는 계속 (continue-on-error)
@@ -129,13 +142,13 @@ jobs:
           retention-days: 14
 
       - name: Commit data
-        if: steps.decide.outputs.mode == 'collect'
+        if: (steps.decide.outputs.mode == 'collect' || steps.decide.outputs.mode == 'mail') && !cancelled()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ docs/archive/
           if git diff --staged --quiet; then echo "변경 없음"; exit 0; fi
-          git commit -q -m "chore: daily brief data [${{ steps.decide.outputs.today }}]"
+          git commit -q -m "chore: daily brief ${{ steps.decide.outputs.mode }} [${{ steps.decide.outputs.today }}]"
           for i in 1 2 3; do
             echo "── push 시도 $i/3"
             if git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" 2>&1 && git push origin "HEAD:${GITHUB_REF_NAME}" 2>&1; then
@@ -159,18 +172,18 @@ jobs:
         run: python src/notify.py --collector-status "${{ steps.collect.outcome }}" --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Check page
-        if: steps.decide.outputs.mode != 'skip' && !cancelled()
+        if: steps.decide.outputs.mode != 'skip' && steps.decide.outputs.mode != 'mail' && !cancelled()
         run: test -s docs/index.html || { echo "::error::docs/index.html 이 없어 배포를 중단합니다."; exit 1; }
 
       - name: Upload Pages artifact
-        if: steps.decide.outputs.mode != 'skip' && !cancelled() && hashFiles('docs/index.html') != ''
+        if: steps.decide.outputs.mode != 'skip' && steps.decide.outputs.mode != 'mail' && !cancelled() && hashFiles('docs/index.html') != ''
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/
 
   deploy:
     needs: update-and-build
-    if: needs.update-and-build.outputs.mode != 'skip' && !cancelled()
+    if: needs.update-and-build.outputs.mode != 'skip' && needs.update-and-build.outputs.mode != 'mail' && !cancelled()
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
