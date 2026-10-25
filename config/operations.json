@@ -16,6 +16,6 @@
     "competitor_max": 8,
     "gemini_model": "gemini-2.5-flash",
     "gemini_max_items": 40,
-    "subject": "[Global Daily News] 지난주 주요 이슈 ({start} ~ {end})"
+    "subject": "[Global Daily News] 주간 브리핑 ({start} ~ {end})"
   }
 }
