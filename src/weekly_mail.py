@@ -347,7 +347,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         + ai_html + top_html + comp_block + button +
         "<tr><td style='padding:18px 28px 24px;font-size:11px;color:#94A3B8;line-height:1.6'>"
         "공개 뉴스를 자동 수집·분류한 결과입니다. 자세한 내용은 원문을 확인해 주세요.<br>"
-        "매주 월요일 아침 자동 발송됩니다. 받는 사람 변경은 담당자에게 요청해 주세요.</td></tr>"
+        "매주 월요일 아침 자동 발송됩니다. 받는 사람 변경은 G.HR팀 이덕혜에게 요청해 주세요.</td></tr>"
         "<tr><td align='center' style='padding:6px 28px 28px;border-top:1px solid #E2E8F0;font-size:13px;"
         "font-weight:700;color:#475569'>Hankook Tire &amp; Technology - Global HR Team</td></tr>"
         "</table></td></tr></table></body></html>")
