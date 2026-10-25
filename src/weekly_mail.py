@@ -340,7 +340,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         "<table width='100%' cellpadding='0' cellspacing='0' style='background:#F4F5F7'><tr><td align='center' style='padding:24px 12px'>"
         "<table width='100%' cellpadding='0' cellspacing='0' style='max-width:720px;background:#F4F5F7'>"
         "<tr><td style='padding:10px 28px 10px'>"
-        "<div style='font-size:12px;font-weight:700;color:#C2410C'>GLOBAL DAILY NEWS · 주간 요약</div>"
+        "<div style='font-size:12px;font-weight:700;color:#C2410C'>Global Daily News · 주간 요약</div>"
         f"<div style='font-size:24px;font-weight:900;color:#1E293B;margin-top:4px;letter-spacing:-0.02em'>{label} 주요 이슈</div>"
         f"<div style='font-size:13px;color:#64748B;margin-top:2px'>{_e(start.replace('-', '.'))} ~ {_e(end.replace('-', '.'))} · 39개국</div>"
         "</td></tr>"
@@ -349,7 +349,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         "공개 뉴스를 자동 수집·분류한 결과입니다. 자세한 내용은 원문을 확인해 주세요.<br>"
         "매주 월요일 아침 자동 발송됩니다. 받는 사람 변경은 담당자에게 요청해 주세요.</td></tr>"
         "<tr><td align='center' style='padding:6px 28px 28px;border-top:1px solid #E2E8F0;font-size:13px;"
-        "font-weight:700;color:#475569'>Hankook Tire &amp; Technology Global HR팀</td></tr>"
+        "font-weight:700;color:#475569'>Hankook Tire &amp; Technology - Global HR Team</td></tr>"
         "</table></td></tr></table></body></html>")
 
     text = [f"Global Daily News {label} 주요 이슈 ({start} ~ {end})", ""]
