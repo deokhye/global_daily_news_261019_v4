@@ -407,7 +407,7 @@ def build(end: date, use_ai: bool = True, ai_override: dict | None = None, today
     ai = ai_override if ai_override is not None else (gemini_summary(info["groups"], info["names"], start, end_s, st) if use_ai else None)
     site = os.environ.get("SITE_URL", "").strip()
     page, text = render(info, top, comps, ai, start, end_s, site, label)
-    subject = (st.get("subject") or "[Global Daily News] 지난주 주요 이슈 ({start} ~ {end})").replace("지난주", label).format(
+    subject = (st.get("subject") or "[Global Daily News] 주간 브리핑 ({start} ~ {end})").replace("지난주", label).format(
         start=start.replace("-", "."), end=end_s.replace("-", "."))
     log.info(f"주간 요약: 아카이브 {len(week)}일, 이슈 {len(info['groups'])}건 → Top {len(top)}, 경쟁사 {len(comps)}건, "
              f"AI 요약 {'있음' if ai else '없음'}")
