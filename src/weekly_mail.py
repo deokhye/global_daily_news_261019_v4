@@ -341,7 +341,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         "<table width='100%' cellpadding='0' cellspacing='0' style='max-width:720px;background:#F4F5F7'>"
         "<tr><td style='padding:10px 28px 10px'>"
         "<div style='font-size:12px;font-weight:700;color:#C2410C'>Global Daily News · 주간 요약</div>"
-        f"<div style='font-size:24px;font-weight:900;color:#1E293B;margin-top:4px;letter-spacing:-0.02em'>{label} 주간 브리핑</div>"
+        f"<div style='font-size:24px;font-weight:900;color:#1E293B;margin-top:4px;letter-spacing:-0.02em'>주간 브리핑</div>"
         f"<div style='font-size:13px;color:#64748B;margin-top:2px'>{_e(start.replace('-', '.'))} ~ {_e(end.replace('-', '.'))} · 39개국</div>"
         "</td></tr>"
         + ai_html + top_html + comp_block + button +
