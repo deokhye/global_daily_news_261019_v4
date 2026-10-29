@@ -256,7 +256,7 @@
   'use strict';
   var INITIAL_DATE = "{{ generated_at_date }}";
   var ARCHIVE_MIN_DATE = "{{ archive_min_date }}";
-  var HIERARCHY = ['KR', 'US', 'DE', 'CN', 'HU', 'ID'];
+  var HIERARCHY = ['CN', 'DE', 'HU', 'US', 'ID'];   // 지역 안에서 먼저 보일 주요 거점국
   var TIER = { KR: 'HQ', US: '본부', DE: '본부', CN: '본부', HU: '공장', ID: '공장' };
   var NEWS_TABS = [{ id: 'safe', label: '안전·재난' }, { id: 'pol', label: '정치·경제' }, { id: 'soc', label: '사회·문화' }];
   var DEFAULT_TAB = NEWS_TABS[0].id;   // 국가 상세에서 처음 열리는 뉴스 탭
@@ -338,8 +338,10 @@
   }
   function rank(code) { var i = HIERARCHY.indexOf(code); return i === -1 ? HIERARCHY.length : i; }
   function sorted(list) {
+    // 지역 순서(중국 → 유럽 → 미주 → 아태 → 중아 → 중남미) → 지역 안에서는 주요 거점국 먼저 → 가나다순
     return list.slice().sort(function (a, b) {
-      var d = rank(a.code) - rank(b.code); return d || String(a.name_kr || '').localeCompare(String(b.name_kr || ''), 'ko-KR');
+      var d = regionRank(a.region) - regionRank(b.region) || rank(a.code) - rank(b.code);
+      return d || String(a.name_kr || '').localeCompare(String(b.name_kr || ''), 'ko-KR');
     });
   }
   function regionLabel(key) { var r = REGIONS.find(function (x) { return x.key === key; }); return r ? r.label : key; }
