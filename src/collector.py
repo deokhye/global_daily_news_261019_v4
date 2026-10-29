@@ -1,7 +1,7 @@
 """
 collector.py
 ------------
-Global Daily News — 한국타이어 39개국 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
+Global Daily News — 한국타이어 해외 사업장 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
 
 입력 (모두 config/, src/profile_overlay.py 가 읽음)
   countries.csv · country_codes.csv · sites.csv · official_sources.csv · manual_profile.json
@@ -670,6 +670,120 @@ def make_relevance_checker(country: dict):
     return check
 
 
+_HOME_RE = None
+
+
+def make_home_checker(strict: bool = False):
+    """한국(국내) 기사 판정: 국내 언론이 쓴 해외 기사(예: '일본 지진', '美 금리')를 걸러낸다.
+    제목에 외국 이름이 있으면 제외. 단, 국내 지명·'국내' 등이 함께 있으면 통과.
+    strict(안전·재난): 외국 이름이 있으면 국내 지명이 함께 있을 때만 통과 ('日 지진에 국내 피해 없어'도 제외).
+    규칙: config/news_rules.json → korea_home"""
+    global _HOME_RE
+    if _HOME_RE is None:
+        cfg = NR.rules().raw.get("korea_home") or {}
+
+        def comp(key):
+            pats = [p for p in cfg.get(key) or [] if p]
+            return re.compile("|".join(f"(?:{p})" for p in pats)) if pats else None
+        _HOME_RE = (comp("foreign_patterns"), comp("korea_patterns"), comp("korea_patterns_safe"))
+    foreign, korea, korea_safe = _HOME_RE
+    local = korea_safe if strict else korea
+
+    def check(title: str, lang: str = "ko") -> bool:
+        if not title:
+            return False
+        if foreign is None or not foreign.search(title):
+            return True
+        return bool(local and local.search(title))
+
+    return check
+
+
+_FOREIGN = None
+
+
+def _foreign_rules():
+    global _FOREIGN
+    if _FOREIGN is None:
+        cfg = NR.rules().raw.get("foreign_story") or {}
+        names = {k: re.compile(v) for k, v in (cfg.get("countries_ko") or {}).items() if not k.startswith("_") and v}
+        comps = {k: re.compile(v) for k, v in (cfg.get("companies") or {}).items() if not k.startswith("_") and v}
+        _FOREIGN = (names, comps)
+    return _FOREIGN
+
+
+def foreign_story_reason(item: dict, country: dict) -> str:
+    """현지 언론이 다른 나라 기사를 옮겨 쓴 것인지. 맞으면 이유(다른 나라·회사 이름), 아니면 ''.
+    번역된 제목·원문 제목에 다른 나라 이름이나 그 나라 대기업 이름이 있는데,
+    이 나라 이름(한글·영문·현지어)·수도·거점 도시가 하나도 없으면 다른 나라 기사로 본다."""
+    iso3, code = country.get("iso3", ""), country.get("code", "")
+    names, comps = _foreign_rules()
+    ko = item.get("title") or ""
+    orig = item.get("original_title") or ""
+    both = f"{ko} / {orig}"
+    hit = ""
+    for k, rx in names.items():
+        if k != iso3 and rx.search(ko):
+            hit = rx.search(ko).group(0); break
+    if not hit:
+        for k, rx in comps.items():
+            if k != iso3 and rx.search(both):
+                hit = rx.search(both).group(0); break
+    if not hit:
+        return ""
+    own = names.get(iso3)
+    if own and own.search(ko):
+        return ""
+    if country.get("name_kr") and country["name_kr"] in ko:
+        return ""
+    cap = country.get("capital") or ""
+    if cap and cap != "-" and cap in ko:
+        return ""
+    alias = _alias_regex(code, query_name(country))
+    if alias and alias.search(both):
+        return ""
+    local = (NR.rules().hr.get("local") or {}).get(iso3) or {}
+    if isinstance(local, dict) and local.get("require_name") and re.search(local["require_name"], both, re.I):
+        return ""
+    site = getattr(NR.rules(), "site_city_re", {}).get(iso3)
+    if site and site.search(both):
+        return ""
+    return hit
+
+
+def drop_foreign_stories(countries: list) -> int:
+    """번역이 끝난 뒤, 국가별 목록에서 다른 나라 기사(현지 언론의 해외 기사 번역)를 뺀다. 한국은 별도 규칙."""
+    removed = 0
+    for c in countries or []:
+        if not isinstance(c, dict) or c.get("code") == "KR":
+            continue
+        meta = PROFILE.by_code.get(c.get("code")) or c
+
+        def keep(lst):
+            nonlocal removed
+            if not isinstance(lst, list):
+                return lst
+            out = []
+            for it in lst:
+                why = "" if (not isinstance(it, dict) or it.get("is_fallback")) else foreign_story_reason(it, meta)
+                if why:
+                    removed += 1
+                    log.info(f"[{c.get('code')}] 다른 나라 기사로 보고 제외({why}): {it.get('title', '')[:60]}")
+                    continue
+                out.append(it)
+            return out
+        news = c.get("news")
+        if isinstance(news, dict):
+            for k in list(news):
+                news[k] = keep(news[k])
+        for t in c.get("hr_trends") or []:
+            if isinstance(t, dict):
+                t["items"] = keep(t.get("items"))
+    if removed:
+        log.info(f"다른 나라 기사 {removed}건 제외")
+    return removed
+
+
 def query_name(country: dict) -> str:
     """뉴스 검색에 쓸 영문 국가명. 공식 표기(Türkiye·Czechia)보다 기사에서 흔히 쓰는 이름이 필요할 때
     config/news_filters.json 의 query_name 으로 지정한다."""
@@ -865,7 +979,7 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
     cached_by_cat = {}
     for t in (cached or {}).get("hr_trends", []) or []:
         if isinstance(t, dict) and t.get("category"):
-            cached_by_cat[t["category"]] = _cached_list(t.get("items"), None if code == "KR" else check)
+            cached_by_cat[t["category"]] = _cached_list(t.get("items"), make_home_checker() if code == "KR" else check)
 
     trends = []
     for spec in INDUSTRY_TOPICS:
@@ -877,7 +991,7 @@ def get_industry_trends(country: dict, cached: dict, seen: set) -> list:
             chk = _hr_check(check) if is_hr else check
             if code == "KR":
                 picked = _pick(_fetch_feed(_google_news_url_ko(f"{spec['home_query']} when:14d"), 30),
-                               "ko", limit, seen, _hr_check() if is_hr else None)
+                               "ko", limit, seen, _hr_check(make_home_checker()) if is_hr else make_home_checker())
             else:
                 if is_hr:   # 현지어 HR 뉴스가 가장 정확하므로 먼저
                     picked = _local_hr_pick(country, limit, seen, picked)
@@ -990,7 +1104,7 @@ def get_local_news(country: dict, cached: dict, seen: set) -> dict:
     쓰고, 그것도 없으면 빈 목록(화면에 '보도 없음')으로 둔다 — 대체 문구를 만들지 않는다."""
     code = country.get("code")
     is_home = code == "KR"
-    check = None if is_home else make_relevance_checker(country)
+    check = make_home_checker() if is_home else make_relevance_checker(country)
     ex = "" if is_home else _exclusions(code)
     name = query_name(country)
     cached_news = (cached or {}).get("news") or {}
@@ -1009,14 +1123,16 @@ def get_local_news(country: dict, cached: dict, seen: set) -> dict:
                 lang = "en"
             if cid == "safe":
                 cands = [c for c in cands if safety_tag(c.get("title", ""))]
-            picked = _pick(cands, lang, limit, seen, check)
+            picked = _pick(cands, lang, limit, seen,
+                           make_home_checker(strict=True) if (is_home and cid == "safe") else check)
             if cid == "pol" and len(picked) < 2 and not is_home:
                 more = _fetch_feed(_google_news_url_en(f'"{name}"{ex} when:2d'), 50)
                 picked = _pick(more, "en", limit, seen, check, picked)
         except Exception as e:
             log.warning(f"[{code}] 뉴스({cat['label']}) 수집 예외: {e}")
         if not picked:
-            prev = _cached_list(cached_news.get(cid), check)
+            prev = _cached_list(cached_news.get(cid),
+                                make_home_checker(strict=True) if (is_home and cid == "safe") else check)
             if cid == "safe":
                 prev = [p for p in prev if safety_tag(p.get("original_title") or p.get("title", ""))]
             picked = prev[:limit]
@@ -1571,6 +1687,11 @@ def main() -> dict:
         apply_translations(countries_result + [{"news": {"global": global_industry}}])
     except Exception as e:
         log.error(f"일괄 번역 단계 실패(원문 유지): {e}")
+
+    try:
+        drop_foreign_stories(countries_result)
+    except Exception as e:
+        log.warning(f"다른 나라 기사 거르기 실패(무시): {e}")
 
     now_kst = datetime.now(KST)
     if BACKFILL_DATE:
