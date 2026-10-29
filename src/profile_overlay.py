@@ -37,7 +37,7 @@ MANUAL_SOURCE = "Global HR 자체 조사"
 NO_STATUTORY_TEXT = "법정 최저임금 없음"
 
 # countries.csv 의 권역 이름 → 화면/데이터에서 쓰는 권역 키 (표시 순서 그대로)
-REGION_KEYS = {"중국": "CN", "미주": "AMER", "유럽": "EU", "중남미": "LATAM", "아태": "APAC", "중아": "MEA"}
+REGION_KEYS = {"중국": "CN", "유럽": "EU", "미주": "AMER", "아태": "APAC", "중아": "MEA", "중남미": "LATAM"}   # 화면 지역 순서
 REGIONS = [{"key": "ALL", "label": "전체"}] + [{"key": v, "label": k} for k, v in REGION_KEYS.items()]
 EU_MEMBERS_ISO3 = {"DEU", "HUN", "FRA", "ITA", "ESP", "NLD", "POL", "SWE", "CZE", "AUT", "ROU", "HRV"}
 
