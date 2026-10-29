@@ -1,19 +1,20 @@
 {
   "_설명": "운영 설정. 받는 사람·메일 계정·API 키는 여기에 쓰지 말고 GitHub Secrets 에 넣으세요 (README 참고).",
-
   "alerts": {
     "_설명": "매일 수집 후 아래 조건 중 하나라도 걸리면 ALERT_TO 로 알림 메일을 보냅니다.",
     "zero_news_countries_max": 10,
     "translation_rate_min": 0.5,
     "alert_on_news_blocked": true
   },
-
   "weekly_mail": {
-    "_설명": "매주 월요일 아침, 지난주(월~일) 주요 이슈 메일. gemini_model 은 저장소 Variables 의 GEMINI_MODEL 로 덮어쓸 수 있습니다.",
+    "_설명": "매주 월요일 05:00, 지난주(월~일) 해외 사업장 주간 브리핑 메일 (안전·재난 / HR·노동 / 정치·경제·사회). gemini_model 은 저장소 Variables 의 GEMINI_MODEL 로 덮어쓸 수 있습니다.",
     "days": 7,
-    "top_n": 7,
-    "per_kind_max": 3,
-    "competitor_max": 3,
+    "sections": {
+      "_설명": "메일 섹션별 기사 수. safe = 안전·재난, hr = HR·노동(최저임금·법 제도 우선), pol = 정치·경제·사회",
+      "safe": 5,
+      "hr": 5,
+      "pol": 5
+    },
     "gemini_model": "gemini-2.5-flash",
     "gemini_max_items": 40,
     "subject": "[Global Daily News] 주간 브리핑 ({start} ~ {end})"
