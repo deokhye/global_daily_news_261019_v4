@@ -338,9 +338,10 @@
   }
   function rank(code) { var i = HIERARCHY.indexOf(code); return i === -1 ? HIERARCHY.length : i; }
   function sorted(list) {
-    // 지역 순서(중국 → 유럽 → 미주 → 아태 → 중아 → 중남미) → 지역 안에서는 주요 거점국 먼저 → 가나다순
+    // 본부·공장 국가(TIER) 먼저 → 지역 순서(중국 → 유럽 → 미주 → 아태 → 중아 → 중남미) → 가나다순
     return list.slice().sort(function (a, b) {
-      var d = regionRank(a.region) - regionRank(b.region) || rank(a.code) - rank(b.code);
+      var d = (TIER[a.code] ? 0 : 1) - (TIER[b.code] ? 0 : 1) || regionRank(a.region) - regionRank(b.region) ||
+              rank(a.code) - rank(b.code);
       return d || String(a.name_kr || '').localeCompare(String(b.name_kr || ''), 'ko-KR');
     });
   }
@@ -936,7 +937,12 @@
       if (first && first.code !== state.code) { go(first.code); } else { renderPicker(); }
       return;
     }
-    if (el.hasAttribute('data-code')) { state.pickRegion = null; go(el.getAttribute('data-code')); return; }
+    if (el.hasAttribute('data-code')) {
+      // 지금 보고 있는 탭(전체 또는 권역)을 그대로 유지한 채 국가만 바꾼다
+      var curC = byCode(state.code);
+      state.pickRegion = state.pickRegion || (curC ? curC.region : 'ALL');
+      go(el.getAttribute('data-code')); return;
+    }
     if (el.hasAttribute('data-newstab')) { state.tab = el.getAttribute('data-newstab'); renderCountry(); }
   });
   // 사이트 이름(Global Daily News)을 누르면 항상 '오늘의 브리핑' 첫 화면으로 (최신 날짜·전체 조직·맨 위)
