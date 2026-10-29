@@ -81,10 +81,10 @@ def test_decimals(value, dec):
 # ---------------------------------------------------------------- 설정·프로필
 def test_countries_from_config():
     cs = load_countries()
-    assert len(cs) == 39
-    kr = next(x for x in cs if x["code"] == "KR")
-    assert kr["capital"] == "서울" and kr["region"] == "KR" and kr["iso3"] == "KOR"
-    assert kr["hubs"][0] == "Hankook Tire Global Headquarters (Seongnam)"
+    assert len(cs) == 38                                  # 해외 사업장만 (한국 제외)
+    assert not any(x["code"] == "KR" for x in cs)
+    cn = next(x for x in cs if x["code"] == "CN")
+    assert cn["capital"] == "베이징" and cn["region"] == "CN" and cn["iso3"] == "CHN"
     de = next(x for x in cs if x["code"] == "DE")
     names = [o["name"] for o in de["official_sources"]]
     assert "Eurofound" in names and names[-1] == "ILO NATLEX"
@@ -98,6 +98,6 @@ def test_min_wage_source_rules():
     us = ctx.by_code["US"]
     p = build_profile(us, {"min_wage": {"display": "$7.25 / 시간", "note": "연방"}}, {}, "")
     assert p["sources"]["min_wage"] == "Department of Labor (정부 공식 발표)"
-    auto = {"min_wage": "KRW 10,320 / 시급", "details": {"min_wage": {"source": "보정 파일(HR 확인)"}}}
-    p = build_profile(ctx.by_code["KR"], {}, auto, "2026-10-01")
+    auto = {"min_wage": "CNY 2,690 / 월", "details": {"min_wage": {"source": "보정 파일(HR 확인)"}}}
+    p = build_profile(ctx.by_code["CN"], {}, auto, "2026-10-01")
     assert p["sources"]["min_wage"] == "정부 공식 발표" and p["stats_asof"] == "2026-10-01"

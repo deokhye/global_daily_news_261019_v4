@@ -26,9 +26,9 @@ def make_paths(tmp_path) -> Paths:
 def test_upsert_overwrites_same_snapshot_only(tmp_path):
     p = tmp_path / "m.csv"
     cols, key = storage.MONTHLY_COLUMNS, storage.MONTHLY_KEY
-    storage.upsert(p, [{"iso3": "KOR", "indicator": "inflation", "snapshot_date": "2026-10-01", "value": 2.9}], cols, key)
-    storage.upsert(p, [{"iso3": "KOR", "indicator": "inflation", "snapshot_date": "2026-11-01", "value": 2.7}], cols, key)
-    storage.upsert(p, [{"iso3": "KOR", "indicator": "inflation", "snapshot_date": "2026-11-01", "value": 2.6}], cols, key)
+    storage.upsert(p, [{"iso3": "JPN", "indicator": "inflation", "snapshot_date": "2026-10-01", "value": 2.9}], cols, key)
+    storage.upsert(p, [{"iso3": "JPN", "indicator": "inflation", "snapshot_date": "2026-11-01", "value": 2.7}], cols, key)
+    storage.upsert(p, [{"iso3": "JPN", "indicator": "inflation", "snapshot_date": "2026-11-01", "value": 2.6}], cols, key)
     df = storage.load(p, cols)
     assert len(df) == 2
     assert df[df.snapshot_date == "2026-11-01"].value.tolist() == ["2.6"]
@@ -50,31 +50,31 @@ class FakeMonthly:
 
 def test_monthly_statuses(tmp_path):
     paths = make_paths(tmp_path)
-    countries = [c for c in load_countries(paths) if c.iso3 in ("KOR", "MAR")]
+    countries = [c for c in load_countries(paths) if c.iso3 in ("JPN", "MAR")]
     settings = load_settings(paths)
     ok = lambda v, prev, ref: MonthlyResult(True, "u", v, prev, ref)  # noqa: E731
 
     s1 = run_monthly(countries, settings, paths, FakeMonthly({
-        ("KOR", "inflation"): ok(2.9, 3.1, "2026-09"),
-        ("KOR", "unemployment"): ok(2.5, 2.6, "2026-09"),
+        ("JPN", "inflation"): ok(2.9, 3.1, "2026-09"),
+        ("JPN", "unemployment"): ok(2.5, 2.6, "2026-09"),
         ("MAR", "unemployment"): ok(9.5, 10.8, "2026-Q2"),
     }), date(2026, 10, 7))
     assert any("첫 실행 URL 점검: 3/4" in n for n in s1.notes)
     assert any("morocco (인플레이션)" in n for n in s1.notes)
 
     run_monthly(countries, settings, paths, FakeMonthly({
-        ("KOR", "inflation"): ok(9.0, 2.9, "2026-10"),        # 6.1%p 급변
+        ("JPN", "inflation"): ok(9.0, 2.9, "2026-10"),        # 6.1%p 급변
         ("MAR", "unemployment"): ok(9.5, 10.8, "2026-Q2"),     # 분기 국가: 갱신 없음
         # KOR 실업률 실패 → 직전 값 유지
     }), date(2026, 11, 1))
 
     df = storage.load(paths.monthly_history, storage.MONTHLY_COLUMNS)
     nov = df[df.snapshot_date == "2026-11-01"].set_index(["iso3", "indicator"])
-    assert nov.loc[("KOR", "inflation"), "status"].startswith("정상 / 경고: 급변 +6.1%p")
+    assert nov.loc[("JPN", "inflation"), "status"].startswith("정상 / 경고: 급변 +6.1%p")
     assert nov.loc[("MAR", "unemployment"), "status"] == "갱신 없음"
-    assert nov.loc[("KOR", "unemployment"), "status"].startswith("미갱신")
-    assert nov.loc[("KOR", "unemployment"), "value"] == "2.5"
-    assert nov.loc[("KOR", "unemployment"), "ref_period"] == "2026-09"
+    assert nov.loc[("JPN", "unemployment"), "status"].startswith("미갱신")
+    assert nov.loc[("JPN", "unemployment"), "value"] == "2.5"
+    assert nov.loc[("JPN", "unemployment"), "ref_period"] == "2026-09"
     assert len(df) == 8   # 2개국 × 2지표 × 2개월, 중복 없음
 
 
@@ -111,12 +111,12 @@ def test_annual_run_with_fallbacks(tmp_path):
     paths = make_paths(tmp_path)
     (paths.config / "min_wage_overrides.csv").write_text(
         "iso3,region,amount,currency,unit,effective_date,checked_date,source_url,note\n"
-        "KOR,전국,10320,KRW,시급,2026-01-01,2026-09-01,https://www.minimumwage.go.kr,\n"
+        "JPN,전국,10320,JPY,시급,2026-01-01,2026-09-01,https://www.minimumwage.go.kr,\n"
         "SWE,,,,,,2026-09-01,https://example.test,법정 최저임금 없음 — 단체협약으로 결정\n",
         encoding="utf-8")
-    countries = [c for c in load_countries(paths) if c.iso3 in ("KOR", "TWN", "DEU", "SWE")]
-    imf_lp = {"values": {"LP": {"KOR": {"2026": 51.6}, "DEU": {"2026": 83.5}, "SWE": {"2026": 10.6}}}}
-    imf_gdp = {"values": {"NGDPD": {"KOR": {"2026": 1872.3}, "DEU": {"2026": 4900.1}, "SWE": {"2026": 620.0}}}}
+    countries = [c for c in load_countries(paths) if c.iso3 in ("JPN", "TWN", "DEU", "SWE")]
+    imf_lp = {"values": {"LP": {"JPN": {"2026": 51.6}, "DEU": {"2026": 83.5}, "SWE": {"2026": 10.6}}}}
+    imf_gdp = {"values": {"NGDPD": {"JPN": {"2026": 1872.3}, "DEU": {"2026": 4900.1}, "SWE": {"2026": 620.0}}}}
     fetcher = FakeFetcher({
         "datamapper/api/v1/LP": (True, json.dumps(imf_lp)),
         "datamapper/api/v1/NGDPD": (True, json.dumps(imf_gdp)),
@@ -127,22 +127,22 @@ def test_annual_run_with_fallbacks(tmp_path):
                          WorldBank(fetcher), Eurostat(fetcher), Ilostat(fetcher), date(2026, 10, 19), 2026)
 
     df = storage.load(paths.annual_history, storage.ANNUAL_COLUMNS).set_index(["iso3", "indicator"])
-    assert df.loc[("KOR", "population"), "value"] == "51.6"
-    assert df.loc[("KOR", "population"), "source"] == "IMF WEO (2026년 10월)"
+    assert df.loc[("JPN", "population"), "value"] == "51.6"
+    assert df.loc[("JPN", "population"), "source"] == "IMF WEO (2026년 10월)"
     assert df.loc[("TWN", "population"), "status"].startswith("미갱신")
-    assert df.loc[("KOR", "min_wage"), "status"] == "정상"
-    assert df.loc[("KOR", "min_wage"), "unit"] == "시급"
+    assert df.loc[("JPN", "min_wage"), "status"] == "정상"
+    assert df.loc[("JPN", "min_wage"), "unit"] == "시급"
     assert df.loc[("DEU", "min_wage"), "value"] == "2343.0"
     assert df.loc[("DEU", "min_wage"), "effective_date"] == "2026-07-01"
     assert df.loc[("SWE", "min_wage"), "status"] == "법정 최저임금 없음"
     assert any(f.startswith("TWN 대만 총인구") for f in summary.failed)
 
     prof = build_profile(countries, paths)
-    kor = next(c for c in prof["countries"] if c["iso3"] == "KOR")
+    kor = next(c for c in prof["countries"] if c["iso3"] == "JPN")
     assert kor["population"] == "51.6백만 명"
     assert kor["gdp"] == "1,872.3십억 USD"
-    assert kor["min_wage"] == "KRW 10,320 / 시급 (전국, 2026-01-01 시행)"
-    assert kor["sites"][0] == "Hankook Tire Global Headquarters (Seongnam)"
+    assert kor["min_wage"] == "JPY 10,320 / 시급 (전국, 2026-01-01 시행)"
+    assert kor["sites"][0] == "Hankook Tire Japan Corp. (Osaka)"
     swe = next(c for c in prof["countries"] if c["iso3"] == "SWE")
     assert swe["min_wage"] == "법정 최저임금 없음 (단체협약으로 결정)"
     assert (paths.output / "country_profile.xlsx").exists()
