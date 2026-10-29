@@ -274,10 +274,14 @@
   var DASHBOARD, REGIONS, COUNTRIES;
   // 해외 사업장만 표시: 한국(국내)은 예전 아카이브에 있어도 숨긴다
   var HIDDEN = { KR: 1 };
+  // 지역 순서 (예전 날짜 데이터도 이 순서로 보여 준다)
+  var REGION_ORDER = ['ALL', 'CN', 'EU', 'AMER', 'APAC', 'MEA', 'LATAM'];
+  function regionRank(k) { var i = REGION_ORDER.indexOf(k); return i === -1 ? REGION_ORDER.length : i; }
   function hideDomestic(d) {
     if (!d || d._hid) return d;
     d.countries = (d.countries || []).filter(function (c) { return c && !HIDDEN[c.code]; });
-    d.regions = (d.regions || []).filter(function (r) { return r && !HIDDEN[r.key]; });
+    d.regions = (d.regions || []).filter(function (r) { return r && !HIDDEN[r.key]; })
+      .sort(function (a, b) { return regionRank(a.key) - regionRank(b.key); });
     if (Array.isArray(d.top_briefing)) d.top_briefing = d.top_briefing.filter(function (t) {
       var cs = (t && t.countries) || [];
       return !cs.length || cs.some(function (code) { return !HIDDEN[code]; });
