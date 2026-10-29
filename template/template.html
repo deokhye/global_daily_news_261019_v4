@@ -9,15 +9,16 @@
   :root {
     --bg: #F4F5F7; --card: #FFFFFF; --line: #E2E8F0; --line-soft: #F1F5F9;
     --text: #1E293B; --sub: #475569; --muted: #64748B;
-    --accent: #C2410C; --accent-dark: #9A3412; --accent-bg: #FFF7ED; --accent-line: #FED7AA;
+    --accent: #e07b00; --accent-dark: #c56d00; --accent-bg: #fff6ed; --accent-line: #fde8cc;
+    --accent-text: #A35400;   /* 글자용: 흰 바탕에서도 잘 읽히는 진한 주황 */
     --red: #B91C1C; --red-bg: #FEE2E2; --amber: #92400E; --amber-bg: #FEF3C7;
     --indigo: #3730A3; --indigo-bg: #E0E7FF; --up: #B91C1C; --down: #1D4ED8;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text);
          font-family: 'Pretendard', 'Noto Sans KR', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { color: var(--accent-dark); text-decoration: underline; }
+  a { color: var(--accent-text); text-decoration: none; }
+  a:hover { color: var(--accent-text); text-decoration: underline; }
   button { font-family: inherit; }
   .hidden { display: none !important; }
   .wrap { max-width: 1360px; margin: 0 auto; padding: 0 24px; }
@@ -26,19 +27,26 @@
   .top-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 14px 24px; }
   .brand { display: flex; align-items: center; gap: 12px; flex: 1 1 320px; color: var(--text); text-decoration: none; }
   .brand:hover { text-decoration: none; color: var(--text); }
-  .brand:hover h1 { color: var(--accent); }
+  .brand:hover h1 { color: var(--accent-text); }
   .b-new { color: #fff; background: #16A34A; font-size: 11px; letter-spacing: .02em; }
-  .brand-mark { width: 40px; height: 40px; border-radius: 12px; background: #FFF0E6; display: flex; align-items: center; justify-content: center; }
+  .brand-mark { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-bg); display: flex; align-items: center; justify-content: center; }
   .brand h1 { margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
   .brand p { margin: 0; font-size: 12px; color: var(--muted); }
-  .date-box { display: flex; align-items: center; gap: 8px; }
-  .date-box label { font-size: 12px; color: var(--sub); font-weight: 700; }
-  .date-box input { height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px; font-size: 14px; font-family: inherit; }
+  /* 탭 줄: 왼쪽 탭 · 오른쪽 일자 + 기사 검색 */
+  .tab-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .tab-row .tools { margin-left: auto; display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* 일자: ◀ 날짜 (요일) ▶ 를 한 덩어리로 */
+  .date-box { flex: 0 0 auto; display: flex; align-items: center; height: 38px; border: 1px solid #CBD5E1; border-radius: 10px; background: #fff; overflow: hidden; }
+  .date-box input { height: 36px; border: 0; padding: 0 2px 0 6px; font-size: 14px; font-weight: 600; font-family: inherit; color: var(--text); background: transparent; }
+  .date-box input:focus { outline: none; }
+  .date-dow { font-size: 13px; color: var(--sub); padding-right: 6px; white-space: nowrap; }
   .date-box.loading { opacity: .5; pointer-events: none; }
-  .date-nav { width: 36px; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; background: #fff; color: var(--sub);
-              font-size: 14px; cursor: pointer; font-family: inherit; }
-  .date-nav:disabled { opacity: .35; cursor: default; }
-  .search-box { display: flex; align-items: center; flex: 0 1 300px; min-width: 200px; }
+  .date-nav { width: 34px; height: 36px; border: 0; background: transparent; color: var(--sub);
+              font-size: 13px; cursor: pointer; font-family: inherit; }
+  .date-nav:hover:not(:disabled) { background: var(--accent-bg); color: var(--accent-text); }
+  .date-nav:disabled { opacity: .3; cursor: default; }
+  .search-box { display: flex; align-items: center; flex: 0 0 300px; min-width: 0; }   /* 기사 검색칸 너비 */
   .search-box input { width: 100%; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px 0 34px; font-size: 14px;
                       font-family: inherit; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") no-repeat 11px center; }
   #stale { background: #FEF3C7; color: #92400E; border-bottom: 1px solid #FDE68A; font-size: 13px; font-weight: 600; text-align: center; padding: 9px 16px; }
@@ -47,14 +55,14 @@
   nav.tabs { display: flex; gap: 4px; }
   nav.tabs a { padding: 12px 18px; font-size: 15px; font-weight: 500; color: var(--sub); border-bottom: 3px solid transparent; }
   nav.tabs a:hover { text-decoration: none; color: var(--text); }
-  nav.tabs a.active { font-weight: 700; color: var(--accent); border-bottom-color: var(--accent); }
+  nav.tabs a.active { font-weight: 700; color: var(--accent-text); border-bottom-color: var(--accent); }
 
   .picker { border-top: 1px solid var(--line-soft); background: #FBFBFC; }
   .picker-inner { padding-top: 10px; padding-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
   .picker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
   .pill { min-height: 36px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer;
           border: 1px solid var(--line); background: #fff; color: var(--sub); }
-  .pill[aria-pressed="true"] { border-color: var(--accent-dark); background: var(--accent-dark); color: #fff; }
+  .pill[aria-pressed="true"] { border-color: var(--accent-text); background: var(--accent-text); color: #fff; }
   .picker-current { font-size: 14px; color: var(--sub); margin-left: 8px; }
   .picker-toggle { margin-left: auto; min-height: 36px; padding: 0 14px; border: 1px solid #CBD5E1; background: #fff; border-radius: 9px;
                    font-size: 13px; font-weight: 700; color: #334155; cursor: pointer; }
@@ -62,7 +70,7 @@
   .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 999px; font-size: 13px;
           cursor: pointer; border: 1px solid var(--line); background: #fff; color: #334155; }
   .chip img { width: 18px; height: 13px; object-fit: cover; border-radius: 2px; }
-  .chip .tier { font-size: 10px; font-weight: 900; border-radius: 4px; padding: 0 4px; background: #FFEDD5; color: var(--accent-dark); }
+  .chip .tier { font-size: 10px; font-weight: 900; border-radius: 4px; padding: 0 4px; background: #FFEDD5; color: var(--accent-text); }
   .chip[aria-pressed="true"] { border-color: var(--text); background: var(--text); color: #fff; font-weight: 700; }
   .chip[aria-pressed="true"] .tier { background: rgba(255,255,255,.2); color: #FFEDD5; }
 
@@ -84,15 +92,15 @@
   .item.old:hover { opacity: 1; }
   a.item:hover { text-decoration: none; background: var(--accent-bg); border-radius: 10px; margin: 0 -10px; padding-left: 10px; padding-right: 10px; }
   .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }
-  .meta .src { font-weight: 700; color: var(--sub); }
-  .ttl { display: block; font-size: 15px; font-weight: 700; line-height: 1.5; margin-top: 4px; color: var(--text); }
+  .meta .src { font-weight: 500; color: var(--muted); }   /* 매체 이름: 제목보다 약하게 (회색·보통 굵기) */
+  .ttl { display: block; font-size: 15px; font-weight: 600; line-height: 1.5; margin-top: 4px; color: var(--text); }   /* 기사 제목 굵기 */
   .ttl.sm { font-size: 14px; }
-  a.ttl:hover { color: var(--accent); }
+  a.ttl:hover { color: var(--accent-text); }
   .badge { font-size: 12px; font-weight: 700; border-radius: 6px; padding: 1px 8px; }
   .b-law { color: var(--indigo); background: var(--indigo-bg); }
   .b-red { color: var(--red); background: var(--red-bg); }
   .b-amber { color: var(--amber); background: var(--amber-bg); }
-  .b-ind { color: var(--accent-dark); background: #FFEDD5; }
+  .b-ind { color: var(--accent-text); background: #FFEDD5; }
   .b-own { color: #fff; background: var(--accent); }
   .b-comp { color: #7C2D12; background: #FED7AA; }
   .b-site { color: #1E40AF; background: #DBEAFE; }
@@ -101,17 +109,17 @@
   .top-list { list-style: none; margin: 4px 0 0; padding: 0; }
   .top-list li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line-soft); }
   .top-list li:last-child { border-bottom: 0; padding-bottom: 2px; }
-  .top-list .rk { flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--accent-bg); color: var(--accent-dark);
+  .top-list .rk { flex: 0 0 28px; height: 28px; border-radius: 50%; background: var(--accent-bg); color: var(--accent-text);
                   font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
   .top-list .body { min-width: 0; flex: 1; }
   .top-list .ttl { font-size: 16px; }
   .card.top-card { border-color: var(--accent-line); }
   .b-tr { border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; font-size: 11px; color: var(--muted); }
   .ctry-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; font-size: 14px; color: var(--text); cursor: pointer; }
-  .ctry-link:hover { color: var(--accent); text-decoration: underline; }
+  .ctry-link:hover { color: var(--accent-text); text-decoration: underline; }
   .more-btn { display: block; width: 100%; margin-top: 10px; min-height: 40px; border: 1px solid var(--line); border-radius: 10px;
               background: #FBFBFC; color: var(--sub); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-  .more-btn:hover { background: var(--accent-bg); border-color: var(--accent-line); color: var(--accent-dark); }
+  .more-btn:hover { background: var(--accent-bg); border-color: var(--accent-line); color: var(--accent-text); }
   .row-2 { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
   .row-2 > .main-col { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
   .row-2 > .side-col { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
@@ -128,14 +136,14 @@
 
   .overview { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
   .overview .flag { width: 48px; height: 34px; object-fit: cover; border-radius: 5px; border: 1px solid var(--line); }
-  .overview .eyebrow { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .overview .eyebrow { font-size: 12px; font-weight: 700; color: var(--accent-text); }
   .overview h2 { font-size: 26px; letter-spacing: -0.02em; }
   .overview dl { flex: 1 1 420px; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 14px; }
   .overview dl div { display: flex; gap: 6px; }
   .overview dt { color: var(--muted); }
   .overview dd { margin: 0; font-weight: 700; }
   .sites { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-  .sites .lbl { font-size: 13px; font-weight: 900; color: var(--accent-dark); margin-right: 4px; }
+  .sites .lbl { font-size: 13px; font-weight: 900; color: var(--accent-text); margin-right: 4px; }
   .site { display: inline-flex; align-items: baseline; gap: 6px; background: var(--accent-bg); border: 1px solid var(--accent-line);
           border-radius: 999px; padding: 6px 14px; font-size: 13px; }
   .site b { font-weight: 700; }
@@ -149,7 +157,7 @@
   .kpi .v.txt { line-height: 1.25; }          /* '법정 최저임금 없음' 같은 글자 값도 숫자와 같은 크기 */
   .kpi .v .unit { font-size: 15px; font-weight: 700; color: var(--sub); white-space: nowrap; }
   .kpi .v .approx { font-size: 15px; font-weight: 700; color: var(--muted); margin-right: 3px; }
-  .kpi .krw { font-size: 13px; font-weight: 700; color: var(--accent-dark); margin-top: 2px; }
+  .kpi .krw { font-size: 13px; font-weight: 700; color: var(--accent-text); margin-top: 2px; }
   .kpi .d { font-size: 13px; font-weight: 700; color: var(--sub); margin-top: 2px; }
   .kpi .s { font-size: 12px; color: var(--sub); margin-top: 8px; }
   .kpi svg { display: block; margin-top: 6px; }
@@ -158,17 +166,18 @@
   .calc { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
   .calc label { font-size: 14px; font-weight: 700; color: var(--sub); }
   .calc input { width: 160px; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 12px; font-size: 15px; font-weight: 700; font-family: inherit; }
-  .calc .res { font-size: 20px; font-weight: 900; color: var(--accent-dark); }
+  .calc .res { font-size: 20px; font-weight: 900; color: var(--accent-text); }
   .calc .basis { margin-left: auto; font-size: 12px; color: var(--muted); }
   .seg { display: flex; flex-wrap: wrap; gap: 6px; background: var(--line-soft); padding: 4px; border-radius: 12px; }
   .seg button { min-height: 38px; padding: 0 14px; border: 0; border-radius: 9px; font-size: 14px; cursor: pointer; background: transparent; color: var(--sub); }
-  .seg button[aria-selected="true"] { background: #fff; color: var(--accent-dark); font-weight: 700; box-shadow: 0 1px 3px rgba(15,23,42,.12); }
+  .seg button[aria-selected="true"] { background: #fff; color: var(--accent-text); font-weight: 700; box-shadow: 0 1px 3px rgba(15,23,42,.12); }
   .seg .n { font-size: 11px; color: var(--muted); margin-left: 4px; }
+  .search-day .count { display: inline-block; min-width: 22px; padding: 0 7px; margin-left: 4px; border-radius: 11px; background: var(--accent-bg); color: var(--accent-text); font-size: 13px; text-align: center; vertical-align: 2px; }
   .off-list { margin: 0; padding: 0; list-style: none; }
   .off-list li { border-bottom: 1px solid var(--line-soft); }
   .off-list li:last-child { border-bottom: 0; }
   .off-list a { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text); }
-  .off-list a b { font-weight: 700; }
+  .off-list a b { font-weight: 500; }   /* 기관·보고서 이름: 기사 제목과 같은 보통 굵기 */
   .off-list a span { color: var(--muted); text-align: right; }
 
   #toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 50; background: var(--text); color: #fff;
@@ -182,9 +191,10 @@
   }
   @media (max-width: 640px) {
     .wrap, .top-row { padding-left: 16px; padding-right: 16px; }
-    .search-box { order: 3; flex: 1 1 100%; }
-    .date-box { margin-left: auto; }
-    .date-box label { display: none; }
+    .brand { flex: 1 1 0; min-width: 0; }
+    .tab-row { gap: 0; }
+    .tab-row .tools { margin-left: 0; width: 100%; padding: 4px 0 10px; }
+    .search-box { flex: 1 1 auto; min-width: 0; }
     .page-title h2 { font-size: 21px; }
     .top-list .ttl { font-size: 15px; }
     .top-list li { gap: 10px; }
@@ -207,28 +217,31 @@
   <div class="top-row" style="max-width:1360px;margin:0 auto">
     <a class="brand" href="#/briefing" id="brand-home" title="오늘의 브리핑으로">
       <div class="brand-mark">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"></path></svg>
       </div>
       <div>
         <h1>Global Daily News</h1>
         <p>한국타이어 해외 사업장 HR·현지 정세 데일리 브리핑</p>
       </div>
     </a>
-    <form class="search-box" id="search-form" role="search" onsubmit="return false">
-      <input type="search" id="search-input" placeholder="기사 검색 (예: 파업, minimum wage)" aria-label="기사 검색" enterkeyhint="search">
-    </form>
-    <div class="date-box" id="date-box">
-      <label for="briefDatePicker">일자</label>
-      <button type="button" class="date-nav" id="date-prev" aria-label="이전 날">◀</button>
-      <input type="date" id="briefDatePicker" value="{{ generated_at_date }}" min="{{ archive_min_date }}" max="{{ archive_max_date }}">
-      <button type="button" class="date-nav" id="date-next" aria-label="다음 날">▶</button>
-    </div>
   </div>
-  <div class="wrap">
+  <div class="wrap tab-row">
     <nav class="tabs" aria-label="주요 화면">
       <a href="#/briefing" id="tab-briefing">오늘의 브리핑</a>
       <a href="#/country" id="tab-country">국가 상세</a>
     </nav>
+      <div class="tools">
+        <div class="date-box" id="date-box">
+          <label for="briefDatePicker" class="sr-only">일자</label>
+          <button type="button" class="date-nav" id="date-prev" aria-label="이전 날">◀</button>
+          <input type="date" id="briefDatePicker" value="{{ generated_at_date }}" min="{{ archive_min_date }}" max="{{ archive_max_date }}">
+          <span class="date-dow" id="date-dow"></span>
+          <button type="button" class="date-nav" id="date-next" aria-label="다음 날">▶</button>
+        </div>
+        <form class="search-box" id="search-form" role="search" onsubmit="return false">
+          <input type="search" id="search-input" placeholder="기사 검색 (예: 파업, 최저임금)" aria-label="기사 검색" enterkeyhint="search">
+        </form>
+      </div>
   </div>
 </header>
 <div id="stale" class="hidden" role="status"></div>
@@ -476,46 +489,114 @@
     }
   }
 
-  // ------------------------------------------------------------- 키워드 검색 (보고 있는 날짜의 전체 국가 기사)
+  // ------------------------------------------------------------- 키워드 검색 (최근 수집일 전체 · 날짜별로 묶어서 표시)
   var SEARCH_KIND = { safe: '안전·재난', pol: '정치·경제', soc: '사회·문화', hr: 'HR·노동', auto: '완성차·타이어', ind: '업계 동향' };
-  function allArticles() {
-    var out = [], seen = {};
-    function add(i, kind, c) {
-      var key = String(i.link || i.title).toLowerCase();
-      if (seen[key]) { if (c && seen[key].countries.indexOf(c) === -1) seen[key].countries.push(c); return; }
-      seen[key] = { item: i, kind: kind, countries: c ? [c] : [] }; out.push(seen[key]);
+  var SEARCH_MAX_DAYS = 30;          // 최근 며칠 치 수집분까지 찾을지
+  var DAY_CACHE = {};
+  var searchToken = 0;
+  function fetchDay(d) { return fetch('./archive/' + d + '.json', { cache: 'no-store' }); }
+  function loadDay(d) {
+    if (d === INITIAL_DATE) return Promise.resolve(INITIAL_DASHBOARD);
+    if (d === currentDate) return Promise.resolve(DASHBOARD);
+    if (!DAY_CACHE[d]) {
+      DAY_CACHE[d] = fetchDay(d)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { return j && j.countries && j.countries.length ? hideDomestic(j) : null; })
+        .catch(function () { return null; });
     }
-    COUNTRIES.forEach(function (c) {
-      var n = news(c);
-      ['safe', 'pol', 'soc'].forEach(function (k) { n[k].forEach(function (i) { add(i, k, c); }); });
-      trend(c, 'HR & LABOR').forEach(function (i) { add(i, 'hr', c); });
-      trend(c, 'AUTO MARKET').forEach(function (i) { add(i, 'auto', c); });
-    });
-    realItems(DASHBOARD.global_industry, 'ind').forEach(function (i) { add(i, 'ind', null); });
+    return DAY_CACHE[d];
+  }
+  function searchDates() {
+    var input = document.getElementById('briefDatePicker');
+    var max = input.max || INITIAL_DATE, min = input.min || ARCHIVE_MIN_DATE || '';
+    var out = [], d = new Date(max + 'T00:00:00Z');
+    for (var k = 0; k < SEARCH_MAX_DAYS; k++) {
+      var v = d.toISOString().slice(0, 10);
+      if (min && v < min) break;
+      out.push(v);
+      d.setUTCDate(d.getUTCDate() - 1);
+    }
+    return out;                        // 최신 날짜부터
+  }
+  function allArticles(data, day) {
+    var out = [], seen = {}, keepDate = currentDate;
+    currentDate = day;                 // 기사 나이 기준을 그 수집일로 맞춘다
+    try {
+      var add = function (i, kind, c) {
+        var key = String(i.link || i.title).toLowerCase();
+        if (seen[key]) { if (c && seen[key].countries.indexOf(c) === -1) seen[key].countries.push(c); return; }
+        seen[key] = { item: i, kind: kind, countries: c ? [c] : [], key: key }; out.push(seen[key]);
+      };
+      (data.countries || []).forEach(function (c) {
+        var n = news(c);
+        ['safe', 'pol', 'soc'].forEach(function (k) { n[k].forEach(function (i) { add(i, k, c); }); });
+        trend(c, 'HR & LABOR').forEach(function (i) { add(i, 'hr', c); });
+        trend(c, 'AUTO MARKET').forEach(function (i) { add(i, 'auto', c); });
+      });
+      realItems(data.global_industry, 'ind').forEach(function (i) { add(i, 'ind', null); });
+    } finally { currentDate = keepDate; }
     return out;
+  }
+  function dayLabel(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ''); if (!m) return d;
+    return Number(m[2]) + '월 ' + Number(m[3]) + '일 (' + '일월화수목금토'.charAt(new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).getUTCDay()) + ')';
+  }
+  function hitHtml(g) {
+    var i = g.item;
+    var kindBadge = g.kind === 'safe' && i.safety_tag ? safetyBadge(i.safety_tag) : '<span class="badge b-gray">' + SEARCH_KIND[g.kind] + '</span>';
+    return '<div class="item"><div class="meta">' + newBadge(i) + kindBadge + (i.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(i) +
+      (g.countries.length ? countryButtons(g.countries, g.kind === 'safe' || g.kind === 'pol' || g.kind === 'soc' ? g.kind : '') : '<b>글로벌</b>') + '</div>' +
+      '<a class="ttl" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + esc(i.title) + '</a>' +
+      '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
   }
   function renderSearch() {
     var q = String(state.q || '').trim();
     var words = q.toLowerCase().split(/\s+/).filter(Boolean);
-    var hits = !words.length ? [] : allArticles().filter(function (g) {
+    var main = document.getElementById('main');
+    var token = ++searchToken;
+    if (!words.length) {
+      main.innerHTML = '<div class="page-title"><h2>기사 검색</h2></div><section class="card"><p class="empty">검색어를 입력해 주세요.</p></section>';
+      return;
+    }
+    var dates = searchDates();
+    main.innerHTML = '<div class="page-title"><h2>‘' + esc(q) + '’ 검색 중…</h2><span class="note">최근 ' + dates.length +
+      '일 수집 기사를 찾고 있습니다</span></div><section class="card"><p class="empty">잠시만 기다려 주세요.</p></section>';
+    var match = function (g) {
       var hay = (g.item.title + ' ' + (g.item.original_title || '') + ' ' + (g.item.source || '') + ' ' +
                  g.countries.map(function (c) { return c.name_kr + ' ' + c.name_en; }).join(' ')).toLowerCase();
       return words.every(function (w) { return hay.indexOf(w) !== -1; });
-    }).sort(function (a, b) { return byNewest(a.item, b.item); });
-    var h = '<div class="page-title"><h2>‘' + esc(q) + '’ 검색 결과 ' + hits.length + '건</h2><span class="note">' +
-      esc(currentDate) + ' 수집 데이터의 전체 국가 기사에서 찾았습니다 · 제목·원문 제목·매체·국가명</span></div>';
-    h += '<section class="card">';
-    h += hits.length ? hits.map(function (g) {
-      var i = g.item;
-      var kindBadge = g.kind === 'safe' && i.safety_tag ? safetyBadge(i.safety_tag) : '<span class="badge b-gray">' + SEARCH_KIND[g.kind] + '</span>';
-      return '<div class="item"><div class="meta">' + newBadge(i) + kindBadge + (i.law ? '<span class="badge b-law">법·제도</span>' : '') + extraBadges(i) +
-        (g.countries.length ? countryButtons(g.countries, g.kind === 'safe' || g.kind === 'pol' || g.kind === 'soc' ? g.kind : '') : '<b>글로벌</b>') + '</div>' +
-        '<a class="ttl" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + esc(i.title) + '</a>' +
-        '<div class="meta"><span class="src">' + esc(i.source || '') + '</span>' + alsoNote(i) + '<span>' + relDate(i.published) + '</span>' + trBadge(i) + '</div></div>';
-    }).join('') : '<p class="empty">' + (words.length ? '찾는 단어가 들어간 기사가 없습니다. 다른 단어(영어·한국어)로 찾아보세요.' : '검색어를 입력해 주세요.') + '</p>';
-    h += '</section>';
-    document.getElementById('main').innerHTML = h;
+    };
+    Promise.all(dates.map(loadDay)).then(function (sets) {
+      if (token !== searchToken || state.view !== 'search') return;      // 그사이 다른 검색·화면으로 바뀜
+      var shown = {}, groups = [], total = 0, searched = 0;
+      dates.forEach(function (d, idx) {
+        var data = sets[idx]; if (!data) return;
+        searched++;
+        var hits = allArticles(data, d).filter(function (g) { return !shown[g.key] && match(g); })
+          .sort(function (a, b) { return byNewest(a.item, b.item); });
+        hits.forEach(function (g) { shown[g.key] = 1; });                 // 같은 기사는 가장 최근 수집일에만 표시
+        if (hits.length) { groups.push({ date: d, hits: hits }); total += hits.length; }
+      });
+      var h = '<div class="page-title"><h2>‘' + esc(q) + '’ 검색 결과 ' + total + '건</h2><span class="note">최근 ' + searched +
+        '일 수집 기사에서 찾았습니다</span></div>';
+      h += groups.length ? groups.map(function (gr) {
+        return '<section class="card search-day"><div class="card-head"><h2>' + esc(dayLabel(gr.date)) +
+          ' <span class="count">' + gr.hits.length + '</span></h2><a href="#" class="note" data-goto-date="' + esc(gr.date) + '">이 날짜 브리핑 보기 →</a></div>' +
+          gr.hits.map(hitHtml).join('') + '</section>';
+      }).join('') : '<section class="card"><p class="empty">최근 ' + searched + '일 동안 찾는 단어가 들어간 기사가 없습니다. 다른 단어(영어·한국어)로 찾아보세요.</p></section>';
+      main.innerHTML = h;
+    });
   }
+  // 검색 결과의 '이 날짜 브리핑 보기' → 그 날짜의 오늘의 브리핑으로
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-goto-date]');
+    if (!a) return;
+    e.preventDefault();
+    var d = a.getAttribute('data-goto-date'), input = document.getElementById('briefDatePicker');
+    document.getElementById('search-input').value = '';
+    location.hash = '#/briefing';
+    if (d !== currentDate) { input.value = d; input.dispatchEvent(new Event('change')); }
+  });
 
   // ------------------------------------------------------------- 오늘의 브리핑
   function scopeCountries() {
@@ -563,7 +644,7 @@
       return (t.countries || []).some(function (code) { return inScope[code]; });
     }).map(showTitle);
     var h = '<section class="card top-card" aria-labelledby="top-h"><div class="card-head"><h2 id="top-h">' +
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"></path></svg>' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"></path></svg>' +
       '오늘 주요 브리핑</h2></div>';
     if (!list.length) return h + '<p class="empty">' + (state.org === 'ALL' ? '오늘 주요 이슈로 꼽힌 보도가 없습니다.' : '선택한 조직에는 오늘 주요 이슈가 없습니다.') + '</p></section>';
     h += '<ol class="top-list">' + list.map(function (t, idx) {
@@ -683,7 +764,7 @@
     var hrHtml = sec; sec = '';
 
     var gi = freshItems(realItems(DASHBOARD.global_industry, 'ind')).filter(function (i) { return !excluded[i.link]; });
-    sec += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
+    sec += '<section class="card" aria-labelledby="gi-h"><div class="card-head"><h2 id="gi-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>글로벌 완성차·타이어 동향</h2><span class="note">업계 전반 뉴스 · 경쟁사 동향</span></div>';
     sec += gi.length ? '<div class="grid-2">' + gi.map(function (i) {
       // 경쟁사 기사는 '경쟁사' 배지 하나만 (분류 배지와 경쟁사 배지가 겹치지 않게)
       // 분류 배지 하나만 (경쟁사 / 타이어 / EV / 시장전망 / 완성차)
@@ -789,7 +870,7 @@
     var pts = v.map(function (x, i) { return (i * 200 / (v.length - 1)).toFixed(1) + ',' + (44 - (x - min) / rng * 40).toFixed(1); }).join(' ');
     return '<svg width="100%" height="40" viewBox="0 0 200 48" preserveAspectRatio="none" role="img" aria-label="최근 ' + v.length + '개월 환율 추이: ' +
       esc(fmtNum(v[0])) + '원에서 ' + esc(fmtNum(v[v.length - 1])) + '원"><polyline points="' + pts +
-      '" fill="none" stroke="#C2410C" stroke-width="2.5" vector-effect="non-scaling-stroke"></polyline></svg>';
+      '" fill="none" stroke="#e07b00" stroke-width="2.5" vector-effect="non-scaling-stroke"></polyline></svg>';
   }
   // "10.19 종가 기준 · 출처: Yahoo Finance" — 출처 글자 자체가 원문 링크
   function fxSourceLine(asof, source, url) {
@@ -891,7 +972,7 @@
     }).join('') : '<p class="empty">최근 2주 동안 수집된 HR·노동 보도가 없습니다.</p>';
     h += '</section>';
 
-    h += '<section class="card" aria-labelledby="news-h"><div class="card-head"><h2 id="news-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 8h3v9a2 2 0 0 1-2 2"></path><path d="M7 9h7M7 13h7M7 17h4"></path></svg>현지 주요 뉴스</h2><div class="seg" role="tablist" aria-label="뉴스 분류">' +
+    h += '<section class="card" aria-labelledby="news-h"><div class="card-head"><h2 id="news-h"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2z"></path><path d="M17 8h3v9a2 2 0 0 1-2 2"></path><path d="M7 9h7M7 13h7M7 17h4"></path></svg>현지 주요 뉴스</h2><div class="seg" role="tablist" aria-label="뉴스 분류">' +
       NEWS_TABS.map(function (t) {
         return '<button type="button" role="tab" data-newstab="' + t.id + '" aria-selected="' + (t.id === state.tab) + '">' + t.label + '<span class="n">' + nw[t.id].length + '</span></button>';
       }).join('') + '</div></div>';
@@ -901,11 +982,11 @@
     }).join('') : '<p class="empty">' + (state.tab === 'safe' ? '최근 3일 동안 안전·재난 관련 보도가 없습니다.' : '최근 수집된 보도가 없습니다.') + '</p>';
     h += '</section></div>';
 
-    h += '<aside class="side-col"><section class="card" aria-labelledby="ind-h"><h2 id="ind-h" style="margin-bottom:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>완성차·타이어</h2>';
+    h += '<aside class="side-col"><section class="card" aria-labelledby="ind-h"><h2 id="ind-h" style="margin-bottom:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17l1.5-5h9L18 17"></path><path d="M7.5 12l1.5-4h6l1.5 4"></path><circle cx="8" cy="17.5" r="1.5"></circle><circle cx="16" cy="17.5" r="1.5"></circle></svg>완성차·타이어</h2>';
     h += auto.length ? auto.map(function (i) {
       return articleLink(i, metaLine(i) + '<span class="ttl sm">' + esc(i.title) + '</span>');
     }).join('') : '<p class="empty">최근 2주 동안 수집된 산업 보도가 없습니다.</p>';
-    h += '</section><section class="card" aria-labelledby="off-h"><h2 id="off-h" style="margin-bottom:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"></path><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"></path></svg>공식 기관 · 보고서</h2>';
+    h += '</section><section class="card" aria-labelledby="off-h"><h2 id="off-h" style="margin-bottom:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"></path><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"></path></svg>공식 기관 · 보고서</h2>';
     h += official.length ? '<ul class="off-list">' + official.map(function (o) {
       return '<li><a href="' + esc(safeUrl(o.url)) + '" target="_blank" rel="noopener noreferrer"><b>' + esc(o.name) + ' ↗</b><span>' + esc(o.desc || '') + '</span></a></li>';
     }).join('') + '</ul>' : '<p class="empty" style="font-size:13px">등록된 기관이 없습니다.</p>';
@@ -976,6 +1057,8 @@
   }
   function updateDateNav() {
     var input = document.getElementById('briefDatePicker');
+    var dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(currentDate || input.value || '');
+    document.getElementById('date-dow').textContent = dm ? '(' + '일월화수목금토'.charAt(new Date(Date.UTC(+dm[1], +dm[2] - 1, +dm[3])).getUTCDay()) + ')' : '';
     document.getElementById('date-prev').disabled = !!input.min && currentDate <= input.min;
     document.getElementById('date-next').disabled = !!input.max && currentDate >= input.max;
   }
