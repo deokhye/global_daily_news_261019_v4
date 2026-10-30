@@ -193,8 +193,63 @@ def pick_top(groups: list, top_n: int, per_kind_max: int) -> list:
     return out
 
 
+_HANGUL = re.compile(r"[가-힣]")
+
+
+def is_korean(text: str) -> bool:
+    """제목이 '대부분 한국어'인지 (한글 2자 이상 · 글자 중 한글 40% 이상)."""
+    t = text or ""
+    h = len(_HANGUL.findall(t))
+    other = sum(1 for ch in t if ch.isalpha() and not _HANGUL.match(ch))
+    return h >= 2 and h / max(1, h + other) >= 0.4
+
+
+class _Translator:
+    """메일에 넣을 기사 중 번역이 안 된 제목을 발송 직전에 다시 번역 (수집기 번역 기능 재사용)."""
+    def __init__(self):
+        self.ok = None
+        self.cache = {}
+
+    def _load(self):
+        if self.ok is None:
+            try:
+                import collector as C
+                self.C = C
+                self.cache = C.load_translation_cache() or {}
+                self.ok = True
+            except Exception as e:                       # noqa: BLE001
+                log.warning(f"번역기를 불러오지 못해 번역 안 된 기사는 메일에서 뺍니다: {e}")
+                self.ok = False
+        return self.ok
+
+    def korean(self, it: dict) -> bool:
+        """제목이 한국어면 True. 아니면 번역을 시도해 성공하면 제목을 바꾸고 True, 실패하면 False."""
+        if is_korean(it.get("title")):
+            return True
+        if not self._load():
+            return False
+        src = it.get("original_title") or it.get("title") or ""
+        ko = self.cache.get(src) or ""
+        if not (ko and self.C.is_good_translation(src, ko)):
+            try:
+                self.C._TEXT_LANG[src] = it.get("lang") or "auto"
+                ko = self.C._translate_one(src) or self.C._translate_split(src)
+            except Exception as e:                       # noqa: BLE001
+                log.warning(f"번역 실패: {e}")
+                ko = ""
+        if ko and is_korean(ko):
+            self.cache[src] = ko
+            it["original_title"], it["title"], it["translated"] = src, ko, True
+            log.info(f"메일용 번역: {src[:40]} → {ko[:40]}")
+            return True
+        log.info(f"번역이 안 돼 메일에서 제외: {src[:60]}")
+        return False
+
+
 def pick_sections(groups: list, counts: dict) -> list:
-    """섹션별(안전·재난 / HR·노동 / 정치·경제) 중요도 상위 N건. 업계·경쟁사 기사는 넣지 않는다."""
+    """섹션별(안전·재난 / HR·노동 / 정치·경제) 중요도 상위 N건. 업계·경쟁사 기사는 넣지 않는다.
+    제목이 번역되지 않은 기사는 발송 직전에 다시 번역하고, 그래도 안 되면 빼고 다음 기사로 채운다."""
+    tr = _Translator()
     out = []
     for key, _title, _color, kinds in SECTIONS:
         n = int((counts or {}).get(key, SECTION_DEFAULT[key]))
@@ -202,9 +257,15 @@ def pick_sections(groups: list, counts: dict) -> list:
         lst.sort(key=lambda g: (g["weekly"], str(g["item"].get("published") or "")), reverse=True)
         if key == "hr":                      # 최저임금·법 제도 우선 (안정 정렬이라 같은 단계는 중요도 순 유지)
             lst.sort(key=hr_priority)
-        for g in lst[:n]:
+        picked = 0
+        for g in lst:
+            if picked >= n:
+                break
+            if not tr.korean(g["item"]):
+                continue
             g["section"] = key
             out.append(g)
+            picked += 1
     return out
 
 
