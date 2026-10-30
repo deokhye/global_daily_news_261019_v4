@@ -229,8 +229,9 @@ class _Translator:
         if not self._load():
             return False
         src = it.get("original_title") or it.get("title") or ""
-        ko = self.cache.get(src) or ""
-        if not (ko and self.C.is_good_translation(src, ko)):
+        hit = self.cache.get(src)
+        ko = (hit.get("ko") if isinstance(hit, dict) else hit) or ""      # 캐시 형식: {"ko": 번역, "last": 날짜}
+        if not (isinstance(ko, str) and ko and self.C.is_good_translation(src, ko)):
             try:
                 self.C._TEXT_LANG[src] = it.get("lang") or "auto"
                 ko = self.C._translate_one(src) or self.C._translate_split(src)
@@ -238,7 +239,6 @@ class _Translator:
                 log.warning(f"번역 실패: {e}")
                 ko = ""
         if ko and is_korean(ko):
-            self.cache[src] = ko
             it["original_title"], it["title"], it["translated"] = src, ko, True
             log.info(f"메일용 번역: {src[:40]} → {ko[:40]}")
             return True
