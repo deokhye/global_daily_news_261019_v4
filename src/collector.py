@@ -1624,7 +1624,25 @@ def apply_translations(countries: list) -> None:
 
     # 호출부에서 글로벌 동향을 마지막 묶음으로 넘긴다 → 그 항목들을 맨 앞으로
     global_ids = {id(i) for i, _ in _iter_news_items(countries[-1:])}
-    ordered = sorted(targets, key=lambda t: (0 if id(t[0]) in global_ids else 1, -_date_num(t[0].get("published"))))
+    # 순서: 글로벌 동향 → 나라별로 번갈아(각 나라 최신 기사부터 한 건씩).
+    # 전체를 최신순으로만 번역하면 며칠째 화면에 남아 있는 오래된 기사가 매일 뒤로 밀려 계속 원문으로 남기 때문.
+    owner = {}
+    for idx, c in enumerate(countries):
+        for it, _ in _iter_news_items([c]):
+            owner[id(it)] = idx
+    glob = [t for t in targets if id(t[0]) in global_ids]
+    per = {}
+    for t in targets:
+        if id(t[0]) not in global_ids:
+            per.setdefault(owner.get(id(t[0]), -1), []).append(t)
+    for lst in per.values():
+        lst.sort(key=lambda t: -_date_num(t[0].get("published")))
+    ordered = sorted(glob, key=lambda t: -_date_num(t[0].get("published")))
+    queues = list(per.values())
+    while any(queues):
+        for q in queues:
+            if q:
+                ordered.append(q.pop(0))
     mapping = translate_texts([t[1] for t in ordered], cache)
     for item, src_title in targets:
         ko_title = mapping.get(src_title)
