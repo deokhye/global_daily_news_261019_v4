@@ -75,7 +75,8 @@ REQUEST_TIMEOUT = 12
 RUN_STARTED = time.monotonic()
 FX_BUDGET_SEC = int(os.environ.get("FX_BUDGET_SEC", "180"))
 NEWS_BUDGET_SEC = int(os.environ.get("NEWS_BUDGET_SEC", "480"))
-TRANSLATION_BUDGET_SEC = int(os.environ.get("TRANSLATION_BUDGET_SEC", "360"))
+TRANSLATION_BUDGET_SEC = int(os.environ.get("TRANSLATION_BUDGET_SEC", "540"))
+TRANSLATE_RETRY_WORKERS = 4      # 묶음 번역에서 빠진 제목을 한 건씩 다시 번역할 때 동시에 처리하는 수
 NEWS_MAX_CONSECUTIVE_ERRORS = 12   # Google News 오류가 이만큼 연속되면 차단으로 보고 뉴스 수집 중단
 NEWS_WORKERS = 4          # Google News 동시 요청 수 (너무 높으면 503/429 차단)
 HTTP_USER_AGENT = (
@@ -1546,14 +1547,20 @@ def translate_texts(texts: list, cache: dict) -> dict:
             stop_reason = f"시간 예산({TRANSLATION_BUDGET_SEC}초) 초과"
             break
         translated = _translate_batch(ch, lang) or [""] * len(ch)
-        # 묶음 번역에서 한글이 안 나온 줄(번역 실패·원문 그대로)은 한 건씩 다시 시도
-        for i, t in enumerate(ch):
-            if is_good_translation(t, translated[i]):
-                continue
-            if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
-                break
-            translated[i] = _translate_one(t) or _translate_split(t)
-            time.sleep(0.3)
+        # 묶음 번역에서 한글이 안 나온 줄(번역 실패·원문 그대로)은 한 건씩 다시 시도 — 여러 건을 동시에 처리해 시간 절약
+        retry = [i for i, t in enumerate(ch) if not is_good_translation(t, translated[i])]
+        if retry and time.monotonic() - started <= TRANSLATION_BUDGET_SEC:
+            def _one(i):
+                if time.monotonic() - started > TRANSLATION_BUDGET_SEC:
+                    return i, ""
+                try:
+                    return i, (_translate_one(ch[i]) or _translate_split(ch[i]))
+                except Exception:          # noqa: BLE001
+                    return i, ""
+            with ThreadPoolExecutor(max_workers=TRANSLATE_RETRY_WORKERS) as pool:
+                for i, ko in pool.map(_one, retry):
+                    if ko:
+                        translated[i] = ko
         for src, ko in zip(ch, translated):
             if is_good_translation(src, ko):
                 result[src] = ko
