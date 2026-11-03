@@ -48,7 +48,7 @@ concurrency:
 jobs:
   update-and-build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
     outputs:
       mode: ${{ steps.decide.outputs.mode }}
     steps:
@@ -99,7 +99,7 @@ jobs:
       - name: Run Collector
         id: collect
         if: steps.decide.outputs.mode == 'collect'
-        timeout-minutes: 20
+        timeout-minutes: 25
         env:
           MYMEMORY_EMAIL: ${{ secrets.MYMEMORY_EMAIL }}   # 선택: 보조 번역기 일일 한도 확대
         run: python src/collector.py
