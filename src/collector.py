@@ -1,7 +1,7 @@
 """
 collector.py
 ------------
-Global Daily News — 한국타이어 해외 사업장 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
+Global HR Radar — 한국타이어 해외 사업장 일일 데이터 수집기 (매일 KST 05:20, GitHub Actions).
 
 입력 (모두 config/, src/profile_overlay.py 가 읽음)
   countries.csv · country_codes.csv · sites.csv · official_sources.csv · manual_profile.json

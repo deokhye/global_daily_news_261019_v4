@@ -457,16 +457,16 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
 
     button = (f"<tr><td align='center' style='padding:22px 28px 6px'><a href='{_e(site_url)}' "
               "style='display:inline-block;background:#C2410C;color:#fff;font-weight:700;font-size:14px;"
-              "text-decoration:none;border-radius:10px;padding:11px 22px'>Global Daily News 바로가기</a></td></tr>") if site_url else ""
+              "text-decoration:none;border-radius:10px;padding:11px 22px'>Global HR Radar 바로가기</a></td></tr>") if site_url else ""
 
     page = (
         "<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'>"
-        f"<title>Global Daily News 주간 브리핑</title></head>"
+        f"<title>Global HR Radar 주간 브리핑</title></head>"
         "<body style='margin:0;padding:0;background:#F4F5F7;font-family:-apple-system,\"Malgun Gothic\",\"Apple SD Gothic Neo\",sans-serif'>"
         "<table width='100%' cellpadding='0' cellspacing='0' style='background:#F4F5F7'><tr><td align='center' style='padding:24px 12px'>"
         "<table width='100%' cellpadding='0' cellspacing='0' style='max-width:720px;background:#F4F5F7'>"
         "<tr><td style='padding:10px 28px 10px'>"
-        "<div style='font-size:12px;font-weight:700;color:#C2410C'>Global Daily News · 주간 요약</div>"
+        "<div style='font-size:12px;font-weight:700;color:#C2410C'>Global HR Radar · 주간 요약</div>"
         f"<div style='font-size:24px;font-weight:900;color:#1E293B;margin-top:4px;letter-spacing:-0.02em'>주간 브리핑</div>"
         f"<div style='font-size:13px;color:#64748B;margin-top:2px'>{_e(start.replace('-', '.'))} ~ {_e(end.replace('-', '.'))} · 해외 {n_countries}개국</div>"
         "</td></tr>"
@@ -478,7 +478,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         "font-weight:700;color:#475569'>Hankook Tire &amp; Technology Global HR팀</td></tr>"
         "</table></td></tr></table></body></html>")
 
-    text = [f"Global Daily News 주간 브리핑 ({start} ~ {end})", ""]
+    text = [f"Global HR Radar 주간 브리핑 ({start} ~ {end})", ""]
     if ai:
         text += [f"[AI 요약 · 원문 확인 필요] {ai.get('headline', '')}"]
         for s in ai.get("sections") or []:
@@ -493,7 +493,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             text += [f"{i}. [{ctry(g['code'])}] {g['item'].get('title', '')}\n   {g['item'].get('link', '')}"
                      for i, g in enumerate(lst, 1)]
     if site_url:
-        text += ["", f"Global Daily News 바로가기: {site_url}"]
+        text += ["", f"Global HR Radar 바로가기: {site_url}"]
     text += ["", "Hankook Tire & Technology Global HR팀"]
     return page, "\n".join(text)
 
@@ -531,7 +531,7 @@ def build(end: date, use_ai: bool = True, ai_override: dict | None = None, today
     ai = ai_override if ai_override is not None else (gemini_summary(info["groups"], info["names"], start, end_s, st) if use_ai else None)
     site = os.environ.get("SITE_URL", "").strip()
     page, text = render(info, top, comps, ai, start, end_s, site, label)
-    subject = (st.get("subject") or "[Global Daily News] 지난주 주요 이슈 ({start} ~ {end})").replace("지난주", label).format(
+    subject = (st.get("subject") or "[Global HR Radar] 지난주 주요 이슈 ({start} ~ {end})").replace("지난주", label).format(
         start=start.replace("-", "."), end=end_s.replace("-", "."))
     log.info(f"주간 요약: 아카이브 {len(week)}일, 이슈 {len(info['groups'])}건 → 안전 {sum(g['kind'] == 'safe' for g in top)} · HR {sum(g['kind'] == 'hr' for g in top)} · "
              f"정치·경제·사회 {sum(g['kind'] in ('pol', 'soc') for g in top)}건, "

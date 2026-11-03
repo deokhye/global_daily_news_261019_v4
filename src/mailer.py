@@ -29,7 +29,7 @@ def mail_configured() -> bool:
     return bool(os.environ.get("MAIL_USER") and os.environ.get("MAIL_PASSWORD"))
 
 
-def send_mail(subject: str, html: str, text: str, recipients: list, sender_name: str = "Global Daily News") -> None:
+def send_mail(subject: str, html: str, text: str, recipients: list, sender_name: str = "Global HR Radar") -> None:
     """받는 사람끼리 주소가 보이지 않도록 숨은 참조(Bcc)로 보낸다. 실패하면 예외."""
     user = os.environ.get("MAIL_USER", "").strip()
     password = os.environ.get("MAIL_PASSWORD", "").strip()
