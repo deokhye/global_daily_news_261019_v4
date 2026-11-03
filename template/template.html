@@ -57,6 +57,25 @@
   nav.tabs a:hover { text-decoration: none; color: var(--text); }
   nav.tabs a.active { font-weight: 700; color: var(--accent-text); border-bottom-color: var(--accent); }
 
+  /* 소개 화면 */
+  .about-hero { background: var(--accent-bg); border-color: var(--accent-line); }
+  .about-eyebrow { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--accent-text); }
+  .about-lead { margin: 6px 0 8px; font-size: 22px; font-weight: 800; color: var(--text); }
+  .about-desc { margin: 0; font-size: 14px; line-height: 1.7; color: var(--sub); }
+  .about-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+  .about-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
+  .about-card h3 { margin: 0; font-size: 17px; }
+  .about-card .about-sub { margin: 2px 0 0; font-size: 12px; color: var(--accent-text); font-weight: 600; }
+  .about-card ul, .about-list { margin: 10px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.7; color: var(--sub); }
+  .about-card.dark { background: #1E293B; border-color: #1E293B; }
+  .about-card.dark h3 { color: #F8FAFC; }
+  .about-card.dark ul { color: #CBD5E1; }
+  .about-card.dark b { color: #FDBA74; }
+  .about-effects { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+  .about-effect { background: var(--accent-bg); border-radius: 12px; padding: 14px 16px; }
+  .about-effect p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--sub); }
+  .about-effect .t { font-size: 15px; font-weight: 700; color: var(--accent-text); margin-bottom: 4px; }
+  @media (max-width: 900px) { .about-grid { grid-template-columns: minmax(0, 1fr); } .about-effects { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .picker { border-top: 1px solid var(--line-soft); background: #FBFBFC; }
   .picker-inner { padding-top: 10px; padding-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
   .picker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
@@ -229,6 +248,7 @@
     <nav class="tabs" aria-label="주요 화면">
       <a href="#/briefing" id="tab-briefing">오늘의 브리핑</a>
       <a href="#/country" id="tab-country">국가 상세</a>
+      <a href="#/about" id="tab-about">소개</a>
     </nav>
       <div class="tools">
         <div class="date-box" id="date-box">
@@ -369,6 +389,14 @@
     var o = (t.match(/[A-Za-zÀ-ɏ\u0400-\u04FF\u4E00-\u9FFF\u3040-\u30FF\u0E00-\u0E7F]/g) || []).length;
     return h >= 2 && h / (h + o) >= 0.4;
   }
+  // 읽을 수 없는 원문인지: 한국어도, 로마자(영어·유럽어)도 아닌 글자(태국어·일본어·중국어·러시아어 등)가 대부분인 제목
+  function unreadable(t) {
+    if (goodKo(t)) return false;
+    var letters = String(t || '').match(/[^\s\d\p{P}\p{S}]/gu) || [];
+    if (!letters.length) return false;
+    var latin = letters.filter(function (ch) { return /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF]/.test(ch); }).length;
+    return latin / letters.length < 0.6;
+  }
   function showTitle(i) {
     if (!i || i.lang === 'ko' || !i.lang) return i;
     if (i.translated && goodKo(i.title)) return i;
@@ -387,7 +415,7 @@
     return (Array.isArray(list) ? list : []).filter(function (i) {
       return i && i.title && !i.is_fallback && i.title !== FALLBACK_TITLE &&
         !GOSSIP.test(i.title) && !GOSSIP.test(i.original_title || '') && (!kind || withinAge(i, kind));
-    }).map(showTitle);
+    }).map(showTitle).filter(function (i) { return !unreadable(i.title); });   // 번역 안 된 읽을 수 없는 원문은 숨김
   }
   function trend(c, cat) {
     var t = (c.hr_trends || []).find(function (x) { return x && x.category === cat; });
@@ -438,6 +466,7 @@
     pickerOpen: storeGet('ghr.pickerOpen', '1') === '1'
   };
   function readHash() {
+    if (/^#\/about/.test(location.hash || '')) { state.view = 'about'; return; }
     var sq = /^#\/search\/(.*)$/.exec(location.hash || '');
     if (sq) {
       state.view = 'search';
@@ -464,6 +493,7 @@
   function render() {
     document.getElementById('tab-briefing').classList.toggle('active', state.view === 'briefing');
     document.getElementById('tab-country').classList.toggle('active', state.view === 'country');
+    document.getElementById('tab-about').classList.toggle('active', state.view === 'about');
     document.getElementById('tab-country').setAttribute('href', '#/country/' + state.code);
     document.getElementById('picker').classList.toggle('hidden', state.view !== 'country');
     var si = document.getElementById('search-input');
@@ -471,6 +501,7 @@
     renderStale();
     if (state.view === 'country') { renderPicker(); renderCountry(); }
     else if (state.view === 'search') { renderSearch(); }
+    else if (state.view === 'about') { renderAbout(); }
     else { renderBriefing(); }
   }
 
@@ -597,6 +628,49 @@
     location.hash = '#/briefing';
     if (d !== currentDate) { input.value = d; input.dispatchEvent(new Event('change')); }
   });
+
+  // ------------------------------------------------------------- 소개 (목적·배경·기능·기대효과)
+  function renderAbout() {
+    function card(title, sub, items, dark) {
+      return '<div class="about-card' + (dark ? ' dark' : '') + '"><h3>' + title + '</h3>' + (sub ? '<p class="about-sub">' + sub + '</p>' : '') +
+        '<ul>' + items.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul></div>';
+    }
+    var h = '<div class="page-title"><h2>Global HR Radar 소개</h2><span class="note">한국타이어 해외 사업장 HR·현지 정세 데일리 브리핑</span></div>';
+    h += '<section class="card about-hero"><p class="about-eyebrow">GLOBAL HR RADAR</p>' +
+      '<p class="about-lead">해외 38개국의 HR 리스크를 매일 아침 한 화면에서</p>' +
+      '<p class="about-desc">해외 사업장의 안전 사고, 파업, 최저임금·노동법 변화와 현지 정세를 매일 새벽 자동으로 모으고 번역·선별해 보여 드립니다. ' +
+      '매일 보는 <b>웹 대시보드</b>와 매주 받는 <b>주간 레터</b> 두 가지로 제공됩니다.</p></section>';
+    h += '<div class="about-grid">' +
+      card('배경 · 목적', '', [
+        '38개국 소식이 현지어·여러 매체에 흩어져 있어 매일 확인하기 어려움',
+        '안전 사고·파업·최저임금 변화가 현지 인력 운영에 바로 영향',
+        '법인 보고에 의존하면 이슈 인지가 늦어짐',
+        '<b>→ HR 리스크를 매일 자동으로 감지하고 함께 보는 것이 목적</b>'], true) +
+      card('① 웹 대시보드', 'HR Insight · 매일 아침 자동 갱신', [
+        '<b>오늘의 브리핑</b>: 오늘 주요 이슈 Top 5, 지역별 안전 동향·HR·노동 소식, 글로벌 완성차·타이어 동향',
+        '<b>국가 상세</b>: 거점, 환율·물가·실업률·최저임금, 환율 계산기, 현지 뉴스, 공식 기관',
+        '<b>일자 이동·기사 검색</b>: 지난 날짜 브리핑, 최근 기사 날짜별 검색']) +
+      card('② 주간 레터', '매주 월요일 아침 메일 발송', [
+        '지난주(월~일) 핵심 이슈 15건 요약',
+        '안전·재난 5 · HR·노동 5 · 정치·경제·사회 5',
+        'HR·노동은 최저임금 → 법·제도 이슈 우선',
+        '같은 사건은 1건으로 묶어 “외 N개 매체 · N일 연속 보도”로 표시']) +
+      '</div>';
+    h += '<section class="card"><div class="card-head"><h2>이렇게 고릅니다</h2></div><ul class="about-list">' +
+      '<li>나라별로 <b>한국어·영어·현지어</b> 뉴스를 매일 새벽 자동 수집하고 제목을 한국어로 번역</li>' +
+      '<li>안전·재난은 <b>실제 발생한 사건</b>만, 유형(자연재해·대형사고·무력충돌·테러·사회불안·보건·환경)으로 표시</li>' +
+      '<li>칼럼·광고·주가·연예·스포츠·개인 범죄, 다른 나라 기사를 옮긴 것은 제외</li>' +
+      '<li>여러 매체가 보도한 같은 사건은 하나로 묶고, 심각도·법·제도·거점 인근 여부로 중요도 순 정렬</li></ul></section>';
+    h += '<section class="card"><div class="card-head"><h2>기대효과</h2></div><div class="about-effects">' +
+      [['리스크 조기 인지', '안전·파업 이슈를 당일 파악해 주재원·현지 인력 대응을 앞당김'],
+       ['선제 대응 근거', '임금·노동법 변화를 미리 확인해 협상·제도 대응에 활용'],
+       ['모니터링 자동화', '38개국 뉴스를 사람이 매일 찾아보던 일을 대체'],
+       ['정보 공유 표준화', '본사와 법인이 같은 정보를 보고 소통']].map(function (e) {
+        return '<div class="about-effect"><p class="t">' + e[0] + '</p><p>' + e[1] + '</p></div>';
+      }).join('') + '</div></section>';
+    h += '<p class="notice">문의·수신자 추가: G.HR팀 이덕혜</p>';
+    document.getElementById('main').innerHTML = h;
+  }
 
   // ------------------------------------------------------------- 오늘의 브리핑
   function scopeCountries() {
