@@ -929,7 +929,10 @@
     var fx = c.exchange_rate || {};
     var amt = parseFloat(state.amount);
     if (isNaN(amt) || !fx.current_rate) return '-';
-    return Math.round(amt * (fx.current_rate / (fx.unit_base || 1))).toLocaleString('ko-KR');
+    var won = amt * (fx.current_rate / (fx.unit_base || 1));
+    // 1원 미만(예: 1 IDR ≈ 0.07원)은 소수점 둘째 자리까지, 그 외는 원 단위 반올림
+    if (won !== 0 && Math.abs(won) < 1) return won.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return Math.round(won).toLocaleString('ko-KR');
   }
   function renderCountry() {
     var c = byCode(state.code);
