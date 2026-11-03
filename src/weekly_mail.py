@@ -246,6 +246,34 @@ class _Translator:
         return False
 
 
+# 정치·경제·사회 섹션의 세부 분류 (제목 단어 점수로 판단, 같으면 수집 분류를 따름)
+TOPIC_COLOR = {"정치": ("#334155", "#E2E8F0"), "경제": ("#0F766E", "#CCFBF1"), "사회": ("#6D28D9", "#EDE9FE")}
+_TOPIC_WORDS = {
+    "정치": [(2, r"선거|투표|총선|대선|총리|대통령|의회|국회|정당|내각|정권|탄핵|연정|개헌|"
+                r"\belection|\bvote|\bballot|\bpresident|\bprime minister|\bparliament|\bcabinet|\bcoalition|\bimpeach"),
+             (1, r"정부|장관|외교|정상회담|제재|법안|대사관|군사|\bgovernment|\bminister|\bdiplomat|\bsanction|\bsummit|\bembassy|\bbill\b")],
+    "경제": [(2, r"금리|물가|인플레|환율|관세|무역|수출|수입|GDP|성장률|중앙은행|예산|세금|경기|재정|부채|"
+                r"\binterest rate|\binflation|\btariff|\btrade\b|\bexport|\bimport|\bGDP\b|\bcentral bank|\bbudget|\btax|\beconom|\brecession|\bdebt"),
+             (1, r"경제|투자|기업|산업|시장|생산|공장|에너지|유가|\binvest|\bmarket|\bindustr|\bfactory|\boil price|\benergy")],
+    "사회": [(1, r"시위|항의|학생|교육|보건|의료|병원|이민|난민|인구|출산|문화|언론|매체|종교|범죄|치안|복지|주거|"
+                r"\bprotest|\bstudent|\beducation|\bhealth|\bhospital|\bmigra|\brefugee|\bpopulation|\bculture|\bmedia|\breligio|\bcrime|\bwelfare|\bhousing")],
+}
+_TOPIC_RE = {k: [(w, re.compile(p, re.I)) for w, p in v] for k, v in _TOPIC_WORDS.items()}
+
+
+def topic_of(g: dict) -> str:
+    """정치·경제·사회 섹션 기사를 정치 / 경제 / 사회 중 하나로."""
+    it = g["item"]
+    t = f"{it.get('title', '')} / {it.get('original_title', '')}"
+    score = {k: sum(w * len(rx.findall(t)) for w, rx in rules) for k, rules in _TOPIC_RE.items()}
+    default = "사회" if g.get("kind") == "soc" else "정치"
+    best = max(score.values())
+    if best == 0:
+        return default
+    tops = [k for k, v in score.items() if v == best]
+    return default if default in tops else tops[0]
+
+
 def pick_sections(groups: list, counts: dict) -> list:
     """섹션별(안전·재난 / HR·노동 / 정치·경제) 중요도 상위 N건. 업계·경쟁사 기사는 넣지 않는다.
     제목이 번역되지 않은 기사는 발송 직전에 다시 번역하고, 그래도 안 되면 빼고 다음 기사로 채운다."""
@@ -405,8 +433,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         return kind_badge(g)
 
     def meta(it, n_src=1, days=1):
-        tr = ("<span style='display:inline-block;border:1px solid #E2E8F0;border-radius:4px;padding:0 6px;"
-              "font-size:11px;color:#64748B;margin-left:6px'>자동번역</span>") if it.get("translated") else ""
+        tr = ""          # '자동번역' 표시는 하단 번역 안내 문구로 대신함
         return (f"<div style='font-size:12px;color:#64748B;margin-top:3px'><b style='color:#475569'>{_e(it.get('source'))}</b>"
                 + (f"&nbsp; 외 {n_src - 1}개 매체" if n_src > 1 else "")
                 + f"&nbsp; {_e(str(it.get('published') or '')[5:10].replace('-', '.'))}"
@@ -429,8 +456,9 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         elif g["kind"] == "hr":                    # HR: 최저임금 / 법·제도만 표시
             pr = hr_priority(g)
             tag = badge("최저임금", "#9A3412", "#FFEDD5") if pr == 0 else (badge("법·제도", "#3730A3", "#E0E7FF") if pr == 1 else "")
-        else:                                      # 정치·경제 / 사회·문화 구분
-            tag = badge(KIND_LABEL.get(g["kind"], ""), *KIND_COLOR.get(g["kind"], ("#475569", "#F1F5F9")))
+        else:                                      # 정치 / 경제 / 사회 중 하나
+            sub = topic_of(g)
+            tag = badge(sub, *TOPIC_COLOR[sub])
         return (
             f"<tr><td style='padding:14px 0;{border}vertical-align:top;width:40px'>"
             f"<div style='width:28px;height:28px;border-radius:14px;background:#FFF7ED;"
