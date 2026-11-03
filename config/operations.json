@@ -17,6 +17,6 @@
     },
     "gemini_model": "gemini-2.5-flash",
     "gemini_max_items": 40,
-    "subject": "[Global Daily News] 주간 브리핑 ({start} ~ {end})"
+    "subject": "[Global HR Radar] 주간 브리핑 ({start} ~ {end})"
   }
 }
