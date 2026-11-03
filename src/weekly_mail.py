@@ -285,6 +285,9 @@ def pick_sections(groups: list, counts: dict) -> list:
         lst.sort(key=lambda g: (g["weekly"], str(g["item"].get("published") or "")), reverse=True)
         if key == "hr":                      # 최저임금·법 제도 우선 (안정 정렬이라 같은 단계는 중요도 순 유지)
             lst.sort(key=hr_priority)
+        if key == "pol":                     # 정치·경제·사회는 분야별 비율대로 (부족한 분야는 다른 분야로 채움)
+            out += _pick_mixed(lst, n, (counts or {}).get("pol_mix") or POL_MIX_DEFAULT, tr)
+            continue
         picked = 0
         for g in lst:
             if picked >= n:
@@ -295,6 +298,30 @@ def pick_sections(groups: list, counts: dict) -> list:
             out.append(g)
             picked += 1
     return out
+
+
+POL_MIX_DEFAULT = {"정치": 2, "경제": 2, "사회": 1}
+
+
+def _pick_mixed(lst: list, n: int, mix: dict, tr) -> list:
+    """중요도 순 목록에서 정치·경제·사회를 mix 비율대로 고르고, 모자라면 남은 기사 중 중요도 순으로 채운다.
+    결과는 다시 중요도 순으로 정렬한다."""
+    chosen, quota = [], {k: int(v) for k, v in (mix or {}).items() if not str(k).startswith("_")}
+    usable = [g for g in lst if tr.korean(g["item"])]
+    for g in usable:
+        t = topic_of(g)
+        if quota.get(t, 0) > 0 and len(chosen) < n:
+            chosen.append(g)
+            quota[t] -= 1
+    for g in usable:                          # 비율을 채우지 못한 자리는 중요도 순으로
+        if len(chosen) >= n:
+            break
+        if g not in chosen:
+            chosen.append(g)
+    chosen.sort(key=lambda g: usable.index(g))
+    for g in chosen:
+        g["section"] = "pol"
+    return chosen
 
 
 def is_competitor(g: dict) -> bool:
