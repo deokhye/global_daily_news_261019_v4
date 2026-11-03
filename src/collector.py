@@ -751,6 +751,145 @@ def foreign_story_reason(item: dict, country: dict) -> str:
     return hit
 
 
+_REFINE = None
+
+
+def _refine_rules() -> dict:
+    """config/news_rules.json → refine (추가 정리 규칙)."""
+    global _REFINE
+    if _REFINE is None:
+        cfg = NR.rules().raw.get("refine") or {}
+
+        def comp(key):
+            pats = [p for p in cfg.get(key) or [] if p and not p.startswith("_")]
+            return re.compile("|".join(f"(?:{p})" for p in pats), re.I) if pats else None
+        srcs = [x for x in cfg.get("promo_sources") or [] if x]
+        _REFINE = {
+            "after": comp("aftermath_patterns"), "stock": comp("stock_patterns"),
+            "promo": comp("promo_patterns"), "crime": comp("petty_crime_patterns"), "mass": comp("mass_patterns"),
+            "promo_src": re.compile("|".join(re.escape(x) for x in srcs), re.I) if srcs else None,
+        }
+    return _REFINE
+
+
+_LOC = {}
+
+
+def _location_regex(country: dict):
+    """'그 나라에서 일어난 일'을 가리키는 표현: 「헝가리에서」「헝가리 남부」 / 'in Hungary'."""
+    code = country.get("code", "")
+    if code in _LOC:
+        return _LOC[code]
+    names, _ = _foreign_rules()
+    parts = []
+    ko = names.get(country.get("iso3", ""))
+    if ko:
+        parts.append(rf"(?:{ko.pattern})\s*(?:에서|내\s|전역|남부|북부|동부|서부|중부|수도)")
+    aliases = list(dict.fromkeys(COUNTRY_NEWS_FILTERS.get(code, {}).get("aliases", []) + [query_name(country)]))
+    aliases = [a for a in aliases if a]
+    if aliases:
+        parts.append(r"(?<![A-Za-z])(?:in|across|inside|throughout) (?:the )?(?:" + "|".join(re.escape(a) for a in aliases) + r")(?![A-Za-z])")
+    _LOC[code] = re.compile("|".join(parts)) if parts else None
+    return _LOC[code]
+
+
+def refine_country_news(countries: list) -> dict:
+    """번역이 끝난 뒤 국가별 기사 정리 (한국 제외).
+    ① 다른 나라에서 일어난 일(「OO에서」·'in OO')이면 그 나라 목록으로 옮김
+    ② 안전·재난 중 다른 나라 사건의 여파 기사(…이후 운송 중단 등)는 정치·경제로 옮김
+    ③ 주가·증시·투자 기사 제외  ④ 보도자료·광고성 기사 제외  ⑤ 개인 범죄·단건 사고 제외(안전·사회)"""
+    R = _refine_rules()
+    names, _ = _foreign_rules()
+    stats = {"이동": 0, "안전→정치": 0, "주가": 0, "광고": 0, "개인사건": 0}
+    by_code = {c.get("code"): c for c in countries or [] if isinstance(c, dict)}
+
+    def lists_of(c):
+        out = []
+        news = c.get("news") if isinstance(c.get("news"), dict) else {}
+        for k in ("safe", "pol", "soc"):
+            if isinstance(news.get(k), list):
+                out.append((k, news, k))
+        for t in c.get("hr_trends") or []:
+            if isinstance(t, dict) and isinstance(t.get("items"), list):
+                out.append(("hr" if t.get("category") == "HR & LABOR" else "auto", t, "items"))
+        return out
+
+    def target_list(c, kind):
+        for k, holder, key in lists_of(c):
+            if k == kind:
+                return holder[key]
+        return None
+
+    moves = []
+    for c in countries or []:
+        if not isinstance(c, dict) or c.get("code") == "KR":
+            continue
+        meta = PROFILE.by_code.get(c.get("code")) or c
+        own_iso = meta.get("iso3", "")
+        own_loc = _location_regex(meta)
+        for kind, holder, key in lists_of(c):
+            keep = []
+            for it in holder[key]:
+                if not isinstance(it, dict) or it.get("is_fallback"):
+                    keep.append(it)
+                    continue
+                ko = it.get("title") or ""
+                both = f"{ko} / {it.get('original_title') or ''}"
+                if R["stock"] and R["stock"].search(both):
+                    stats["주가"] += 1
+                    continue
+                if kind != "safe" and ((R["promo_src"] and R["promo_src"].search(it.get("source") or ""))
+                                       or (kind in ("pol", "soc", "auto") and R["promo"] and R["promo"].search(both))):
+                    stats["광고"] += 1
+                    continue
+                if kind in ("safe", "soc") and R["crime"] and R["crime"].search(both) \
+                        and not (R["mass"] and R["mass"].search(both)):
+                    stats["개인사건"] += 1
+                    continue
+                # ① 다른 나라에서 일어난 일 → 그 나라로
+                dest = None
+                if not (own_loc and own_loc.search(both)):
+                    for oc in by_code.values():
+                        if oc is c or oc.get("code") == "KR":
+                            continue
+                        om = PROFILE.by_code.get(oc.get("code")) or oc
+                        loc = _location_regex(om)
+                        if loc and loc.search(both):
+                            dest = oc
+                            break
+                if dest is not None:
+                    moves.append((dest, kind, it))
+                    stats["이동"] += 1
+                    log.info(f"[{c.get('code')}→{dest.get('code')}] 다른 나라에서 일어난 일로 보고 옮김: {ko[:50]}")
+                    continue
+                # ② 안전: 다른 나라 사건의 여파 → 정치·경제
+                if kind == "safe" and R["after"] and R["after"].search(both) and any(
+                        k != own_iso and rx.search(ko) for k, rx in names.items()):
+                    pol = target_list(c, "pol")
+                    if pol is not None:
+                        it.pop("safety_tag", None)
+                        it.pop("incident", None)
+                        pol.append(it)
+                        stats["안전→정치"] += 1
+                        log.info(f"[{c.get('code')}] 다른 나라 사건의 여파로 보고 안전→정치·경제: {ko[:50]}")
+                        continue
+                keep.append(it)
+            holder[key] = keep
+    for dest, kind, it in moves:
+        lst = target_list(dest, kind)
+        if lst is None:
+            continue
+        link = (it.get("link") or "").strip()
+        if any(isinstance(x, dict) and (x.get("link") or "").strip() == link for x in lst):
+            continue
+        if kind == "safe" and not it.get("safety_tag"):
+            continue
+        lst.append(it)
+    if any(stats.values()):
+        log.info("기사 추가 정리: " + ", ".join(f"{k} {v}건" for k, v in stats.items() if v))
+    return stats
+
+
 def drop_foreign_stories(countries: list) -> int:
     """번역이 끝난 뒤, 국가별 목록에서 다른 나라 기사(현지 언론의 해외 기사 번역)를 뺀다. 한국은 별도 규칙."""
     removed = 0
@@ -1692,6 +1831,10 @@ def main() -> dict:
         drop_foreign_stories(countries_result)
     except Exception as e:
         log.warning(f"다른 나라 기사 거르기 실패(무시): {e}")
+    try:
+        refine_country_news(countries_result)
+    except Exception as e:
+        log.warning(f"기사 추가 정리 실패(무시): {e}")
 
     now_kst = datetime.now(KST)
     if BACKFILL_DATE:
@@ -1809,7 +1952,14 @@ def build_top_briefing(countries: list, global_industry: list, today: str) -> li
         g["sources"].add(it.get("source", ""))
         g["sources"].update(a.get("source", "") for a in it.get("also") or [])
 
+    names_kr = {c["code"]: c.get("name_kr", "") for c in COUNTRIES}
     for g in groups:
+        # ⑥ 여러 나라가 묶였으면 제목에 실제로 나오는 나라만 남긴다 (예: 미국 무역협정 기사에 캐나다가 붙는 것 방지)
+        if len(g["countries"]) > 1:
+            named = [cd for cd in g["countries"]
+                     if mentions(cd, g["item"]) or (names_kr.get(cd) and names_kr[cd] in (g["item"].get("title") or ""))]
+            if named:
+                g["countries"] = named
         g["final"] = g["score"] + min(len(g["countries"]) - 1, 3) * 6 + min(len(g["sources"]) - 1, 4) * 3
     groups.sort(key=lambda g: -g["final"])
 
