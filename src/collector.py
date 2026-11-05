@@ -986,8 +986,12 @@ def _cached_list(cached_list, check=None) -> list:
 def _pick(candidates: list, lang: str, limit: int, seen: set, check=None, already: list = None) -> list:
     """후보 중 조건에 맞는 기사를 limit 개까지 고른다.
     - 국가 관련성·의견/과거/연예·스포츠/차단 매체 제외
-    - 이미 고른 기사와 같은 사건이면 새로 넣지 않고 그 기사의 also(다른 매체)에 붙인다"""
+    - 이미 고른 기사와 같은 사건이면 새로 넣지 않고 그 기사의 also(다른 매체)에 붙인다
+    - 자리가 모자라면 신뢰 매체(글로벌 통신사·나라별 주요 매체) 기사를 먼저 고른다.
+      같은 사건을 신뢰 매체도 보도했으면 그 매체 기사를 대표로 쓴다."""
     picked = list(already or [])
+    pool = []                                  # 이번에 새로 고를 후보 (사건별 대표 1건)
+    trusted = NR.is_trusted_source
     for it in candidates:
         title = it.get("title", "")
         if check and not check(title, lang):
@@ -996,16 +1000,25 @@ def _pick(candidates: list, lang: str, limit: int, seen: set, check=None, alread
             continue
         if _is_seen(it, seen):
             continue
-        twin = next((p for p in picked if similar(key_title(p), title)), None)
+        twin = next((p for p in picked + pool if similar(key_title(p), title)), None)
         if twin is not None:
-            add_also(twin, it)
+            if twin in pool and trusted(it.get("source", "")) and not trusted(twin.get("source", "")):
+                # 같은 사건: 신뢰 매체 기사를 대표로 바꾸고, 원래 대표는 '외 N개 매체'로
+                pool[pool.index(twin)] = it
+                for a in twin.get("also") or []:
+                    add_also(it, {"source": a.get("source", ""), "link": a.get("link", "")})
+                add_also(it, twin)
+            else:
+                add_also(twin, it)
             _mark_seen(it, seen)
             continue
-        if len(picked) >= limit:
-            continue          # 자리는 찼어도 같은 사건 보도(also)를 모으려고 끝까지 본다
+        pool.append(it)
+    room = max(0, limit - len(picked))
+    ordered = sorted(pool, key=lambda x: 0 if trusted(x.get("source", "")) else 1)   # 신뢰 매체 먼저 (같은 그룹 안은 원래 순서)
+    for it in ordered[:room]:
         it["lang"] = lang
         it["translated"] = False
-        it["original_title"] = title if lang != "ko" else ""
+        it["original_title"] = it.get("title", "") if lang != "ko" else ""
         picked.append(it)
         _mark_seen(it, seen)
     return picked

@@ -109,7 +109,13 @@ class NewsRules:
         self.non_news_title_re = _compile(nn.get("title_patterns"))
         src = raw.get("sources") or {}
         self.blocked_re = _name_list_regex(src.get("blocked"))
-        self.trusted_re = _name_list_regex(src.get("trusted"))
+        # 신뢰 매체 = 글로벌(trusted) + 나라별 주요 매체(trusted_by_country). 짧은 이름이 다른 단어 속에 걸리지 않게 단어 단위로 맞춘다.
+        names = list(src.get("trusted") or [])
+        for k, v in (src.get("trusted_by_country") or {}).items():
+            if not str(k).startswith("_") and isinstance(v, list):
+                names += v
+        names = [n for n in dict.fromkeys(names) if isinstance(n, str) and n.strip()]
+        self.trusted_re = re.compile("|".join(rf"(?<!\w){re.escape(n)}(?!\w)" for n in names), re.I) if names else None
         comp = raw.get("company") or {}
         self.own_re = _compile([comp.get("own")]) if comp.get("own") else None
         self.competitors = [(name, _compile([pat])) for name, pat in (comp.get("competitors") or {}).items()
@@ -252,7 +258,7 @@ class NewsRules:
         if item.get("near_site"):
             s += 15
         if item.get("trusted"):
-            s += 5
+            s += 20                         # 글로벌 통신사·나라별 주요 매체
         s += min(len(item.get("also") or []), 4) * 5          # 여러 매체 동시 보도
         s += min(max(n_countries - 1, 0), 3) * 6               # 여러 나라 동시 보도
         if country_code in MAJOR_COUNTRIES:
@@ -287,6 +293,11 @@ def similar(a: str, b: str, threshold: float = 0.5) -> bool:
 
 def key_title(item: dict) -> str:
     return item.get("original_title") or item.get("title") or ""
+
+
+def is_trusted_source(source: str) -> bool:
+    r = rules()
+    return bool(source and r.trusted_re and r.trusted_re.search(source))
 
 
 def add_also(target: dict, other: dict) -> None:
