@@ -38,7 +38,8 @@
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* 일자: ◀ 날짜 (요일) ▶ 를 한 덩어리로 */
   .date-box { flex: 0 0 auto; display: flex; align-items: center; height: 38px; border: 1px solid #CBD5E1; border-radius: 10px; background: #fff; overflow: hidden; }
-  .date-box input { height: 36px; border: 0; padding: 0 2px 0 6px; font-size: 14px; font-weight: 600; font-family: inherit; color: var(--text); background: transparent; }
+  .date-box input { height: 36px; border: 0; padding: 0 2px 0 6px; font-size: 14px; font-weight: 600; font-family: inherit; color: var(--text); background: transparent; cursor: pointer; }
+  .date-dow { cursor: pointer; }
   .date-box input:focus { outline: none; }
   .date-dow { font-size: 13px; color: var(--sub); padding-right: 6px; white-space: nowrap; }
   .date-box.loading { opacity: .5; pointer-events: none; }
@@ -1099,6 +1100,17 @@
     render();
     updateDateNav();
   }
+  // 날짜 칸이나 요일을 누르면 바로 달력이 열리게 (숫자 칸을 하나씩 고치는 대신)
+  (function () {
+    var input = document.getElementById('briefDatePicker');
+    function openCal(e) {
+      if (typeof input.showPicker !== 'function') return;          // 지원 안 하는 브라우저는 기본 동작(달력 아이콘)
+      try { if (e) e.preventDefault(); input.showPicker(); } catch (err) { /* 무시 */ }
+    }
+    input.addEventListener('click', openCal);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') openCal(e); });
+    document.getElementById('date-dow').addEventListener('click', function () { input.focus(); openCal(); });
+  })();
   document.getElementById('briefDatePicker').addEventListener('change', function (e) {
     var input = e.target, dateStr = input.value;
     if (dateStr === INITIAL_DATE) { applyDataset(INITIAL_DASHBOARD, INITIAL_DATE); return; }
