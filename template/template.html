@@ -429,7 +429,7 @@
   function trBadge(i) { return i._orig ? '<span class="b-orig" title="번역되지 않아 원문 제목을 표시합니다">원문</span>' : ''; }
   function origTitleAttr(i) { return i.translated && i.original_title ? ' title="원문: ' + esc(i.original_title) + '"' : ''; }
   function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
-  // HR·노동 분류 (제목 기준, 위에서부터 처음 맞는 것 하나). 최저임금·파업·노사는 주황, 나머지는 남색 배지
+  // HR·노동 분류 (제목 기준, 위에서부터 처음 맞는 것 하나). 모두 같은 남색 배지
   var HR_TAGS = [
     ['최저임금', /최저\s?임금|minimum wage|living wage|sal[aá]rio m[ií]nimo|upah minimum|SMIC/i],
     ['파업·노사', /파업|노조|노동조합|노사|단체\s?교섭|단체\s?협약|임금\s?협상|임단협|직장\s?폐쇄|\bstrikes?\b|walk-?out|\bunions?\b|collective (bargaining|agreement)|lockout/i],
@@ -444,7 +444,7 @@
     for (var k = 0; k < HR_TAGS.length; k++) if (HR_TAGS[k][1].test(t)) return HR_TAGS[k][0];
     return i.law ? '노동법·제도' : '';
   }
-  function hrBadge(i) { var tag = hrTag(i); return tag ? '<span class="badge ' + (tag === '파업·노사' || tag === '최저임금' ? 'b-amber' : 'b-law') + '">' + esc(tag) + '</span>' : ''; }
+  function hrBadge(i) { var tag = hrTag(i); return tag ? '<span class="badge ' + 'b-law' + '">' + esc(tag) + '</span>' : ''; }
   // HR 목록에 잘못 들어온 군사·전쟁 기사 (영어 strike = 공습 오분류 등)는 숨김
   var HR_OFFTOPIC = /공격|공습|폭격|미사일|드론|전투기|항공\s?모함|타격 작전|스텔스|군사|병력|나토|NATO|air ?strike|missile|drone|fighter jet|warplane|aircraft carrier|F-35|deadly strikes?|strike (operation|group|mission)/i;
   function articleLink(i, inner) {
