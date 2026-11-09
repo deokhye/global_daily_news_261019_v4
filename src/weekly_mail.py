@@ -11,7 +11,7 @@ weekly_mail.py — 주간 요약 메일 (매주 월요일 아침, .github/workfl
 3) MAIL_TO 에게 숨은 참조로 발송한다.
 
 환경 변수(GitHub Secrets / Variables)
-  GEMINI_API_KEY · GEMINI_MODEL(선택) · MAIL_USER · MAIL_PASSWORD · MAIL_TO · SITE_URL(선택)
+  GEMINI_API_KEY · GEMINI_MODEL(선택) · MAIL_USER · MAIL_PASSWORD · MAIL_TO · MAIL_TO_REVIEW(선택, 검토용 1차 수신자) · SITE_URL(선택) · HR_VIEW_URL(선택, HR Insight 주소)
 """
 from __future__ import annotations
 
@@ -611,9 +611,20 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         first_card = False
     comp_block = ""          # 업계·경쟁사 동향은 메일에서 뺌 (사이트에서 확인)
 
-    button = (f"<tr><td align='center' style='padding:22px 28px 6px'><a href='{_e(site_url)}' "
-              "style='display:inline-block;background:#C2410C;color:#fff;font-weight:700;font-size:14px;"
-              "text-decoration:none;border-radius:10px;padding:11px 22px'>Global HR Radar 바로가기</a></td></tr>") if site_url else ""
+    hr_view = os.environ.get("HR_VIEW_URL", "").strip()     # HR Insight 화면 주소 (사내망 전용, Secret 으로만 받음)
+    btn_css = ("display:inline-block;font-weight:700;font-size:14px;text-decoration:none;border-radius:10px;"
+               "padding:11px 22px;margin:4px")
+    btns = []
+    if hr_view:
+        btns.append(f"<a href='{_e(hr_view)}' style='{btn_css};background:#C2410C;color:#fff'>HR Insight에서 보기</a>")
+    if site_url:
+        btns.append(f"<a href='{_e(site_url)}' style='{btn_css};" +
+                    ("background:#fff;color:#C2410C;border:1px solid #C2410C" if hr_view else "background:#C2410C;color:#fff") +
+                    f"'>{'외부망에서 보기' if hr_view else 'Global HR Radar 바로가기'}</a>")
+    button = (f"<tr><td align='center' style='padding:22px 28px 6px'>{''.join(btns)}"
+              + ("<div style='font-size:11px;color:#94A3B8;margin-top:6px'>HR Insight는 사내망에서만 열립니다. "
+                 "사외에서는 '외부망에서 보기'를 이용해 주세요.</div>" if hr_view and site_url else "")
+              + "</td></tr>") if btns else ""
 
     page = (
         "<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'>"
@@ -648,8 +659,11 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             text += ["", f"■ {title}"]
             text += [f"{i}. [{ctry(g['code'])}] {g['item'].get('title', '')}\n   {g['item'].get('link', '')}"
                      for i, g in enumerate(lst, 1)]
+    if os.environ.get("HR_VIEW_URL", "").strip():
+        text += ["", f"HR Insight에서 보기(사내망): {os.environ['HR_VIEW_URL'].strip()}"]
     if site_url:
-        text += ["", f"Global HR Radar 바로가기: {site_url}"]
+        text += ["" if not os.environ.get("HR_VIEW_URL", "").strip() else "",
+                 f"{'외부망에서 보기' if os.environ.get('HR_VIEW_URL', '').strip() else 'Global HR Radar 바로가기'}: {site_url}"]
     text += ["", "Hankook Tire & Technology Global HR팀"]
     return page, "\n".join(text)
 
@@ -746,7 +760,15 @@ def main() -> int:
     if args.dry_run:
         _report("✅ 주간 메일 미리보기 생성", [f"제목: {subject}", "실행 화면 맨 아래 Artifacts → weekly-mail-preview 에서 내려받으세요."])
         return 0
-    recipients = parse_recipients(os.environ.get("MAIL_TO", ""))
+    # 검토 단계: MAIL_TO_REVIEW 가 있으면 자동 발송은 담당자에게만 [검토용]으로, send_all(MAIL_STAGE=all)일 때만 MAIL_TO 전체
+    review_to = parse_recipients(os.environ.get("MAIL_TO_REVIEW", ""))
+    stage = os.environ.get("MAIL_STAGE", "review").strip()
+    if stage != "all" and review_to:
+        recipients = review_to
+        subject = "[검토용] " + subject
+        log.info("검토용 발송: MAIL_TO_REVIEW 에게만 보냅니다. 전체 발송은 Run workflow → mode=mail, 주간 메일=send_all")
+    else:
+        recipients = parse_recipients(os.environ.get("MAIL_TO", ""))
     user = os.environ.get("MAIL_USER", "").strip()
     host = os.environ.get("MAIL_SMTP_HOST", "").strip() or "smtp.gmail.com"
     port = os.environ.get("MAIL_SMTP_PORT", "").strip() or "465"
@@ -759,7 +781,10 @@ def main() -> int:
         _report("❌ 주간 메일 발송 실패", [_hint(e), f"서버: {host}:{port} · 받는 사람 {len(recipients)}명",
                                           f"오류 원문: {type(e).__name__}: {e}"])
         return 1
-    _report("✅ 주간 메일 발송 완료", [f"제목: {subject}", f"받는 사람 {len(recipients)}명 (숨은 참조) + 보내는 계정 보낸편지함"])
+    lines = [f"제목: {subject}", f"받는 사람 {len(recipients)}명 (숨은 참조) + 보내는 계정 보낸편지함"]
+    if subject.startswith("[검토용]"):
+        lines.append("검토 후 전체 발송: Actions → Run workflow → mode=mail, 주간 메일=send_all")
+    _report("✅ 주간 메일 발송 완료", lines)
     return 0
 
 
