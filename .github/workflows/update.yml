@@ -73,11 +73,13 @@ jobs:
           # 주간 메일: 월요일(KST) 05:00 이후 첫 실행에서 한 번만 발송
           WEEKLY=none
           if [ "$EVENT" = "workflow_dispatch" ]; then WEEKLY="${{ inputs.weekly_mail }}"; fi
+          PICKED=no   # 사람이 Run workflow 에서 주간 메일을 직접 고른 경우 → 오늘 이미 보냈어도 다시 보냄
+          if [ "$EVENT" = "workflow_dispatch" ] && [ "$WEEKLY" != "none" ] && [ "${{ inputs.mode }}" != "auto" ]; then PICKED=yes; fi
           if [ "$MODE" = "mail" ] && [ "$WEEKLY" = "none" ]; then WEEKLY=send; fi
           HOUR=$((10#$(TZ=Asia/Seoul date +%H)))
           if [ "$AUTO" = "yes" ] && [ "$WEEKLY" = "none" ] && [ "$(TZ=Asia/Seoul date +%u)" = "1" ] && [ "$HOUR" -ge 5 ]; then WEEKLY=send; fi
-          if [ "$WEEKLY" = "send" ] && { [ "$AUTO" = "yes" ] || [ "$MODE" = "mail" ]; } && grep -qx "$TODAY" data/weekly_mail_sent.txt 2>/dev/null; then
-            echo "주간 메일: 오늘($TODAY) 이미 보냈습니다 — 건너뜀"; WEEKLY=none
+          if [ "$WEEKLY" = "send" ] && [ "$PICKED" = "no" ] && { [ "$AUTO" = "yes" ] || [ "$MODE" = "mail" ]; } && grep -qx "$TODAY" data/weekly_mail_sent.txt 2>/dev/null; then
+            echo "주간 메일: 오늘($TODAY) 이미 보냈습니다 — 건너뜀 (다시 보내려면 Run workflow 에서 주간 메일=send 를 직접 선택)"; WEEKLY=none
           fi
           if [ "$MODE" = "skip" ] && [ "$WEEKLY" != "none" ]; then MODE=mail; fi
           if [ "$MODE" = "mail" ] && [ "$WEEKLY" = "none" ]; then MODE=skip; fi
