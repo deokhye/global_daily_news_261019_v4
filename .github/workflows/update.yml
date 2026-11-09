@@ -10,7 +10,10 @@ name: Daily Global Brief Update
 # 주간 메일 (지난주 월~일 주요 이슈): 월요일 05:00 이후 첫 실행에서 한 번만 발송한다.
 #   - 정확히 05:00 에 받으려면 cron-job.org 에서 월 05:00 에 mode=mail 로 실행 요청
 #   - 그게 없으면 월요일 05:05 예약(대체)이나 05:00 이후 시작된 자동 수집에서 발송 (GitHub 지연만큼 늦어짐)
-#   수동 실행에서는 '주간 메일' 항목으로 preview(미리보기만) / send(실제 발송)를 고를 수 있다.
+#   수동 실행에서는 '주간 메일' 항목으로 preview(미리보기만) / send(검토용) / send_all(전체 발송)을 고를 수 있다.
+#   검토 단계: Secret MAIL_TO_REVIEW 가 있으면 자동 발송은 그 주소(담당자)에게만 [검토용]으로 간다.
+#             내용 확인 후 Run workflow → mode=mail, 주간 메일=send_all 로 실행하면 MAIL_TO 전체에게 발송.
+#             MAIL_TO_REVIEW 를 지우면 예전처럼 자동 발송이 바로 MAIL_TO 전체에게 간다.
 #   같은 날 두 번 보내지 않도록 data/weekly_mail_sent.txt 에 보낸 날짜를 남긴다.
 on:
   schedule:
@@ -31,9 +34,9 @@ on:
         options: [collect, build, auto, mail]
         default: collect
       weekly_mail:
-        description: "주간 메일: none = 안 함 / preview = 미리보기만(Artifacts) / send = 실제 발송"
+        description: "주간 메일: none = 안 함 / preview = 미리보기만(Artifacts) / send = 검토용(MAIL_TO_REVIEW 에게만) / send_all = 전체 발송(MAIL_TO)"
         type: choice
-        options: [none, preview, send]
+        options: [none, preview, send, send_all]
         default: none
 
 permissions:
@@ -122,15 +125,20 @@ jobs:
           MAIL_SMTP_HOST: ${{ secrets.MAIL_SMTP_HOST }}
           MAIL_SMTP_PORT: ${{ secrets.MAIL_SMTP_PORT }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_TO_REVIEW: ${{ secrets.MAIL_TO_REVIEW }}
+          MAIL_STAGE: ${{ steps.decide.outputs.weekly == 'send_all' && 'all' || 'review' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          HR_VIEW_URL: ${{ secrets.HR_VIEW_URL }}
         run: |
           if [ "${{ steps.decide.outputs.weekly }}" = "preview" ]; then
             python src/weekly_mail.py --dry-run
           else
             python src/weekly_mail.py
-            echo "${{ steps.decide.outputs.today }}" >> data/weekly_mail_sent.txt
+            if [ "${{ steps.decide.outputs.weekly }}" = "send" ]; then
+              echo "${{ steps.decide.outputs.today }}" >> data/weekly_mail_sent.txt
+            fi
           fi
 
       - name: Upload weekly mail preview
