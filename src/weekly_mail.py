@@ -623,7 +623,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             tag = kind_badge(g)
         elif g["kind"] == "hr":                    # HR: 최저임금 / 파업·노사 / 근로시간·복지 / 노동법·제도 / 고용·해고 / 임금 / 외국인 고용
             sub = hr_tag(g)
-            tag = (badge(sub, "#9A3412", "#FFEDD5") if sub in ("최저임금", "파업·노사") else badge(sub, "#3730A3", "#E0E7FF")) if sub else ""
+            tag = badge(sub, "#3730A3", "#E0E7FF") if sub else ""     # HR 분류는 모두 같은 색(남색)
         else:                                      # 정치 / 경제 / 사회 중 하나
             sub = topic_of(g)
             tag = badge(sub, *TOPIC_COLOR[sub])
