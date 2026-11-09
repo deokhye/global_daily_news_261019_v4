@@ -400,7 +400,8 @@
   }
   function trend(c, cat) {
     var t = (c.hr_trends || []).find(function (x) { return x && x.category === cat; });
-    return realItems(t ? t.items : [], cat === 'HR & LABOR' ? 'hr' : 'auto');
+    var items = realItems(t ? t.items : [], cat === 'HR & LABOR' ? 'hr' : 'auto');
+    return cat !== 'HR & LABOR' ? items : items.filter(function (i) { return !HR_OFFTOPIC.test((i.title || '') + ' / ' + (i.original_title || '')); });
   }
   function news(c) {
     var n = c.news;
@@ -428,6 +429,24 @@
   function trBadge(i) { return i._orig ? '<span class="b-orig" title="번역되지 않아 원문 제목을 표시합니다">원문</span>' : ''; }
   function origTitleAttr(i) { return i.translated && i.original_title ? ' title="원문: ' + esc(i.original_title) + '"' : ''; }
   function safetyBadge(tag) { tag = normTag(tag); return tag ? '<span class="badge ' + (SAFETY_RED[tag] ? 'b-red' : 'b-amber') + '">' + esc(tag) + '</span>' : ''; }
+  // HR·노동 분류 (제목 기준, 위에서부터 처음 맞는 것 하나). 최저임금·파업·노사는 주황, 나머지는 남색 배지
+  var HR_TAGS = [
+    ['최저임금', /최저\s?임금|minimum wage|living wage|sal[aá]rio m[ií]nimo|upah minimum|SMIC/i],
+    ['파업·노사', /파업|노조|노동조합|노사|단체\s?교섭|단체\s?협약|임금\s?협상|임단협|직장\s?폐쇄|\bstrikes?\b|walk-?out|\bunions?\b|collective (bargaining|agreement)|lockout/i],
+    ['근로시간·복지', /근로\s?시간|근무\s?시간|노동\s?시간|초과\s?근무|\d+\s?시간\s?근무|주\s?4일|휴가|휴일|연금|복지|육아|working hours|overtime|work ?week|four-day|pension|paid leave|materni|paterni/i],
+    ['노동법·제도', /노동법|근로기준|법안|개정|시행령|입법|판결|규정|제도|의무화|labou?r (law|code|reform)|\bbill\b|regulation|decree|legislat|ruling|reform/i],
+    ['고용·해고', /해고|감원|구조\s?조정|일자리|고용|채용|실업|희망\s?퇴직|layoffs?|job cuts?|redundanc|hiring|unemploy|\bjobs?\b/i],
+    ['임금', /임금|급여|수당|연봉|상여|보너스|\bwages?\b|salar|\bpay\b|bonus/i],
+    ['외국인 고용', /비자|이민|외국인\s?(노동|근로|인력)|이주\s?노동|work permit|\bvisas?\b|migrant work|foreign workers?/i]
+  ];
+  function hrTag(i) {
+    var t = (i.title || '') + ' / ' + (i.original_title || '');
+    for (var k = 0; k < HR_TAGS.length; k++) if (HR_TAGS[k][1].test(t)) return HR_TAGS[k][0];
+    return i.law ? '노동법·제도' : '';
+  }
+  function hrBadge(i) { var tag = hrTag(i); return tag ? '<span class="badge ' + (tag === '파업·노사' || tag === '최저임금' ? 'b-amber' : 'b-law') + '">' + esc(tag) + '</span>' : ''; }
+  // HR 목록에 잘못 들어온 군사·전쟁 기사 (영어 strike = 공습 오분류 등)는 숨김
+  var HR_OFFTOPIC = /공격|공습|폭격|미사일|드론|전투기|항공\s?모함|타격 작전|스텔스|군사|병력|나토|NATO|air ?strike|missile|drone|fighter jet|warplane|aircraft carrier|F-35|deadly strikes?|strike (operation|group|mission)/i;
   function articleLink(i, inner) {
     return '<a class="item' + (isOld(i) ? ' old' : '') + '" href="' + esc(safeUrl(i.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(i) + '>' + inner + '</a>';
   }
@@ -766,7 +785,7 @@
     sec += '<section class="' + cardCls + '" aria-labelledby="hrb-h"><div class="card-head"><h2 id="hrb-h">' +
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
       'HR·노동 주요 소식 <span class="count b-law">' + hrAll.length + '</span></h2><span class="note">국가별 주요 HR 이슈</span></div>';
-    sec += hr.length ? hr.map(function (g) { return feedRow(g, g.item.law ? '<span class="badge b-law">법·제도</span>' : ''); }).join('')
+    sec += hr.length ? hr.map(function (g) { return feedRow(g, hrBadge(g.item)); }).join('')
       : '<p class="empty">선택한 조직에는 ' + (BRIEF_MAX_DAYS ? '오늘·어제' : '오늘') + ' HR·노동 소식이 없습니다.</p>';
     sec += moreButton('hr', hrAll.length);
     sec += '</section>';
@@ -980,7 +999,7 @@
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"></path></svg>' +
       'HR·노동</h2><span class="note">노동법 · 임금 · 고용 · 노조/파업</span></div>';
     h += hr.length ? hr.map(function (i) {
-      return articleLink(i, metaLine(i, i.law ? '<span class="badge b-law">법·제도</span>' : '') + '<span class="ttl">' + esc(i.title) + '</span>');
+      return articleLink(i, metaLine(i, hrBadge(i)) + '<span class="ttl">' + esc(i.title) + '</span>');
     }).join('') : '<p class="empty">최근 2주 동안 수집된 HR·노동 보도가 없습니다.</p>';
     h += '</section>';
 
