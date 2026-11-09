@@ -167,6 +167,7 @@ def collect_week(week: list, start: str, end: str) -> dict:
             g["sources"].update(a.get("source", "") for a in it.get("also") or [])
             if link:
                 by_link[link] = g
+    groups = merge_same_event(groups)
     for g in groups:
         # 여러 날 이어진 이슈·여러 매체 보도는 가산 (날짜 가산점은 주간 비교에서 빼고 다시 계산)
         base = (g["item"].get("score") or 0)
@@ -177,6 +178,46 @@ def collect_week(week: list, start: str, end: str) -> dict:
             row = counts.setdefault(g["code"], {"name": names.get(g["code"], g["code"]), "safe": 0, "hr": 0})
             row[g["kind"]] += 1
     return {"groups": groups, "counts": counts, "names": names, "n_countries": len(all_codes)}
+
+
+_CONFLICT_TAGS = {"무력충돌·테러", "사회불안"}
+
+
+def _pub_gap(a: dict, b: dict) -> int:
+    from news_rules import days_between
+    n = days_between(str(a.get("published") or "")[:10], str(b.get("published") or "")[:10])
+    return abs(n) if n is not None else 99
+
+
+def merge_same_event(groups: list) -> list:
+    """제목은 달라도 같은 나라의 같은 사건이면 1건으로 묶는다.
+    - 안전: 같은 나라·같은 유형 + (무력충돌·사회불안은 한 주 안 전체 = 진행 중인 사태, 그 밖은 3일 이내)
+    - HR: 같은 나라의 최저임금 기사끼리
+    대표는 점수가 높은 기사, 보도 날짜·매체는 합친다."""
+    order = sorted(groups, key=lambda g: (g["item"].get("score") or 0), reverse=True)
+    kept = []
+    for g in order:
+        it = g["item"]
+        host = None
+        if g["code"]:
+            for k in kept:
+                if k["code"] != g["code"] or k["kind"] != g["kind"]:
+                    continue
+                ki = k["item"]
+                if g["kind"] == "safe" and it.get("safety_tag") and it.get("safety_tag") == ki.get("safety_tag") \
+                        and (it["safety_tag"] in _CONFLICT_TAGS or _pub_gap(it, ki) <= 3):
+                    host = k
+                    break
+                if g["kind"] == "hr" and hr_priority(g) == 0 and hr_priority(k) == 0:
+                    host = k
+                    break
+        if host is None:
+            kept.append(g)
+            continue
+        host["days"] |= g["days"]
+        host["sources"] |= g["sources"]
+        host["merged"] = host.get("merged", 0) + 1
+    return kept
 
 
 def pick_top(groups: list, top_n: int, per_kind_max: int) -> list:
@@ -278,6 +319,7 @@ def pick_sections(groups: list, counts: dict) -> list:
     """섹션별(안전·재난 / HR·노동 / 정치·경제) 중요도 상위 N건. 업계·경쟁사 기사는 넣지 않는다.
     제목이 번역되지 않은 기사는 발송 직전에 다시 번역하고, 그래도 안 되면 빼고 다음 기사로 채운다."""
     tr = _Translator()
+    per_country = int((counts or {}).get("per_country_max", 1))
     out = []
     for key, _title, _color, kinds in SECTIONS:
         n = int((counts or {}).get(key, SECTION_DEFAULT[key]))
@@ -286,38 +328,51 @@ def pick_sections(groups: list, counts: dict) -> list:
         if key == "hr":                      # 최저임금·법 제도 우선 (안정 정렬이라 같은 단계는 중요도 순 유지)
             lst.sort(key=hr_priority)
         if key == "pol":                     # 정치·경제·사회는 분야별 비율대로 (부족한 분야는 다른 분야로 채움)
-            out += _pick_mixed(lst, n, (counts or {}).get("pol_mix") or POL_MIX_DEFAULT, tr)
+            out += _pick_mixed(lst, n, (counts or {}).get("pol_mix") or POL_MIX_DEFAULT, tr, per_country)
             continue
-        picked = 0
-        for g in lst:
-            if picked >= n:
-                break
-            if not tr.korean(g["item"]):
-                continue
+        for g in _spread_by_country([g for g in lst if tr.korean(g["item"])], n, per_country):
             g["section"] = key
             out.append(g)
-            picked += 1
     return out
+
+
+def _spread_by_country(lst: list, n: int, per_country: int, pre: list = ()) -> list:
+    """중요도 순 목록에서 한 나라 최대 per_country 건까지 고르고, 모자라면 한도를 늘려 채운다 (순서는 유지).
+    pre = 이미 고른 기사 (나라 건수에 함께 셈)."""
+    chosen, cap = [], max(1, per_country)
+    while len(chosen) < n and cap <= n + len(pre):
+        cnt = {}
+        for g in list(pre) + chosen:
+            cnt[g["code"]] = cnt.get(g["code"], 0) + 1
+        for g in lst:
+            if len(chosen) >= n:
+                break
+            if g in chosen or cnt.get(g["code"], 0) >= cap:
+                continue
+            chosen.append(g)
+            cnt[g["code"]] = cnt.get(g["code"], 0) + 1
+        cap += 1
+    chosen.sort(key=lambda g: lst.index(g))
+    return chosen
 
 
 POL_MIX_DEFAULT = {"정치": 2, "경제": 2, "사회": 1}
 
 
-def _pick_mixed(lst: list, n: int, mix: dict, tr) -> list:
+def _pick_mixed(lst: list, n: int, mix: dict, tr, per_country: int = 1) -> list:
     """중요도 순 목록에서 정치·경제·사회를 mix 비율대로 고르고, 모자라면 남은 기사 중 중요도 순으로 채운다.
     결과는 다시 중요도 순으로 정렬한다."""
     chosen, quota = [], {k: int(v) for k, v in (mix or {}).items() if not str(k).startswith("_")}
     usable = [g for g in lst if tr.korean(g["item"])]
+    cnt = {}
     for g in usable:
         t = topic_of(g)
-        if quota.get(t, 0) > 0 and len(chosen) < n:
+        if quota.get(t, 0) > 0 and len(chosen) < n and cnt.get(g["code"], 0) < per_country:
             chosen.append(g)
             quota[t] -= 1
-    for g in usable:                          # 비율을 채우지 못한 자리는 중요도 순으로
-        if len(chosen) >= n:
-            break
-        if g not in chosen:
-            chosen.append(g)
+            cnt[g["code"]] = cnt.get(g["code"], 0) + 1
+    rest = [g for g in usable if g not in chosen]  # 비율을 채우지 못한 자리는 중요도 순으로 (나라 고르게)
+    chosen += _spread_by_country(rest, n - len(chosen), per_country, chosen) if len(chosen) < n else []
     chosen.sort(key=lambda g: usable.index(g))
     for g in chosen:
         g["section"] = "pol"
@@ -464,7 +519,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         return (f"<div style='font-size:12px;color:#64748B;margin-top:3px'><b style='color:#475569'>{_e(it.get('source'))}</b>"
                 + (f"&nbsp; 외 {n_src - 1}개 매체" if n_src > 1 else "")
                 + f"&nbsp; {_e(str(it.get('published') or '')[5:10].replace('-', '.'))}"
-                + (f"&nbsp;·&nbsp;{days}일 연속 보도" if days > 1 else "") + tr + "</div>")
+                + (f"&nbsp;·&nbsp;{days}일간 보도" if days > 1 else "") + tr + "</div>")
 
     def card(title_html, note, body):
         return ("<tr><td style='padding:8px 24px'><table width='100%' cellpadding='0' cellspacing='0' "
