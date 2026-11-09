@@ -58,6 +58,32 @@ LAW_HR_RE = re.compile(r"(?i)노동법|근로기준|법안|개정|시행령|입�
                        r"\breform\b|\bnew rules?\b")
 
 
+# HR·노동 분류 배지 (웹 화면 template.html 의 HR_TAGS 와 같은 기준, 위에서부터 처음 맞는 것 하나)
+HR_TAGS = [
+    ("파업·노사", r"파업|노조|노동조합|노사|단체\s?교섭|단체\s?협약|임금\s?협상|임단협|직장\s?폐쇄|\bstrikes?\b|walk-?out|\bunions?\b|"
+                 r"collective (bargaining|agreement)|lockout"),
+    ("근로시간·복지", r"근로\s?시간|근무\s?시간|노동\s?시간|초과\s?근무|\d+\s?시간\s?근무|주\s?4일|휴가|휴일|연금|복지|육아|working hours|"
+                    r"overtime|work ?week|four-day|pension|paid leave|materni|paterni"),
+    ("노동법·제도", r"노동법|근로기준|법안|개정|시행령|입법|판결|규정|제도|의무화|labou?r (law|code|reform)|\bbill\b|regulation|decree|"
+                  r"legislat|ruling|reform"),
+    ("고용·해고", r"해고|감원|구조\s?조정|일자리|고용|채용|실업|희망\s?퇴직|layoffs?|job cuts?|redundanc|hiring|unemploy|\bjobs?\b"),
+    ("임금", r"임금|급여|수당|연봉|상여|보너스|\bwages?\b|salar|\bpay\b|bonus"),
+    ("외국인 고용", r"비자|이민|외국인\s?(노동|근로|인력)|이주\s?노동|work permit|\bvisas?\b|migrant work|foreign workers?"),
+]
+HR_TAGS = [(k, re.compile("(?i)" + v)) for k, v in HR_TAGS]
+
+
+def hr_tag(g: dict) -> str:
+    it = g["item"]
+    t = f"{it.get('title', '')} / {it.get('original_title', '')}"
+    if MIN_WAGE_RE.search(t):
+        return "최저임금"
+    for k, rx in HR_TAGS:
+        if rx.search(t):
+            return k
+    return "노동법·제도" if it.get("law") else ""
+
+
 def hr_priority(g: dict) -> int:
     """0 = 최저임금, 1 = 법·제도, 2 = 그 밖."""
     it = g["item"]
@@ -595,9 +621,9 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             tag = badge("사건·사고", "#B91C1C", "#FEE2E2")
         elif g["kind"] == "safe":                  # 안전: 유형(자연재해·대형사고…)
             tag = kind_badge(g)
-        elif g["kind"] == "hr":                    # HR: 최저임금 / 법·제도만 표시
-            pr = hr_priority(g)
-            tag = badge("최저임금", "#9A3412", "#FFEDD5") if pr == 0 else (badge("법·제도", "#3730A3", "#E0E7FF") if pr == 1 else "")
+        elif g["kind"] == "hr":                    # HR: 최저임금 / 파업·노사 / 근로시간·복지 / 노동법·제도 / 고용·해고 / 임금 / 외국인 고용
+            sub = hr_tag(g)
+            tag = (badge(sub, "#9A3412", "#FFEDD5") if sub in ("최저임금", "파업·노사") else badge(sub, "#3730A3", "#E0E7FF")) if sub else ""
         else:                                      # 정치 / 경제 / 사회 중 하나
             sub = topic_of(g)
             tag = badge(sub, *TOPIC_COLOR[sub])
