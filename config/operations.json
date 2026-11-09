@@ -10,7 +10,7 @@
     "_설명": "매주 월요일 05:00, 지난주(월~일) 해외 사업장 주간 브리핑 메일 (안전·재난 / HR·노동 / 정치·경제·사회). gemini_model 은 저장소 Variables 의 GEMINI_MODEL 로 덮어쓸 수 있습니다.",
     "days": 7,
     "sections": {
-      "_설명": "메일 섹션별 기사 수. safe = 안전·재난, hr = HR·노동(최저임금·법 제도 우선), pol = 정치·경제·사회, per_country_max = 한 섹션에서 같은 나라 최대 건수(기사가 모자라면 자동으로 늘려 채움)",
+      "_설명": "메일 섹션별 기사 수. safe = 안전·재난, hr = HR·노동(최저임금·법 제도 우선), hr_min_wage_max = HR·노동 중 최저임금 기사 최대 건수(나머지는 법·제도·파업 등으로 채움), pol = 정치·경제·사회, per_country_max = 한 섹션에서 같은 나라 최대 건수(기사가 모자라면 자동으로 늘려 채움)",
       "safe": 5,
       "hr": 5,
       "pol": 5,
@@ -20,7 +20,37 @@
         "경제": 2,
         "사회": 1
       },
-      "per_country_max": 1
+      "per_country_max": 1,
+      "hr_min_wage_max": 2,
+      "country_weight": {
+        "_설명": "HR·노동, 정치·경제·사회 섹션에서 나라 규모 가산점 (안전·재난은 적용 안 함). tier1 = 본부·공장 국가, tier2 = 주요 시장",
+        "tier1": {
+          "bonus": 20,
+          "codes": [
+            "CN",
+            "US",
+            "DE",
+            "HU",
+            "ID"
+          ]
+        },
+        "tier2": {
+          "bonus": 10,
+          "codes": [
+            "JP",
+            "GB",
+            "FR",
+            "IT",
+            "ES",
+            "CA",
+            "MX",
+            "BR",
+            "PL",
+            "TR",
+            "AU"
+          ]
+        }
+      }
     },
     "gemini_model": "gemini-2.5-flash",
     "gemini_max_items": 40,
