@@ -295,8 +295,8 @@ _TOPIC_WORDS = {
              (1, r"정부|장관|외교|정상회담|제재|법안|대사관|군사|\bgovernment|\bminister|\bdiplomat|\bsanction|\bsummit|\bembassy|\bbill\b")],
     "경제": [(2, r"금리|물가|인플레|환율|관세|무역|수출|수입|GDP|성장률|중앙은행|예산|세금|경기|재정|부채|"
                 r"\binterest rate|\binflation|\btariff|\btrade\b|\bexport|\bimport|\bGDP\b|\bcentral bank|\bbudget|\btax|\beconom|\brecession|\bdebt"),
-             (1, r"경제|투자|기업|산업|시장|생산|공장|에너지|유가|\binvest|\bmarket|\bindustr|\bfactory|\boil price|\benergy")],
-    "사회": [(1, r"시위|항의|학생|교육|보건|의료|병원|이민|난민|인구|출산|문화|언론|매체|종교|범죄|치안|복지|주거|"
+             (1, r"경제|투자|기업|산업|금융시장|증시|노동시장|생산|공장|에너지|유가|석유|가스|운송|물류|\binvest|\bfinancial market|\bindustr|\bfactory|\boil\b|\bgas\b|\benergy|\bshipping")],
+    "사회": [(1, r"시위|항의|학생|교육|보건|의료|병원|이민|난민|인구|출산|문화|언론|매체|종교|범죄|치안|복지|주거|총격|사건|"
                 r"\bprotest|\bstudent|\beducation|\bhealth|\bhospital|\bmigra|\brefugee|\bpopulation|\bculture|\bmedia|\breligio|\bcrime|\bwelfare|\bhousing")],
 }
 _TOPIC_RE = {k: [(w, re.compile(p, re.I)) for w, p in v] for k, v in _TOPIC_WORDS.items()}
@@ -315,6 +315,24 @@ def topic_of(g: dict) -> str:
     return default if default in tops else tops[0]
 
 
+_INCIDENT_RE = re.compile(r"(?i)총격|총기 난사|사망|숨져|부상|폭발|테러|살해|\bshooting|\bkilled\b|\bdead\b|\binjured|\bexplosion|\bterror")
+COUNTRY_WEIGHT_DEFAULT = {
+    "tier1": {"bonus": 20, "codes": ["CN", "US", "DE", "HU", "ID"]},
+    "tier2": {"bonus": 10, "codes": ["JP", "GB", "FR", "IT", "ES", "CA", "MX", "BR", "PL", "TR", "AU"]},
+}
+
+
+def country_bonus(g: dict, counts: dict) -> int:
+    """규모가 큰 나라 가산점 (config/operations.json → weekly_mail.sections.country_weight)."""
+    w = (counts or {}).get("country_weight") or COUNTRY_WEIGHT_DEFAULT
+    for k, t in w.items():
+        if str(k).startswith("_") or not isinstance(t, dict):
+            continue
+        if g.get("code") in (t.get("codes") or []):
+            return int(t.get("bonus", 0))
+    return 0
+
+
 def pick_sections(groups: list, counts: dict) -> list:
     """섹션별(안전·재난 / HR·노동 / 정치·경제) 중요도 상위 N건. 업계·경쟁사 기사는 넣지 않는다.
     제목이 번역되지 않은 기사는 발송 직전에 다시 번역하고, 그래도 안 되면 빼고 다음 기사로 채운다."""
@@ -324,13 +342,25 @@ def pick_sections(groups: list, counts: dict) -> list:
     for key, _title, _color, kinds in SECTIONS:
         n = int((counts or {}).get(key, SECTION_DEFAULT[key]))
         lst = [g for g in groups if g["kind"] in kinds and g.get("code") and not is_industry(g)]
-        lst.sort(key=lambda g: (g["weekly"], str(g["item"].get("published") or "")), reverse=True)
+        if key == "safe":                    # 정치·사회로 수집된 사건·사고(총격 등)도 안전·재난 후보로
+            lst += [g for g in groups if g["kind"] in ("pol", "soc") and g.get("code")
+                    and _INCIDENT_RE.search(f"{g['item'].get('title', '')} {g['item'].get('original_title', '')}")]
+        if key == "pol":                     # 사건·사고 기사(총격·사망 등)는 안전 성격이라 정치·경제·사회에서 뺀다
+            lst = [g for g in lst if not _INCIDENT_RE.search(f"{g['item'].get('title', '')} {g['item'].get('original_title', '')}")]
+        # HR·정치·경제·사회는 규모가 큰 나라(본부·공장·주요 시장)를 우선 (안전·재난은 나라 무관)
+        bonus = (lambda g: country_bonus(g, counts)) if key in ("hr", "pol") else (lambda g: 0)
+        lst.sort(key=lambda g: (g["weekly"] + bonus(g), str(g["item"].get("published") or "")), reverse=True)
         if key == "hr":                      # 최저임금·법 제도 우선 (안정 정렬이라 같은 단계는 중요도 순 유지)
             lst.sort(key=hr_priority)
         if key == "pol":                     # 정치·경제·사회는 분야별 비율대로 (부족한 분야는 다른 분야로 채움)
             out += _pick_mixed(lst, n, (counts or {}).get("pol_mix") or POL_MIX_DEFAULT, tr, per_country)
             continue
-        for g in _spread_by_country([g for g in lst if tr.korean(g["item"])], n, per_country):
+        cand = [g for g in lst if tr.korean(g["item"])]
+        if key == "hr":                      # 최저임금은 최대 N건, 나머지는 법·제도·파업 등으로 채움
+            picked = _pick_hr(cand, n, per_country, int((counts or {}).get("hr_min_wage_max", 2)))
+        else:
+            picked = _spread_by_country(cand, n, per_country)
+        for g in picked:
             g["section"] = key
             out.append(g)
     return out
@@ -352,6 +382,20 @@ def _spread_by_country(lst: list, n: int, per_country: int, pre: list = ()) -> l
             chosen.append(g)
             cnt[g["code"]] = cnt.get(g["code"], 0) + 1
         cap += 1
+    chosen.sort(key=lambda g: lst.index(g))
+    return chosen
+
+
+def _pick_hr(lst: list, n: int, per_country: int, wage_max: int) -> list:
+    """HR·노동: 최저임금 기사는 최대 wage_max 건만, 나머지는 법·제도·파업 등 다른 HR 기사로 채운다.
+    다른 기사가 모자랄 때만 최저임금 기사를 더 넣는다. 결과는 최저임금 → 법·제도 → 그 밖, 같은 단계는 중요도 순."""
+    wage = [g for g in lst if hr_priority(g) == 0]
+    other = [g for g in lst if hr_priority(g) != 0]
+    chosen = _spread_by_country(wage, min(n, max(0, wage_max)), per_country)
+    chosen += _spread_by_country(other, n - len(chosen), per_country, pre=chosen)
+    if len(chosen) < n:                      # 다른 HR 기사가 부족하면 최저임금으로 채움
+        rest = [g for g in wage if g not in chosen]
+        chosen += _spread_by_country(rest, n - len(chosen), per_country, pre=chosen)
     chosen.sort(key=lambda g: lst.index(g))
     return chosen
 
@@ -533,7 +577,9 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         it = g["item"]
         n_src = len([s for s in g["sources"] if s])
         border = "" if last else "border-bottom:1px solid #F1F5F9;"
-        if g["kind"] == "safe":                    # 안전: 유형(자연재해·대형사고…)
+        if g.get("section") == "safe" and g["kind"] != "safe":   # 정치·사회에서 넘어온 사건·사고
+            tag = badge("사건·사고", "#B91C1C", "#FEE2E2")
+        elif g["kind"] == "safe":                  # 안전: 유형(자연재해·대형사고…)
             tag = kind_badge(g)
         elif g["kind"] == "hr":                    # HR: 최저임금 / 법·제도만 표시
             pr = hr_priority(g)
