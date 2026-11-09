@@ -924,7 +924,10 @@
       "\\bstrikes? on (?!(?:mon|tues|wednes|thurs|fri|satur|sun)day|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\b|\\d)(?-i:[A-Z])",
       "\\b(?:U\\.?S\\.?|American|Israeli|Russian|Ukrainian|Iranian|Chinese|Pakistani|Indian|Saudi|Turkish|NATO|Houthi)\\s+(?:air\\s*|drone\\s*|missile\\s*)?strikes?\\b",
       "\\bstrikes? (?:on|against|in|near) (?:Iran|Israel|Gaza|Lebanon|Syria|Yemen|Iraq|Ukraine|Kyiv|Russia|Venezuela|Houthi)",
-      "공습|폭격|미사일|군사 공격|공격 소식|(?:미국|이스라엘|러시아|우크라이나|이란)의 (?:공격|타격)"
+      "공습|폭격|미사일|군사 공격|공격 소식|(?:미국|이스라엘|러시아|우크라이나|이란)의 (?:공격|타격)",
+      "\\bdeadly strikes?\\b|\\btrade (?:deadly )?strikes\\b|\\bstrike (?:operations?|groups?|missions?|aircraft)\\b",
+      "\\bF-35|\\bfighter jets?\\b|\\bwarplanes?\\b|\\baircraft carriers?\\b|\\bdrone (?:attack|strike)s?\\b|\\bNATO\\b",
+      "타격 작전|치명적인 공격|드론 공격|스텔스|항공\\s?모함|나토"
     ],
     "local": {
       "DEU": {
