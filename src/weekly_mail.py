@@ -189,6 +189,16 @@ def _pub_gap(a: dict, b: dict) -> int:
     return abs(n) if n is not None else 99
 
 
+# 다른 나라가 돕는 '지원·파견' 기사 (사건 자체가 아니라 후속 지원 소식) → 대표 제목으로 쓰지 않고, 안전 섹션에서 감점
+_AID_RE = re.compile(r"(?i)합류|파견|지원(?:키로|한다|하기로|에 나서| 나서|금|팀)|원조|구호 ?물자|돕(?:는|기로)|도움|"
+                     r"\bjoins?\b|\bsends?\b|\bdeploys?\b|\baid\b|\bassist|\bhelps?\b|\bdonat")
+AID_PENALTY = 30
+
+
+def _is_aid(it: dict) -> bool:
+    return bool(_AID_RE.search(f"{it.get('title', '')} {it.get('original_title', '')}"))
+
+
 def merge_same_event(groups: list) -> list:
     """제목은 달라도 같은 나라의 같은 사건이면 1건으로 묶는다.
     - 안전: 같은 나라·같은 유형 + (무력충돌·사회불안은 한 주 안 전체 = 진행 중인 사태, 그 밖은 3일 이내)
@@ -217,6 +227,8 @@ def merge_same_event(groups: list) -> list:
         host["days"] |= g["days"]
         host["sources"] |= g["sources"]
         host["merged"] = host.get("merged", 0) + 1
+        if _is_aid(host["item"]) and not _is_aid(it):     # 대표 제목은 '지원·파견' 말고 사건 자체를 다룬 기사로
+            host["item"] = it
     return kept
 
 
@@ -348,7 +360,9 @@ def pick_sections(groups: list, counts: dict) -> list:
         if key == "pol":                     # 사건·사고 기사(총격·사망 등)는 안전 성격이라 정치·경제·사회에서 뺀다
             lst = [g for g in lst if not _INCIDENT_RE.search(f"{g['item'].get('title', '')} {g['item'].get('original_title', '')}")]
         # HR·정치·경제·사회는 규모가 큰 나라(본부·공장·주요 시장)를 우선 (안전·재난은 나라 무관)
-        bonus = (lambda g: country_bonus(g, counts)) if key in ("hr", "pol") else (lambda g: 0)
+        # 안전·재난은 다른 나라의 지원·파견 소식(예: '호주, 산불 진화 작전 합류')이면 감점 → 실제 피해 기사가 먼저
+        bonus = (lambda g: country_bonus(g, counts)) if key in ("hr", "pol") else \
+            (lambda g: -AID_PENALTY if _is_aid(g["item"]) else 0)
         lst.sort(key=lambda g: (g["weekly"] + bonus(g), str(g["item"].get("published") or "")), reverse=True)
         if key == "hr":                      # 최저임금·법 제도 우선 (안정 정렬이라 같은 단계는 중요도 순 유지)
             lst.sort(key=hr_priority)
