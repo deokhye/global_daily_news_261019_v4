@@ -2005,7 +2005,7 @@ def build_top_briefing(countries: list, global_industry: list, today: str) -> li
     for g in groups:
         if len(out) >= r.top_count:
             break
-        if per_kind.get(g["kind"], 0) >= r.top_per_kind:
+        if r.top_per_kind > 0 and per_kind.get(g["kind"], 0) >= r.top_per_kind:   # 0 = 분류별 제한 없음
             continue
         main = g["countries"][0] if g["countries"] else ""
         if main and per_country.get(main, 0) >= 2:
