@@ -613,6 +613,13 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
                 f"<td align='right' style='font-size:12px;color:#64748B'>{note}</td></tr></table>"
                 f"{body}</td></tr></table></td></tr>")
 
+    def orig_line(it):
+        """번역 제목 아래 원문 한 줄 (메일 프로그램은 말줄임 CSS가 잘 안 먹어서 글자 수로 자름)."""
+        o = " ".join(str(it.get("original_title") or "").split())
+        if not o or o == it.get("title") or not is_korean(it.get("title") or ""):
+            return ""
+        return o if len(o) <= 90 else o[:88].rstrip() + "…"
+
     def row(i, g, last):
         it = g["item"]
         n_src = len([s for s in g["sources"] if s])
@@ -636,6 +643,8 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             f"<b style='font-size:14px'>{_e(ctry(g['code']) if g['code'] else '글로벌')}</b></div>"
             f"<a href='{_e(it.get('link'))}' style='display:block;font-size:16px;font-weight:700;color:#1E293B;"
             f"text-decoration:none;line-height:1.5;margin-top:2px'>{_e(it.get('title'))}</a>"
+            + (f"<div style='font-size:12px;color:#94A3B8;line-height:1.45;margin-top:1px'>{_e(orig_line(it))}</div>"
+               if orig_line(it) else "")
             + meta(it, n_src, len(g["days"])) + "</td></tr>")
 
     # 분류별 섹션 카드 (안전·재난 / HR·노동 / 정치·경제) — 안내 문구는 첫 카드 오른쪽 위에만
@@ -697,7 +706,9 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         lst = [g for g in top if g.get("section", g["kind"]) == key or (not g.get("section") and g["kind"] in kinds)]
         if lst:
             text += ["", f"■ {title}"]
-            text += [f"{i}. [{ctry(g['code'])}] {g['item'].get('title', '')}\n   {g['item'].get('link', '')}"
+            text += [f"{i}. [{ctry(g['code'])}] {g['item'].get('title', '')}"
+                     + (f"\n   원문: {orig_line(g['item'])}" if orig_line(g['item']) else "")
+                     + f"\n   {g['item'].get('link', '')}"
                      for i, g in enumerate(lst, 1)]
     if os.environ.get("HR_VIEW_URL", "").strip():
         text += ["", f"HR Insight에서 보기(사내망): {os.environ['HR_VIEW_URL'].strip()}"]
