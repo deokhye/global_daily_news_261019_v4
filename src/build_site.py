@@ -102,6 +102,7 @@ def build() -> None:
         "top_briefing": data.get("top_briefing", []),
         "countries": data.get("countries", []),
         "global_industry": data.get("global_industry", []),
+        "exec_changes": data.get("exec_changes", []),
     }
     raw = json.dumps(dashboard, ensure_ascii=False, separators=(",", ":"), default=str)
     payload = raw.replace("</", "<\\/")

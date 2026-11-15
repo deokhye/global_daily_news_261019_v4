@@ -34,7 +34,7 @@ GOSSIP_PATTERN = (
 )
 
 # 분류별 기본 점수: 안전 > HR > 업계 > 정치·경제 > 사회·문화
-KIND_BASE = {"safe": 40, "hr": 32, "ind": 26, "pol": 20, "auto": 18, "soc": 10}
+KIND_BASE = {"safe": 40, "hr": 32, "exec": 30, "ind": 26, "pol": 20, "auto": 18, "soc": 10}
 SAFETY_SEVERE = {"무력충돌·테러", "자연재해", "대형사고"}
 MAJOR_COUNTRIES = {"KR", "US", "DE", "CN", "HU", "ID"}   # 본부·주요 공장 국가
 
@@ -109,6 +109,9 @@ class NewsRules:
         self.non_news_title_re = _compile(nn.get("title_patterns"))
         src = raw.get("sources") or {}
         self.blocked_re = _name_list_regex(src.get("blocked"))
+        pw = [n for n in (src.get("paywall") or []) if isinstance(n, str) and n.strip()]
+        # 유료 구독 매체: 이름이 정확히 같을 때만 (부분 일치 금지 — 'The Times' ≠ 'The Times of India')
+        self.paywall_re = re.compile(r"^\s*(?:" + "|".join(re.escape(n.strip()) for n in pw) + r")(?:\.com)?\s*$", re.I) if pw else None
         # 신뢰 매체 = 글로벌(trusted) + 나라별 주요 매체(trusted_by_country). 짧은 이름이 다른 단어 속에 걸리지 않게 단어 단위로 맞춘다.
         names = list(src.get("trusted") or [])
         for k, v in (src.get("trusted_by_country") or {}).items():
@@ -158,6 +161,8 @@ class NewsRules:
         t = title or ""
         if self.blocked_re and source and self.blocked_re.search(source):
             return "차단 매체"
+        if self.paywall_re and source and self.paywall_re.search(source):
+            return "유료 구독 매체"
         if self.opinion_re and self.opinion_re.search(t):
             return "의견 기사"
         if self.opinion_src_re and source and self.opinion_src_re.search(source):
@@ -293,6 +298,11 @@ def similar(a: str, b: str, threshold: float = 0.5) -> bool:
 
 def key_title(item: dict) -> str:
     return item.get("original_title") or item.get("title") or ""
+
+
+def is_paywall_source(source: str) -> bool:
+    r = rules()
+    return bool(source and getattr(r, "paywall_re", None) and r.paywall_re.search(source))
 
 
 def is_trusted_source(source: str) -> bool:

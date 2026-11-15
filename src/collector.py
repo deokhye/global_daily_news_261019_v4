@@ -1338,6 +1338,83 @@ def get_global_industry(previous: list) -> list:
     return rank_items(items, "ind")[:10]
 
 
+# ---------------------------------------------------------------------------
+# 글로벌 시총 상위 기업 CEO 교체 → HR·노동 (config/news_rules.json → exec_watch)
+# ---------------------------------------------------------------------------
+def _exec_cfg() -> dict:
+    return (NR.rules().raw or {}).get("exec_watch") or {}
+
+
+def _exec_regexes():
+    cfg = _exec_cfg()
+    comps = [(c.get("name_kr") or c.get("name"), re.compile("(?i)" + c["pattern"]))
+             for c in cfg.get("companies") or [] if isinstance(c, dict) and c.get("pattern")]
+    role = re.compile("(?i)" + "|".join(cfg.get("role_patterns") or ["CEO"]))
+    change = re.compile("(?i)" + "|".join(cfg.get("change_patterns") or ["resign"]))
+    return comps, role, change
+
+
+def exec_company(title: str, comps=None, role=None, change=None) -> str:
+    """제목이 감시 기업의 최고경영진 교체 기사면 기업 이름(한글), 아니면 ""."""
+    if comps is None:
+        comps, role, change = _exec_regexes()
+    t = title or ""
+    if not (role.search(t) and change.search(t)):
+        return ""
+    return next((name for name, rx in comps if rx.search(t)), "")
+
+
+def get_exec_changes(previous: list) -> list:
+    """시총 상위 기업의 CEO 사임·교체·선임 기사 (화면·메일에서 HR·노동으로 표시). 기업 5곳씩 묶어 검색 → 제목으로 다시 확인."""
+    cfg = _exec_cfg()
+    comps_cfg = [c for c in cfg.get("companies") or [] if isinstance(c, dict) and c.get("name")]
+    if not comps_cfg:
+        return []
+    comps, role, change = _exec_regexes()
+
+    def check(title: str, lang: str) -> bool:
+        return bool(exec_company(title, comps, role, change))
+
+    queries = []
+    for i in range(0, len(comps_cfg), 5):
+        names = " OR ".join(f'"{c["name"].split("(")[0]}"' for c in comps_cfg[i:i + 5])
+        queries.append(("en", f"({names}) (CEO OR \"chief executive\") (resigns OR \"steps down\" OR successor OR appointed OR "
+                              f"ousted OR retire OR \"new CEO\" OR \"interim CEO\") when:3d"))
+    names_kr = " OR ".join(c.get("name_kr", "").split("(")[0] for c in comps_cfg if c.get("name_kr"))
+    queries.append(("ko", f"({names_kr}) (CEO OR 최고경영자 OR 대표이사) (사임 OR 퇴임 OR 사퇴 OR 선임 OR 교체 OR 후임 OR 물러) when:3d"))
+    seen: set = set()
+    items = []
+    for lang, q in queries:
+        try:
+            url = _google_news_url_ko(q) if lang == "ko" else _google_news_url_en(q)
+            items = _pick(_fetch_feed(url, 30), lang, len(items) + 6, seen, check, items)
+        except Exception as e:
+            log.warning(f"경영진 변화 수집 예외: {e}")
+    if not items:
+        items = _cached_list(previous)
+    for it in items:
+        it["company"] = exec_company(it.get("original_title") or it.get("title", ""), comps, role, change) \
+            or exec_company(it.get("title", ""), comps, role, change)
+    items = [it for it in rank_items([it for it in items if it.get("company")], "exec")]
+    per, out = {}, []
+    for it in items:                        # 같은 기업은 최대 per_company_max 건
+        if per.get(it["company"], 0) >= int(cfg.get("per_company_max", 2)):
+            continue
+        per[it["company"]] = per.get(it["company"], 0) + 1
+        out.append(it)
+    out = out[:int(cfg.get("max_items", 8))]
+    log.info(f"CEO 교체: {len(out)}건 " + ", ".join(sorted({it['company'] for it in out})))
+    return out
+
+
+def _load_previous_exec() -> list:
+    try:
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            return [sanitize_item(x) for x in (json.load(f).get("exec_changes") or []) if isinstance(x, dict)]
+    except Exception:
+        return []
+
+
 def is_good_translation(src: str, ko: str) -> bool:
     """번역 결과가 '대부분 한국어'인지. 날짜만 한글로 바뀌고 나머지는 원문 그대로인 결과
     (예: '2026년 11월 20일, CGIL PROCLAMA LO SCIOPERO')나 엉터리 음차를 걸러낸다."""
@@ -1861,7 +1938,13 @@ def main() -> dict:
         global_industry = [] if BACKFILL_DATE else _load_previous_global_industry()
 
     try:
-        apply_translations(countries_result + [{"news": {"global": global_industry}}])
+        exec_changes = get_exec_changes([] if BACKFILL_DATE else _load_previous_exec())
+    except Exception as e:
+        log.error(f"경영진 변화 수집 실패: {e}")
+        exec_changes = [] if BACKFILL_DATE else _load_previous_exec()
+
+    try:
+        apply_translations(countries_result + [{"news": {"global": global_industry}}, {"news": {"exec": exec_changes}}])
     except Exception as e:
         log.error(f"일괄 번역 단계 실패(원문 유지): {e}")
 
@@ -1879,11 +1962,11 @@ def main() -> dict:
         dt = datetime.strptime(BACKFILL_DATE + " 05:30", "%Y-%m-%d %H:%M")
         now_kst = KST.localize(dt) if hasattr(KST, "localize") else dt.replace(tzinfo=KST)
     try:
-        mark_first_seen(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"))
+        mark_first_seen(countries_result, (global_industry or []) + exec_changes, now_kst.strftime("%Y-%m-%d"))
     except Exception as e:
         log.warning(f"새 기사 표시(first_seen) 실패(무시): {e}")
     try:
-        top_briefing = build_top_briefing(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"))
+        top_briefing = build_top_briefing(countries_result, global_industry, now_kst.strftime("%Y-%m-%d"), exec_changes)
     except Exception as e:
         log.error(f"오늘 핵심 브리핑 구성 실패(빈 목록): {e}")
         top_briefing = []
@@ -1895,6 +1978,7 @@ def main() -> dict:
         "top_briefing": top_briefing,
         "countries": countries_result,
         "global_industry": global_industry,
+        "exec_changes": exec_changes,
     }
 
     if BACKFILL_DATE:
@@ -1928,7 +2012,7 @@ TOP_FIELDS = ("title", "original_title", "translated", "lang", "link", "source",
               "safety_tag", "incident", "law", "own", "competitor", "mfg", "near_site", "trusted", "first_seen")
 
 
-def _top_candidates(countries: list, global_industry: list):
+def _top_candidates(countries: list, global_industry: list, exec_changes: list = None):
     for c in countries:
         news = c.get("news") or {}
         for kind in ("safe", "pol", "soc"):
@@ -1940,12 +2024,14 @@ def _top_candidates(countries: list, global_industry: list):
                 yield kind, c.get("code", ""), it
     for it in global_industry or []:
         yield "ind", "", it
+    for it in exec_changes or []:
+        yield "hr", "", it              # 글로벌 시총 상위 기업 CEO 교체는 HR·노동으로
 
 
-def build_top_briefing(countries: list, global_industry: list, today: str) -> list:
+def build_top_briefing(countries: list, global_industry: list, today: str, exec_changes: list = None) -> list:
     r = NR.rules()
     cands = []
-    for kind, code, it in _top_candidates(countries, global_industry):
+    for kind, code, it in _top_candidates(countries, global_industry, exec_changes):
         if not isinstance(it, dict) or it.get("is_fallback") or not it.get("title"):
             continue
         n = NR.days_between(it.get("published"), today)
@@ -2015,6 +2101,8 @@ def build_top_briefing(countries: list, global_industry: list, today: str) -> li
             per_country[main] = per_country.get(main, 0) + 1
         it = g["item"]
         entry = {k: it[k] for k in TOP_FIELDS if it.get(k) not in (None, "", False)}
+        if it.get("company"):
+            entry["company"] = it["company"]
         entry.update({"kind": g["kind"], "countries": g["countries"], "score": g["final"],
                       "source_count": len([x for x in g["sources"] if x])})
         out.append(entry)
@@ -2052,7 +2140,7 @@ def mark_first_seen(countries: list, global_industry: list, today: str) -> None:
     by_link, by_title = {}, {}
     # 처음 나온 날짜가 없는 이전 기사(이 기능 이전 데이터): 이전 수집이 오늘이면 '날짜 미상(오래됨)'으로 보고 NEW 를 붙이지 않는다
     unknown = prev_day if prev_day < today else "0000-00-00"
-    for it in _all_items(prev.get("countries") or [], prev.get("global_industry") or []):
+    for it in _all_items(prev.get("countries") or [], (prev.get("global_industry") or []) + (prev.get("exec_changes") or [])):
         fs = it.get("first_seen") or unknown
         if it.get("link"):
             by_link[it["link"]] = min(fs, by_link.get(it["link"], fs))

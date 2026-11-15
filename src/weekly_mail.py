@@ -75,6 +75,8 @@ HR_TAGS = [(k, re.compile("(?i)" + v)) for k, v in HR_TAGS]
 
 def hr_tag(g: dict) -> str:
     it = g["item"]
+    if it.get("company"):
+        return "CEO 교체"
     t = f"{it.get('title', '')} / {it.get('original_title', '')}"
     if MIN_WAGE_RE.search(t):
         return "최저임금"
@@ -85,14 +87,16 @@ def hr_tag(g: dict) -> str:
 
 
 def hr_priority(g: dict) -> int:
-    """0 = 최저임금, 1 = 법·제도, 2 = 그 밖."""
+    """0 = 최저임금, 1 = 글로벌 시총 상위 기업 CEO 교체, 2 = 법·제도, 3 = 그 밖."""
     it = g["item"]
+    if it.get("company"):
+        return 1
     t = f"{it.get('title', '')} / {it.get('original_title', '')}"
     if MIN_WAGE_RE.search(t):
         return 0
     if it.get("law") or LAW_HR_RE.search(t):
-        return 1
-    return 2
+        return 2
+    return 3
 HIDDEN_CODES = {"KR"}          # 데일리 뉴스·주간 메일에서 빼는 나라 (해외 사업장만)
 LINK_HINT = "기사 제목을 누르면 원문으로 이동합니다"
 KIND_COLOR = {"safe": ("#B91C1C", "#FEE2E2"), "hr": ("#3730A3", "#E0E7FF"), "ind": ("#9A3412", "#FFEDD5"),
@@ -136,6 +140,8 @@ def _iter_items(data: dict):
                 yield kind, c, it
     for it in data.get("global_industry") or []:
         yield "ind", None, it
+    for it in data.get("exec_changes") or []:      # 글로벌 시총 상위 기업 CEO 교체 → HR·노동
+        yield "hr", None, it
 
 
 def _foreign_checker():
@@ -169,7 +175,7 @@ def collect_week(week: list, start: str, end: str) -> dict:
                 continue                       # 지난주 범위 밖 (이전 기사 캐시·월요일 새벽 기사 등)
             if r.reject_reason(key_title(it), it.get("source", "")):
                 continue                       # 옛 아카이브에도 새 제외 규칙 적용
-            code = (c or {}).get("code", "")
+            code = (c or {}).get("code", "") or (f"@{it['company']}" if it.get("company") else "")
             if code in HIDDEN_CODES:
                 continue                       # 한국(국내)은 대상 아님 — 예전 아카이브에도 적용
             if code and is_foreign(it, code):
@@ -187,6 +193,8 @@ def collect_week(week: list, start: str, end: str) -> dict:
                     r.annotate(item, kind, "")
                     item["score"] = r.score(item, kind, pub or day, code)
                 g = {"kind": kind, "code": code, "item": item, "days": set(), "sources": set()}
+                if it.get("company"):
+                    g["company"] = it["company"]
                 groups.append(g)
             g["days"].add(day)
             g["sources"].add(it.get("source", ""))
@@ -200,7 +208,7 @@ def collect_week(week: list, start: str, end: str) -> dict:
         g["weekly"] = base + min(len(g["days"]) - 1, 4) * 6 + min(len([s for s in g["sources"] if s]) - 1, 4) * 3
     counts = {}
     for g in groups:
-        if g["code"] and g["kind"] in ("safe", "hr"):
+        if g["code"] and not str(g["code"]).startswith("@") and g["kind"] in ("safe", "hr"):
             row = counts.setdefault(g["code"], {"name": names.get(g["code"], g["code"]), "safe": 0, "hr": 0})
             row[g["kind"]] += 1
     return {"groups": groups, "counts": counts, "names": names, "n_countries": len(all_codes)}
@@ -242,6 +250,9 @@ def merge_same_event(groups: list) -> list:
                 ki = k["item"]
                 if g["kind"] == "safe" and it.get("safety_tag") and it.get("safety_tag") == ki.get("safety_tag") \
                         and (it["safety_tag"] in _CONFLICT_TAGS or _pub_gap(it, ki) <= 3):
+                    host = k
+                    break
+                if g["kind"] == "hr" and str(g["code"]).startswith("@"):     # 같은 기업 CEO 교체 기사끼리
                     host = k
                     break
                 if g["kind"] == "hr" and hr_priority(g) == 0 and hr_priority(k) == 0:
@@ -490,7 +501,7 @@ def gemini_summary(groups: list, names: dict, start: str, end: str, settings: di
     lines = []
     for g in sorted(groups, key=lambda g: -g["weekly"])[: int(settings.get("gemini_max_items", 40))]:
         it = g["item"]
-        lines.append(f"- [{names.get(g['code'], '글로벌') if g['code'] else '글로벌'}] [{KIND_LABEL.get(g['kind'], '')}] "
+        lines.append(f"- [{g.get('company') or (names.get(g['code'], '글로벌') if g['code'] else '글로벌')}] [{KIND_LABEL.get(g['kind'], '')}] "
                      f"{it.get('title', '')} ({it.get('source', '')}, {str(it.get('published') or '')[:10]})")
     prompt = (
         f"다음은 {start}~{end} 한 주 동안 한국타이어 해외 사업장 관련 공개 뉴스 중 중요도가 높은 기사 제목 목록입니다.\n"
@@ -640,7 +651,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
             f"color:#9A3412;font-weight:900;font-size:14px;text-align:center;line-height:28px'>{i}</div></td>"
             f"<td style='padding:14px 0;{border}'>"
             f"<div style='font-size:14px;color:#1E293B'>{tag}"
-            f"<b style='font-size:14px'>{_e(ctry(g['code']) if g['code'] else '글로벌')}</b></div>"
+            f"<b style='font-size:14px'>{_e(g.get('company') or (ctry(g['code']) if g['code'] else '글로벌'))}</b></div>"
             f"<a href='{_e(it.get('link'))}' style='display:block;font-size:16px;font-weight:700;color:#1E293B;"
             f"text-decoration:none;line-height:1.5;margin-top:2px'>{_e(it.get('title'))}</a>"
             + (f"<div style='font-size:12px;color:#94A3B8;line-height:1.45;margin-top:1px'>{_e(orig_line(it))}</div>"
@@ -706,7 +717,7 @@ def render(week_info: dict, top: list, comps: list, ai: dict | None, start: str,
         lst = [g for g in top if g.get("section", g["kind"]) == key or (not g.get("section") and g["kind"] in kinds)]
         if lst:
             text += ["", f"■ {title}"]
-            text += [f"{i}. [{ctry(g['code'])}] {g['item'].get('title', '')}"
+            text += [f"{i}. [{g.get('company') or ctry(g['code'])}] {g['item'].get('title', '')}"
                      + (f"\n   원문: {orig_line(g['item'])}" if orig_line(g['item']) else "")
                      + f"\n   {g['item'].get('link', '')}"
                      for i, g in enumerate(lst, 1)]
