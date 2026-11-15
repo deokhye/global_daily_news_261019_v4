@@ -214,6 +214,30 @@ def collect_week(week: list, start: str, end: str) -> dict:
     return {"groups": groups, "counts": counts, "names": names, "n_countries": len(all_codes)}
 
 
+def add_manual_items(info: dict, st: dict, start: str, end: str) -> None:
+    """config/operations.json → weekly_mail.manual_items: 자동 수집에서 빠진 기사를 레터에만 직접 넣는다.
+    기사 날짜가 레터 기간 안일 때만, 같은 링크가 이미 있으면 넣지 않는다. 우선순위를 높게 줘 섹션에 꼭 들어가게 한다."""
+    items = ((st.get("manual_items") or {}).get("items") or []) if isinstance(st.get("manual_items"), dict) else []
+    links = {g["item"].get("link") for g in info["groups"]}
+    for m in items:
+        if not isinstance(m, dict) or not m.get("title") or m.get("section") not in ("safe", "hr", "pol"):
+            continue
+        pub = str(m.get("published") or "")[:10]
+        if not (start <= pub <= end) or m.get("link") in links:
+            continue
+        item = {k: v for k, v in m.items() if k not in ("section", "country")}
+        item.setdefault("score", 100)
+        code = m.get("country") or (f"@{m['company']}" if m.get("company") else "")
+        if not code:
+            continue
+        g = {"kind": m["section"], "code": code, "item": item, "days": {pub}, "sources": {item.get("source", "")},
+             "weekly": 200, "manual": True}
+        if m.get("company"):
+            g["company"] = m["company"]
+        info["groups"].append(g)
+        log.info(f"직접 추가한 기사: [{m['section']}] {m['title']}")
+
+
 _CONFLICT_TAGS = {"무력충돌·테러", "사회불안"}
 
 
@@ -758,6 +782,7 @@ def build(end: date, use_ai: bool = True, ai_override: dict | None = None, today
             raise RuntimeError(f"최근 7일({start}~{end_s}) 아카이브도 없습니다. 매일 수집(Daily Global Brief Update)이 "
                                "한 번 이상 돌아 docs/archive/ 에 파일이 생긴 뒤 다시 실행해 주세요.")
         info = collect_week(week, start, end_s)
+    add_manual_items(info, st, start, end_s)
     top = pick_sections(info["groups"], st.get("sections") or SECTION_DEFAULT)
     comps = []
     ai = ai_override if ai_override is not None else (gemini_summary(info["groups"], info["names"], start, end_s, st) if use_ai else None)
