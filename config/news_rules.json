@@ -1295,7 +1295,8 @@
     "soc": 7,
     "hr": 14,
     "auto": 14,
-    "ind": 7
+    "ind": 7,
+    "exec": 7
   },
   "top_briefing": {
     "_설명": "오늘 핵심 브리핑: 최근 max_days 일 기사 중 점수 상위 count 건. 분류(안전·HR·정치경제 등) 구분 없이 점수 순 (per_kind = 같은 분류 최대 건수, 0 = 제한 없음). 같은 나라는 최대 2건.",
@@ -1512,6 +1513,120 @@
       "\\bscores of\\b",
       "\\bterror",
       "\\b\\d{2,} (people|dead|killed|injured)"
+    ]
+  },
+  "exec_watch": {
+    "_설명": "글로벌 시가총액 상위 기업(2026.11 기준 20개, 한국 기업 포함)의 CEO 교체(사임·퇴임·선임) 기사 → HR·노동으로 분류(배지 'CEO 교체'). 제목에 기업 이름 + CEO + 교체 표현이 모두 있어야 채택. 순위가 바뀌면 companies 목록만 고치면 됩니다 (name = 영문 검색어, name_kr = 화면 표시, pattern = 제목에서 기업을 찾는 정규식).",
+    "max_items": 8,
+    "per_company_max": 2,
+    "companies": [
+      {
+        "name": "Apple",
+        "name_kr": "애플",
+        "pattern": "(?-i:Apple)\\b|애플"
+      },
+      {
+        "name": "Nvidia",
+        "name_kr": "엔비디아",
+        "pattern": "Nvidia|엔비디아"
+      },
+      {
+        "name": "Microsoft",
+        "name_kr": "마이크로소프트",
+        "pattern": "Microsoft|마이크로소프트|MS\\s?CEO"
+      },
+      {
+        "name": "Alphabet(Google)",
+        "name_kr": "알파벳(구글)",
+        "pattern": "Alphabet|Google|알파벳|구글"
+      },
+      {
+        "name": "Amazon",
+        "name_kr": "아마존",
+        "pattern": "(?-i:Amazon)\\b|아마존"
+      },
+      {
+        "name": "TSMC",
+        "name_kr": "TSMC",
+        "pattern": "TSMC|Taiwan Semiconductor|대만 ?TSMC"
+      },
+      {
+        "name": "SpaceX",
+        "name_kr": "스페이스X",
+        "pattern": "SpaceX|스페이스X|스페이스엑스"
+      },
+      {
+        "name": "Saudi Aramco",
+        "name_kr": "사우디 아람코",
+        "pattern": "Aramco|아람코"
+      },
+      {
+        "name": "Meta",
+        "name_kr": "메타",
+        "pattern": "(?-i:Meta)\\b|메타 플랫폼|메타(?= ?(CEO|최고|회장|창업))"
+      },
+      {
+        "name": "Broadcom",
+        "name_kr": "브로드컴",
+        "pattern": "Broadcom|브로드컴"
+      },
+      {
+        "name": "Tesla",
+        "name_kr": "테슬라",
+        "pattern": "Tesla|테슬라"
+      },
+      {
+        "name": "Eli Lilly",
+        "name_kr": "일라이 릴리",
+        "pattern": "Eli Lilly|(?-i:Lilly)\\b|일라이 ?릴리"
+      },
+      {
+        "name": "Berkshire Hathaway",
+        "name_kr": "버크셔 해서웨이",
+        "pattern": "Berkshire|버크셔"
+      },
+      {
+        "name": "Samsung Electronics",
+        "name_kr": "삼성전자",
+        "pattern": "Samsung Electronics|삼성전자"
+      },
+      {
+        "name": "Walmart",
+        "name_kr": "월마트",
+        "pattern": "Walmart|월마트"
+      },
+      {
+        "name": "SK hynix",
+        "name_kr": "SK하이닉스",
+        "pattern": "SK ?hynix|SK ?하이닉스"
+      },
+      {
+        "name": "JPMorgan Chase",
+        "name_kr": "JP모건",
+        "pattern": "JP ?Morgan|JP ?모건"
+      },
+      {
+        "name": "Micron",
+        "name_kr": "마이크론",
+        "pattern": "Micron|마이크론"
+      },
+      {
+        "name": "Visa",
+        "name_kr": "비자",
+        "pattern": "(?-i:Visa)\\b(?! (rule|policy|ban|fee|program|application|holders?|applicants?))|비자(?= ?(CEO|최고경영자|회장))"
+      },
+      {
+        "name": "AMD",
+        "name_kr": "AMD",
+        "pattern": "(?-i:AMD)\\b|Advanced Micro Devices"
+      }
+    ],
+    "role_patterns": [
+      "\\bCEO\\b|chief executive|최고경영자|대표이사|대표(?= ?(?:교체|선임|사임|사퇴|퇴임|내정))"
+    ],
+    "change_patterns": [
+      "resign|steps? down|stepping down|step aside|\\bquits?\\b|ousted|\\boust|\\bfired\\b|sacked|\\bretir|departs?\\b|departure|succeed|successor|succession|replac|appoint|\\bnames?\\b|\\bnamed\\b|\\bnew CEO|interim|to lead\\b|takes? (?:over|the helm)",
+      "사임|사퇴|퇴임|물러|해임|경질|선임|교체|후임|내정|취임|은퇴|퇴진"
     ]
   }
 }
