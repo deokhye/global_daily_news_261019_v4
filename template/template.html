@@ -389,7 +389,7 @@
     return o;
   }
   // 분류별 최대 기사 나이 (config/news_rules.json → max_age_days, 보고 있는 날짜 기준)
-  var MAX_AGE_DEFAULT = { safe: 3, pol: 7, soc: 7, hr: 14, auto: 14, ind: 7 };
+  var MAX_AGE_DEFAULT = { safe: 3, pol: 7, soc: 7, hr: 14, auto: 14, ind: 7, exec: 7 };
   function withinAge(i, kind) {
     var lim = (INITIAL_DASHBOARD.max_age_days || MAX_AGE_DEFAULT)[kind]; if (lim === undefined) return true;
     var n = daysAgo(i.published); return n === null || n <= lim;
@@ -447,11 +447,12 @@
     ['외국인 고용', /비자|이민|외국인\s?(노동|근로|인력)|이주\s?노동|work permit|\bvisas?\b|migrant work|foreign workers?/i]
   ];
   function hrTag(i) {
+    if (i.company) return 'CEO 교체';          // 글로벌 시총 상위 기업 CEO 교체 (수집 단계에서 기업명 표시)
     var t = (i.title || '') + ' / ' + (i.original_title || '');
     for (var k = 0; k < HR_TAGS.length; k++) if (HR_TAGS[k][1].test(t)) return HR_TAGS[k][0];
     return i.law ? '노동법·제도' : '';
   }
-  function hrBadge(i) { var tag = hrTag(i); return tag ? '<span class="badge ' + 'b-law' + '">' + esc(tag) + '</span>' : ''; }
+  function hrBadge(i) { var tag = hrTag(i); return (i.company ? '<b>' + esc(i.company) + '</b>' : '') + (tag ? '<span class="badge ' + 'b-law' + '">' + esc(tag) + '</span>' : ''); }
   // HR 목록에 잘못 들어온 군사·전쟁 기사 (영어 strike = 공습 오분류 등)는 숨김
   var HR_OFFTOPIC = /공격|공습|폭격|미사일|드론|전투기|항공\s?모함|타격 작전|스텔스|군사|병력|나토|NATO|air ?strike|missile|drone|fighter jet|warplane|aircraft carrier|F-35|deadly strikes?|strike (operation|group|mission)/i;
   function articleLink(i, inner) {
@@ -642,7 +643,7 @@
     rows.forEach(function (r) {
       var key = String(r.item.link || r.item.title || '').toLowerCase();
       if (!map[key]) { map[key] = { item: r.item, countries: [] }; out.push(map[key]); }
-      if (map[key].countries.indexOf(r.country) === -1) map[key].countries.push(r.country);
+      if (r.country && map[key].countries.indexOf(r.country) === -1) map[key].countries.push(r.country);
     });
     return out;
   }
@@ -668,7 +669,8 @@
   var KIND = {
     safe: { label: '안전·재난', cls: 'b-red', tab: 'safe' }, hr: { label: 'HR·노동', cls: 'b-law', tab: '' },
     ind: { label: '업계 동향', cls: 'b-ind', tab: '' }, auto: { label: '완성차·타이어', cls: 'b-ind', tab: '' },
-    pol: { label: '정치·경제', cls: 'b-gray', tab: 'pol' }, soc: { label: '사회·문화', cls: 'b-gray', tab: 'soc' }
+    pol: { label: '정치·경제', cls: 'b-gray', tab: 'pol' }, soc: { label: '사회·문화', cls: 'b-gray', tab: 'soc' },
+    exec: { label: 'HR·노동', cls: 'b-law', tab: '' }
   };
   function topBriefingHtml(scope) {
     if (!Array.isArray(DASHBOARD.top_briefing)) return '';          // 이 기능 이전의 아카이브
@@ -687,7 +689,7 @@
       var kindBadge = t.kind === 'safe' && t.safety_tag ? safetyBadge(t.safety_tag) : '<span class="badge ' + k.cls + '">' + k.label + '</span>';
       var ctry = (t.countries || []).map(byCode).filter(Boolean);
       return '<li><span class="rk">' + (idx + 1) + '</span><div class="body">' +
-        '<div class="meta">' + newBadge(t) + kindBadge + (ctry.length ? countryButtons(ctry, k.tab) : '') + '</div>' +
+        '<div class="meta">' + newBadge(t) + kindBadge + (ctry.length ? countryButtons(ctry, k.tab) : (t.company ? '<b>' + esc(t.company) + '</b>' : '')) + '</div>' +
         '<a class="ttl" href="' + esc(safeUrl(t.link)) + '" target="_blank" rel="noopener noreferrer"' + origTitleAttr(t) + '>' + esc(t.title) + '</a>' + origLine(t) +
         '<div class="meta"><span class="src">' + esc(t.source || '') + '</span>' + alsoNote(t) + '<span>' + relDate(t.published) + '</span>' + trBadge(t) + '</div>' +
         '</div></li>';
@@ -750,10 +752,14 @@
         .sort(function (a, b) { return (b.law ? 1 : 0) - (a.law ? 1 : 0) || byScore(a, b); })[0];
       if (r) hrRows.push({ item: r, country: c });
     });
+    if (state.org === 'ALL') {     // 글로벌 시총 상위 기업 CEO 교체 → HR·노동 소식으로
+      freshItems(realItems(DASHBOARD.exec_changes, 'exec')).filter(function (i) { return i.company && !excluded[i.link]; })
+        .forEach(function (i) { hrRows.push({ item: i, country: null }); });
+    }
     var byDate = function (a, b) { return newer(a.item, b.item); };
     var safetyAll = safetyGroups(scope, excluded);     // 목록은 주요 브리핑과 겹치는 기사를 빼고 표시
     var safety = state.expand.safe ? safetyAll : safetyAll.slice(0, FRONT_MAX);
-    var hrAll = groupByLink(hrRows).sort(function (a, b) { return (b.item.law ? 1 : 0) - (a.item.law ? 1 : 0) || byScore(a.item, b.item) || byDate(a, b); });
+    var hrAll = groupByLink(hrRows).sort(function (a, b) { return (b.item.law || b.item.company ? 1 : 0) - (a.item.law || a.item.company ? 1 : 0) || byScore(a.item, b.item) || byDate(a, b); });
     var hr = state.expand.hr ? hrAll : hrAll.slice(0, FRONT_MAX);
 
     // 조직 카드의 ⚠ 숫자 = 그 조직 나라가 포함된 '안전 보도 건수' (아래 목록과 같은 기준)
