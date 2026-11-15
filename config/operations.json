@@ -54,6 +54,20 @@
     },
     "gemini_model": "gemini-2.5-flash",
     "gemini_max_items": 40,
-    "subject": "[Global HR Radar] 주간 브리핑 ({start} ~ {end})"
+    "subject": "[Global HR Radar] 주간 브리핑 ({start} ~ {end})",
+    "manual_items": {
+      "_설명": "자동 수집에서 빠진 기사를 주간 레터에만 직접 넣을 때 (웹·HR Insight 화면에는 영향 없음). published 가 레터 기간(지난주 월~일) 안에 있을 때만 들어가고, 지난 주 것은 자동으로 무시됩니다. section = safe / hr / pol, company 또는 country(국가 코드) 중 하나.",
+      "items": [
+        {
+          "section": "hr",
+          "company": "엔비디아",
+          "published": "2026-11-12",
+          "title": "엔비디아 CEO 젠슨 황 사임…콜레트 크레스 CFO가 임시 CEO",
+          "original_title": "NVIDIA announces CEO transition: Jensen Huang resigns, CFO Colette Kress named interim CEO",
+          "source": "NVIDIA 공시(SEC 8-K)",
+          "link": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000082/nvidiaannouncesceotransiti.htm"
+        }
+      ]
+    }
   }
 }
