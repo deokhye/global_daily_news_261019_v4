@@ -1516,7 +1516,7 @@
     ]
   },
   "exec_watch": {
-    "_설명": "글로벌 시가총액 상위 기업(2026.11 기준 상위 10개 + 삼성전자·SK하이닉스, 12개)의 CEO 교체(사임·퇴임·선임) 기사 → HR·노동으로 분류(배지 'CEO 교체'). 제목에 기업 이름 + CEO + 교체 표현이 모두 있어야 채택. 순위가 바뀌면 companies 목록만 고치면 됩니다 (name = 영문 검색어, name_kr = 화면 표시, pattern = 제목에서 기업을 찾는 정규식).",
+    "_설명": "글로벌 시가총액 상위 기업(2026.11 기준 상위 10개 + 삼성전자·SK하이닉스, 12개)의 CEO 교체(사임·퇴임·선임) 기사 → HR·노동으로 분류(배지 'CEO 교체'). 제목에 기업 이름 + CEO + 교체 표현이 모두 있어야 채택. 순위가 바뀌면 companies 목록만 고치면 됩니다 (name = 영문 검색어, name_kr = 화면 표시, pattern = 제목에서 기업을 찾는 정규식). exclude_patterns = 제목에 있으면 제외 (다른 회사 CEO 교체에 대한 반응·논평, 팟캐스트·영상·인터뷰). 메일은 보낼 때 지금 목록·기준으로 다시 확인합니다.",
     "max_items": 8,
     "per_company_max": 2,
     "companies": [
@@ -1587,6 +1587,11 @@
     "change_patterns": [
       "resign|steps? down|stepping down|step aside|\\bquits?\\b|ousted|\\boust|\\bfired\\b|sacked|\\bretir|departs?\\b|departure|succeed|successor|succession|replac|appoint|\\bnames?\\b|\\bnamed\\b|\\bnew CEO|interim|to lead\\b|takes? (?:over|the helm)",
       "사임|사퇴|퇴임|물러|해임|경질|선임|교체|후임|내정|취임|은퇴|퇴진"
+    ],
+    "exclude_patterns": [
+      "breaks? (?:her |his |their )?silence|\\breacts?\\b|reaction|weighs? in|comments? on|speaks? (?:out|on)|\\bsays\\b|\\bon [A-Z][\\w.]+(?: [A-Z][\\w.]+)*'s (?:resignation|exit|departure|ouster)",
+      "podcast|Squawk|Audio Only|\\bvideo\\b|\\bwatch\\b|\\blive\\b|interview",
+      "입장|언급|반응|침묵|소감|팟캐스트|오디오|영상|인터뷰"
     ]
   }
 }
