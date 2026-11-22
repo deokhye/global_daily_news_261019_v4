@@ -1516,7 +1516,7 @@
     ]
   },
   "exec_watch": {
-    "_설명": "글로벌 시가총액 상위 기업(2026.11 기준 20개, 한국 기업 포함)의 CEO 교체(사임·퇴임·선임) 기사 → HR·노동으로 분류(배지 'CEO 교체'). 제목에 기업 이름 + CEO + 교체 표현이 모두 있어야 채택. 순위가 바뀌면 companies 목록만 고치면 됩니다 (name = 영문 검색어, name_kr = 화면 표시, pattern = 제목에서 기업을 찾는 정규식).",
+    "_설명": "글로벌 시가총액 상위 기업(2026.11 기준 상위 10개 + 삼성전자·SK하이닉스, 12개)의 CEO 교체(사임·퇴임·선임) 기사 → HR·노동으로 분류(배지 'CEO 교체'). 제목에 기업 이름 + CEO + 교체 표현이 모두 있어야 채택. 순위가 바뀌면 companies 목록만 고치면 됩니다 (name = 영문 검색어, name_kr = 화면 표시, pattern = 제목에서 기업을 찾는 정규식).",
     "max_items": 8,
     "per_company_max": 2,
     "companies": [
@@ -1571,54 +1571,14 @@
         "pattern": "Broadcom|브로드컴"
       },
       {
-        "name": "Tesla",
-        "name_kr": "테슬라",
-        "pattern": "Tesla|테슬라"
-      },
-      {
-        "name": "Eli Lilly",
-        "name_kr": "일라이 릴리",
-        "pattern": "Eli Lilly|(?-i:Lilly)\\b|일라이 ?릴리"
-      },
-      {
-        "name": "Berkshire Hathaway",
-        "name_kr": "버크셔 해서웨이",
-        "pattern": "Berkshire|버크셔"
-      },
-      {
         "name": "Samsung Electronics",
         "name_kr": "삼성전자",
         "pattern": "Samsung Electronics|삼성전자"
       },
       {
-        "name": "Walmart",
-        "name_kr": "월마트",
-        "pattern": "Walmart|월마트"
-      },
-      {
         "name": "SK hynix",
         "name_kr": "SK하이닉스",
         "pattern": "SK ?hynix|SK ?하이닉스"
-      },
-      {
-        "name": "JPMorgan Chase",
-        "name_kr": "JP모건",
-        "pattern": "JP ?Morgan|JP ?모건"
-      },
-      {
-        "name": "Micron",
-        "name_kr": "마이크론",
-        "pattern": "Micron|마이크론"
-      },
-      {
-        "name": "Visa",
-        "name_kr": "비자",
-        "pattern": "(?-i:Visa)\\b(?! (rule|policy|ban|fee|program|application|holders?|applicants?))|비자(?= ?(CEO|최고경영자|회장))"
-      },
-      {
-        "name": "AMD",
-        "name_kr": "AMD",
-        "pattern": "(?-i:AMD)\\b|Advanced Micro Devices"
       }
     ],
     "role_patterns": [
