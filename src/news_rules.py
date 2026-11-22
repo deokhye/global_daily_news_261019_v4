@@ -300,6 +300,34 @@ def key_title(item: dict) -> str:
     return item.get("original_title") or item.get("title") or ""
 
 
+_EXEC_CACHE: tuple | None = None
+
+
+def exec_regexes():
+    """config/news_rules.json → exec_watch 로 (기업 목록, CEO 표현, 교체 표현, 제외 표현) 정규식."""
+    global _EXEC_CACHE
+    if _EXEC_CACHE is None:
+        cfg = (rules().raw or {}).get("exec_watch") or {}
+        comps = [(c.get("name_kr") or c.get("name"), re.compile("(?i)" + c["pattern"]))
+                 for c in cfg.get("companies") or [] if isinstance(c, dict) and c.get("pattern")]
+        role = re.compile("(?i)" + "|".join(cfg.get("role_patterns") or ["CEO"]))
+        change = re.compile("(?i)" + "|".join(cfg.get("change_patterns") or ["resign"]))
+        ex = cfg.get("exclude_patterns") or []
+        exclude = re.compile("(?i)" + "|".join(ex)) if ex else None
+        _EXEC_CACHE = (comps, role, change, exclude)
+    return _EXEC_CACHE
+
+
+def exec_company(title: str) -> str:
+    """제목이 감시 기업의 CEO 교체 기사면 기업 이름(한글), 아니면 "".
+    기업 이름 + CEO 표현 + 교체 표현이 모두 있고, 제외 표현(다른 회사 CEO 교체에 대한 반응·팟캐스트 등)이 없어야 한다."""
+    comps, role, change, exclude = exec_regexes()
+    t = title or ""
+    if not (role.search(t) and change.search(t)) or (exclude and exclude.search(t)):
+        return ""
+    return next((name for name, rx in comps if rx.search(t)), "")
+
+
 def is_paywall_source(source: str) -> bool:
     r = rules()
     return bool(source and getattr(r, "paywall_re", None) and r.paywall_re.search(source))

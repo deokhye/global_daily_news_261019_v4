@@ -102,7 +102,9 @@ def build() -> None:
         "top_briefing": data.get("top_briefing", []),
         "countries": data.get("countries", []),
         "global_industry": data.get("global_industry", []),
-        "exec_changes": data.get("exec_changes", []),
+        # CEO 교체: 지금 기업 목록·기준으로 다시 확인 (목록에서 빠진 기업, 반응·팟캐스트 기사 제외)
+        "exec_changes": [dict(i, company=c) for i in data.get("exec_changes") or [] if isinstance(i, dict)
+                         for c in [NR.exec_company(i.get("original_title") or i.get("title", "")) or NR.exec_company(i.get("title", ""))] if c],
     }
     raw = json.dumps(dashboard, ensure_ascii=False, separators=(",", ":"), default=str)
     payload = raw.replace("</", "<\\/")

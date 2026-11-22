@@ -1345,23 +1345,9 @@ def _exec_cfg() -> dict:
     return (NR.rules().raw or {}).get("exec_watch") or {}
 
 
-def _exec_regexes():
-    cfg = _exec_cfg()
-    comps = [(c.get("name_kr") or c.get("name"), re.compile("(?i)" + c["pattern"]))
-             for c in cfg.get("companies") or [] if isinstance(c, dict) and c.get("pattern")]
-    role = re.compile("(?i)" + "|".join(cfg.get("role_patterns") or ["CEO"]))
-    change = re.compile("(?i)" + "|".join(cfg.get("change_patterns") or ["resign"]))
-    return comps, role, change
-
-
-def exec_company(title: str, comps=None, role=None, change=None) -> str:
-    """제목이 감시 기업의 최고경영진 교체 기사면 기업 이름(한글), 아니면 ""."""
-    if comps is None:
-        comps, role, change = _exec_regexes()
-    t = title or ""
-    if not (role.search(t) and change.search(t)):
-        return ""
-    return next((name for name, rx in comps if rx.search(t)), "")
+def exec_company(title: str, *_ignored) -> str:
+    """제목이 감시 기업의 CEO 교체 기사면 기업 이름(한글), 아니면 "" (판정 기준은 news_rules.exec_company)."""
+    return NR.exec_company(title)
 
 
 def get_exec_changes(previous: list) -> list:
@@ -1370,10 +1356,8 @@ def get_exec_changes(previous: list) -> list:
     comps_cfg = [c for c in cfg.get("companies") or [] if isinstance(c, dict) and c.get("name")]
     if not comps_cfg:
         return []
-    comps, role, change = _exec_regexes()
-
     def check(title: str, lang: str) -> bool:
-        return bool(exec_company(title, comps, role, change))
+        return bool(exec_company(title))
 
     queries = []
     for i in range(0, len(comps_cfg), 5):
@@ -1393,8 +1377,7 @@ def get_exec_changes(previous: list) -> list:
     if not items:
         items = _cached_list(previous)
     for it in items:
-        it["company"] = exec_company(it.get("original_title") or it.get("title", ""), comps, role, change) \
-            or exec_company(it.get("title", ""), comps, role, change)
+        it["company"] = exec_company(it.get("original_title") or it.get("title", "")) or exec_company(it.get("title", ""))
     items = [it for it in rank_items([it for it in items if it.get("company")], "exec")]
     per, out = {}, []
     for it in items:                        # 같은 기업은 최대 per_company_max 건

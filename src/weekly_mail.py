@@ -141,7 +141,12 @@ def _iter_items(data: dict):
     for it in data.get("global_industry") or []:
         yield "ind", None, it
     for it in data.get("exec_changes") or []:      # 글로벌 시총 상위 기업 CEO 교체 → HR·노동
-        yield "hr", None, it
+        if not isinstance(it, dict):
+            continue
+        # 예전 기록도 지금 기업 목록·기준으로 다시 확인 (목록에서 빠진 기업, 반응·팟캐스트 기사 제외)
+        co = NR.exec_company(it.get("original_title") or it.get("title", "")) or NR.exec_company(it.get("title", ""))
+        if co:
+            yield "hr", None, dict(it, company=co)
 
 
 def _foreign_checker():
